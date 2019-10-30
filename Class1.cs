@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Nlp
 {
@@ -6,10 +7,15 @@ namespace Nlp
     {
         public class Test
         {
-            public string readTest(string file)
+            public Dictionary<string, string> readTest(string file)
             {
-                string files = FileLogic.FileReader.GetAllTextFromFileAsString(file);
-                return files;
+                var files = FileLogic.FileReader.GetAllTextFromFileAsList(file);
+                Dictionary<string, string> dic = new Dictionary<string, string>();
+                foreach(var ifile in files)
+                {
+                    dic.Add(ifile.Name, ifile.Text);
+                }
+                return dic;
             }
             
         }

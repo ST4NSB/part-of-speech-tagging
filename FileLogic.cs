@@ -1,8 +1,25 @@
 ﻿using System.IO;
 using System.Collections.Generic;
+using Nlp.PosTagger;
 
 namespace FileLogic
 {
+    public struct DirectoryFile
+    {
+        public string Name;
+        public string Text;
+        /// <summary>
+        /// Public constructor to load the directory file name and file text.
+        /// </summary>
+        /// <param name="Name"></param>
+        /// <param name="Text"></param>
+        public DirectoryFile(string Name, string Text)
+        {
+            this.Name = Name;
+            this.Text = Text;
+        }
+    }
+
     class FileReader
     {
         /// <summary>
@@ -19,7 +36,7 @@ namespace FileLogic
         /// Static method to read all lines from inputFile and return a List of strings.
         /// </summary>
         /// <param name="inputFile"></param>
-        /// <returns>Returns List of string.</returns>
+        /// <returns>Returns a List.</returns>
         public static List<string> GetTextFromFileAsList(string inputFile)
         {
             List<string> outputFile = new List<string>();
@@ -46,17 +63,18 @@ namespace FileLogic
             return outputFile;
         }
         /// <summary>
-        /// Static method to read all lines from inputFile (directory) and return a List of strings.
+        /// Static method to read all lines from inputFile (directory) and return a List of structs (DirectoryFile).
         /// </summary>
         /// <param name="inputFile"></param>
-        /// <returns>Returns List of strings.</returns>
-        public static List<string> GetAllTextFromFileAsList(string inputFile)
+        /// <returns>Returns a List.</returns>
+        public static List<DirectoryFile> GetAllTextFromFileAsList(string inputFile)
         {
-            List<string> outputFile = new List<string>();
-            var files = Directory.EnumerateFiles(inputFile);
+            List<DirectoryFile> outputFile = new List<DirectoryFile>();
+            var files = Directory.GetFiles(inputFile);
             foreach (string file in files)
             {
-                outputFile.Add(GetTextFromFileAsString(file));
+                DirectoryFile elem = new DirectoryFile(Path.GetFileName(file), GetTextFromFileAsString(file));
+                outputFile.Add(elem);
             }
             return outputFile;
         }
