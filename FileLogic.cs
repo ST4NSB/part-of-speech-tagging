@@ -6,17 +6,17 @@ namespace FileLogic
 {
     public struct DirectoryFile
     {
-        public string Name;
-        public string Text;
+        public string name;
+        public string text;
         /// <summary>
         /// Public constructor to load the directory file name and file text.
         /// </summary>
         /// <param name="Name">File name. (ex. "info.csv" -> info)</param>
         /// <param name="Text">File data text.</param>
-        public DirectoryFile(string Name, string Text)
+        public DirectoryFile(string name, string text)
         {
-            this.Name = Name;
-            this.Text = Text;
+            this.name = name;
+            this.text = text;
         }
     }
 
