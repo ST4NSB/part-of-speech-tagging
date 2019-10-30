@@ -11,8 +11,8 @@ namespace FileLogic
         /// <summary>
         /// Public constructor to load the directory file name and file text.
         /// </summary>
-        /// <param name="Name"></param>
-        /// <param name="Text"></param>
+        /// <param name="Name">File name. (ex. "info.csv" -> info)</param>
+        /// <param name="Text">File data text.</param>
         public DirectoryFile(string Name, string Text)
         {
             this.Name = Name;
@@ -25,7 +25,7 @@ namespace FileLogic
         /// <summary>
         /// Static method to read all text from inputFile and return a string.
         /// </summary>
-        /// <param name="inputFile"></param> 
+        /// <param name="inputFile">Data input file text.</param> 
         /// <returns>Returns a string.</returns>
         public static string GetTextFromFileAsString(string inputFile)
         {
@@ -35,7 +35,7 @@ namespace FileLogic
         /// <summary>
         /// Static method to read all lines from inputFile and return a List of strings.
         /// </summary>
-        /// <param name="inputFile"></param>
+        /// <param name="inputFile">Data input file text.</param>
         /// <returns>Returns a List.</returns>
         public static List<string> GetTextFromFileAsList(string inputFile)
         {
@@ -50,7 +50,7 @@ namespace FileLogic
         /// <summary>
         /// Static method to read all lines from inputFile (directory) and return a string.
         /// </summary>
-        /// <param name="inputFile"></param>
+        /// <param name="inputFile">Directory input file.</param>
         /// <returns>Returns a string.</returns>
         public static string GetAllTextFromFileAsString(string inputFile)
         {
@@ -65,7 +65,7 @@ namespace FileLogic
         /// <summary>
         /// Static method to read all lines from inputFile (directory) and return a List of structs (DirectoryFile).
         /// </summary>
-        /// <param name="inputFile"></param>
+        /// <param name="inputFile">Directory input file.</param>
         /// <returns>Returns a List.</returns>
         public static List<DirectoryFile> GetAllTextFromFileAsList(string inputFile)
         {
