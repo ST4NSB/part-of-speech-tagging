@@ -14,7 +14,7 @@ namespace Nlp
                 set => trainFile = value;
             }
             /// <summary>
-            /// Loads Brown Corpus automatically.
+            /// Loads Brown Corpus file path automatically.
             /// </summary>
             public Tagger()
             {
