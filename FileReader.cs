@@ -1,21 +1,32 @@
-﻿using System;
+﻿using System.IO;
 using System.Collections.Generic;
-using System.Text;
 
-namespace File
+namespace FileLogic
 {
     class FileReader
     {
-        private string fileName;
-        public FileReader(string fileName)
+        /// <summary>
+        /// Static method to read all text from method argument file and returns a string.
+        /// </summary>
+        /// <returns>Returns a string.</returns>
+        public static string GetTextFromFileAsString(string fileName)
         {
-            this.fileName = fileName;
+            string file = File.ReadAllText(fileName);
+            return file;
         }
-        public string getStringFromFile()
+        /// <summary>
+        /// Static method to read all lines from method argument file and returns a List of string.
+        /// </summary>
+        /// <returns>Returns List of string.</returns>
+        public static List<string> GetTextFromFileAsList(string fileName)
         {
-            string rFile = System.IO.File.ReadAllText(this.fileName);
-            return rFile;
+            List<string> textFileList = new List<string>();
+            var lines = File.ReadLines(fileName);
+            foreach (var line in lines)
+                textFileList.Add(line);
+            return textFileList;
         }
-
+        
     }
 }
+

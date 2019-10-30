@@ -6,10 +6,13 @@ namespace Nlp
     {
         public class Test
         {
-            public int add(int x, int y)
+            public string readTest(string file)
             {
-                return x + y;
+                string files = FileLogic.FileReader.GetTextFromFileAsString(file);
+                return files;
             }
+            
         }
     }
+    
 }
