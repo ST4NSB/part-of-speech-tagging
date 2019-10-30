@@ -8,7 +8,7 @@ namespace Nlp
         {
             public string readTest(string file)
             {
-                string files = FileLogic.FileReader.GetTextFromFileAsString(file);
+                string files = FileLogic.FileReader.GetAllTextFromFileAsString(file);
                 return files;
             }
             
