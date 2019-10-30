@@ -15,7 +15,11 @@ namespace Nlp
             /// <returns></returns>
             public static string GetTextGenreFromFileName(string fileName)
             {
+                if(fileName.Length <= 1)
+                    return "NO GENRE FOUND";
                 char secondLetter = fileName[1];
+                if (!Char.IsLetter(secondLetter))
+                    return "NO GENRE FOUND";
                 switch (secondLetter)
                 {
                     case 'a': return "PRESS: REPORTAGE";
