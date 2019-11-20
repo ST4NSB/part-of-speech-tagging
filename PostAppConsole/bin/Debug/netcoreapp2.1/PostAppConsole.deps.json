@@ -1,0 +1,39 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v2.1",
+    "signature": "da39a3ee5e6b4b0d3255bfef95601890afd80709"
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v2.1": {
+      "PostAppConsole/1.0.0": {
+        "dependencies": {
+          "Nlp-PosTagger": "1.0.0.0"
+        },
+        "runtime": {
+          "PostAppConsole.dll": {}
+        }
+      },
+      "Nlp-PosTagger/1.0.0.0": {
+        "runtime": {
+          "Nlp-PosTagger.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "PostAppConsole/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "Nlp-PosTagger/1.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}
