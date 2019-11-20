@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace NLP
 {
-    public class GrammarTagger
+    public class Tagger
     {
         public List<WordModel> Models;
         private Stopwatch TrainingTime;
@@ -27,12 +27,12 @@ namespace NLP
         /// Constructor that creates the list of models (SVM) for every individual word with a dictionary of grammar tags
         /// </summary>
         /// <param name="wordsInput">List of words - tag, eg. The - at)</param>
-        public GrammarTagger(List<Tokenizer.WordTag> wordsInput)
+        public Tagger(List<Tokenizer.WordTag> wordsInput)
         {
-            TrainingTime = new Stopwatch();
-            TrainingTime.Start();
+            this.TrainingTime = new Stopwatch();
+            this.TrainingTime.Start();
 
-            Models = new List<WordModel>();
+            this.Models = new List<WordModel>();
             foreach(var w in wordsInput)
             {
                 WordModel wmFind = Models.Find(x => x.Word == w.word);
@@ -41,7 +41,7 @@ namespace NLP
                     WordModel wModel = new WordModel();
                     wModel.Word = w.word;
                     wModel.TagFreq.Add(w.tag, 1);
-                    Models.Add(wModel);
+                    this.Models.Add(wModel);
                 }
                 else
                 {
@@ -57,8 +57,20 @@ namespace NLP
                 }
             }
 
-            TrainingTime.Stop();
+            this.TrainingTime.Stop();
         }
+
+        public Dictionary<string, string> EasyWordTag(List<string> inputWords)
+        {
+            Dictionary<string, string> output = new Dictionary<string, string>();
+            foreach(string word in inputWords)
+            {
+                WordModel wordModelFinder = this.Models.Find(x => x.Word == word);
+                var maxValueTag = wordModelFinder.TagFreq.OrderByDescending(x => x.Value).FirstOrDefault().Key;
+                output.Add(word, maxValueTag);
+            }
+            return output;
+        } 
 
         /// <summary>
         /// Method that returns the elapsed time, loading SVM (ms)

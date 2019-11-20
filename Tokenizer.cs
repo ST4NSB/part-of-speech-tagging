@@ -25,7 +25,7 @@ namespace NLP
         /// </summary>
         /// <param name="Text"></param>
         /// <returns>List of strings</returns>
-        public static List<string> WordTokenize(string Text)
+        public static List<string> WordTokenizeCorpus(string Text)
         {
             List<string> tokenizedText = new List<string>();
             string word = "";
@@ -42,6 +42,46 @@ namespace NLP
             if (word.Length > 0)
                 tokenizedText.Add(word);
             return tokenizedText;
+        }
+
+        /// <summary>
+        /// Static method to tokenize every word from input, eg. "The man is here." -> (The, man, is, here, .) 
+        /// </summary>
+        /// <param name="Text"></param>
+        /// <returns></returns>
+        public static List<string> WordsOnlyTokenize(string Text)
+        {
+            List<string> tokenized = new List<string>();
+            string word = "";
+            foreach (char c in Text) 
+            {
+                if (!Char.IsWhiteSpace(c) && !Char.IsPunctuation(c))
+                {
+                    word += c;
+                }
+                else if (word.Length > 0)
+                {
+                    if (c != '\'')
+                    {
+                        tokenized.Add(word);
+                        word = "";
+                        if (Char.IsPunctuation(c))
+                            tokenized.Add(c.ToString());
+                    }
+                    else
+                    {
+                        word += c;
+                    }
+                }
+                else if(word.Length == 0)
+                {
+                    if (c == '\'')
+                        tokenized.Add(c.ToString());
+                }
+            }
+            if (word.Length > 0)
+                tokenized.Add(word);
+            return tokenized;
         }
 
         /// <summary>
