@@ -10,6 +10,9 @@ namespace NLP
         public List<WordModel> Models;
         private Stopwatch TrainingTime;
 
+        /// <summary>
+        /// The Model struct definition (Word - Dic[Tag, Tag_Frequency]), eg. (The, [at, 1]) 
+        /// </summary>
         public class WordModel
         {
             public string Word;
@@ -20,6 +23,10 @@ namespace NLP
             }
         }
 
+        /// <summary>
+        /// Constructor that creates the list of models (SVM) for every individual word with a dictionary of grammar tags
+        /// </summary>
+        /// <param name="wordsInput">List of words - tag, eg. The - at)</param>
         public GrammarTagger(List<Tokenizer.WordTag> wordsInput)
         {
             TrainingTime = new Stopwatch();
@@ -53,6 +60,9 @@ namespace NLP
             TrainingTime.Stop();
         }
 
+        /// <summary>
+        /// Method that returns the elapsed time, loading SVM (ms)
+        /// </summary>
         public long GetTrainingTimeMs()
         {
             return this.TrainingTime.ElapsedMilliseconds;

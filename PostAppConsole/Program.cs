@@ -43,7 +43,7 @@ namespace PostAppConsole
         static void Main(string[] args)
         {
             const string Brownfolder = "Brown Corpus", testFile2 = "test_files2", testFile = "test_files";
-            var text = LoadAndReadFolderFiles(testFile);
+            var text = LoadAndReadFolderFiles(Brownfolder);
             var words = Tokenizer.SeparateTagFromWord(Tokenizer.WordTokenize(text));
             // foreach (var item in words)
             //      Console.WriteLine(item.word + " -> " + item.tag);
@@ -63,7 +63,7 @@ namespace PostAppConsole
 
             Console.WriteLine("Duration of training model: " + gTagger.GetTrainingTimeMs() + " ms!");
 
-            WriteToTxtFile("test.txt", gTagger);
+            WriteToTxtFile("svm_brown_corpus.txt", gTagger);
         }
     }
 }

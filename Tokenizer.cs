@@ -6,6 +6,9 @@ namespace NLP
 {
     public class Tokenizer
     {
+        /// <summary>
+        /// WordTag structure definition (Word - Tag), eg. "The\at" -> (The, at)
+        /// </summary>
         public struct WordTag
         {
             public string word;
@@ -17,6 +20,11 @@ namespace NLP
             }
         }
           
+        /// <summary>
+        /// Static method to tokenize every word from the corpus, eg. "The\at man\nn is\bez here\rb" -> (The\at, man\nn, is\bez, here\rb)
+        /// </summary>
+        /// <param name="Text"></param>
+        /// <returns>List of strings</returns>
         public static List<string> WordTokenize(string Text)
         {
             List<string> tokenizedText = new List<string>();
@@ -36,6 +44,11 @@ namespace NLP
             return tokenizedText;
         }
 
+        /// <summary>
+        /// Static method to separate the tag from the word, eg. "The/at" -> (The, at) 
+        /// </summary>
+        /// <param name="Words"></param>
+        /// <returns>List of WordTags</returns>
         public static List<WordTag> SeparateTagFromWord(List<string> Words)
         {
             List<WordTag> wordTags = new List<WordTag>();
