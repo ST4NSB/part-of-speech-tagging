@@ -3,26 +3,56 @@ using System.Collections.Generic;
 
 namespace NLP
 {
-    public class Tagger
+    public class GrammarTagger
     {
-        public class SMH { }
+        public List<WordModel> Models;
 
-        private string trainFile;
-        public string TrainFilePath
+        public class WordModel
         {
-            get => trainFile;
-            set => trainFile = value;
+            public string Word;
+            public Dictionary<string, int> TagFreq;
+            public WordModel()
+            {
+                TagFreq = new Dictionary<string, int>();
+            }
         }
-        /// <summary>
-        /// Loads Brown Corpus file path automatically.
-        /// </summary>
-        public Tagger()
+
+        public GrammarTagger(List<Tokenizer.WordTag> wordsInput)
         {
-            trainFile = "brown corpus to be added..";
+            Models = new List<WordModel>();
+            foreach(var w in wordsInput)
+            {
+                bool wordFound = false;
+                foreach (var model in Models)
+                {
+                    if (model.Word == w.word)
+                    {
+                        wordFound = true;
+                        bool tagFound = false;
+                        foreach (var tag in model.TagFreq)
+                        {
+                            if (tag.Key == w.tag) 
+                            {
+                                tagFound = true;
+                                model.TagFreq[tag.Key] += 1;
+                                break;
+                            }
+                        }
+                        if (!tagFound)
+                        {
+                            model.TagFreq.Add(w.tag, 1);
+                        }
+                    }
+                }
+                if (!wordFound) 
+                {
+                    WordModel wModel = new WordModel();
+                    wModel.Word = w.word;
+                    wModel.TagFreq.Add(w.tag, 1);
+                    Models.Add(wModel);
+                }
+            }
         }
-        
 
     }
-    
-    
 }

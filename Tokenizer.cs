@@ -16,7 +16,7 @@ namespace NLP
                 this.tag = tag;
             }
         }
-           
+          
         public static List<string> WordTokenize(string Text)
         {
             List<string> tokenizedText = new List<string>();
@@ -46,7 +46,5 @@ namespace NLP
             }
             return wordTags;
         }
-
-
     }
 }

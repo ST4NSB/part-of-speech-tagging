@@ -33,12 +33,12 @@ namespace NLP
         /// <summary>
         /// Static method to read all lines from inputFile (directory) and return a string.
         /// </summary>
-        /// <param name="inputFile">Directory input file.</param>
+        /// <param name="inputDir">Directory input file.</param>
         /// <returns>Returns a string.</returns>
-        public static string GetAllTextFromFileAsString(string inputFile)
+        public static string GetAllTextFromDirectoryAsString(string inputDir)
         {
             string outputFile = "";
-            var files = Directory.EnumerateFiles(inputFile);
+            var files = Directory.EnumerateFiles(inputDir);
             foreach (string file in files)
             {
                 outputFile += GetTextFromFileAsString(file);
@@ -48,12 +48,12 @@ namespace NLP
         /// <summary>
         /// Static method to read all lines from inputFile (directory) and return a List of string.
         /// </summary>
-        /// <param name="inputFile">Directory input file.</param>
+        /// <param name="inputDir">Directory input file.</param>
         /// <returns>Returns a List.</returns>
-        public static List<string> GetAllTextFromFileAsList(string inputFile)
+        public static List<string> GetAllTextFromDirectoryAsList(string inputDir)
         {
             List<string> outputFile = new List<string>();
-            var files = Directory.GetFiles(inputFile);
+            var files = Directory.GetFiles(inputDir);
             foreach (string file in files)
             {
                 string elem = GetTextFromFileAsString(file);
