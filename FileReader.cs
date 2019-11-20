@@ -6,7 +6,7 @@ namespace NLP
     public class FileReader
     {
         /// <summary>
-        /// Static method to read all text from inputFile and return a string.
+        /// Static method to read all text from inputFile and returns a string.
         /// </summary>
         /// <param name="inputFile">Data input file text.</param> 
         /// <returns>Returns a string.</returns>
@@ -16,7 +16,7 @@ namespace NLP
             return outputFile;
         }
         /// <summary>
-        /// Static method to read all lines from inputFile and return a List of strings.
+        /// Static method to read all lines from inputFile and returns a List of strings.
         /// </summary>
         /// <param name="inputFile">Data input file text.</param>
         /// <returns>Returns a List.</returns>
@@ -31,7 +31,7 @@ namespace NLP
             return outputFile;
         }
         /// <summary>
-        /// Static method to read all lines from inputFile (directory) and return a string.
+        /// Static method to read all lines from inputDir (directory) and returns a string.
         /// </summary>
         /// <param name="inputDir">Directory input file.</param>
         /// <returns>Returns a string.</returns>
@@ -46,7 +46,7 @@ namespace NLP
             return outputFile;
         }
         /// <summary>
-        /// Static method to read all lines from inputFile (directory) and return a List of string.
+        /// Static method to read all lines from inputDir (directory) and returns a List of string.
         /// </summary>
         /// <param name="inputDir">Directory input file.</param>
         /// <returns>Returns a List.</returns>

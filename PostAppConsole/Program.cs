@@ -7,7 +7,7 @@ namespace PostAppConsole
 {
     class Program
     {
-        static string ReadTestFile(string folderName)
+        static string LoadAndReadFolderFiles(string folderName)
         {
             string path = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.Parent.FullName + "\\" + folderName;
             Console.WriteLine("File Path: [" + path +"]");
@@ -17,17 +17,13 @@ namespace PostAppConsole
 
         static void Main(string[] args)
         {
-            var text = ReadTestFile("test_files");
+            var text = LoadAndReadFolderFiles("test_files2");
             var words = Tokenizer.SeparateTagFromWord(Tokenizer.WordTokenize(text));
             //foreach (var item in words)
             //    Console.WriteLine(item.word + " -> " + item.tag);
-
-            var timer = new System.Diagnostics.Stopwatch();
-
-            timer.Start();
+            
             GrammarTagger gTagger = new GrammarTagger(words);
-            timer.Stop();
-            Console.WriteLine("Duration of training model: " + timer.ElapsedMilliseconds + " ms!");
+            Console.WriteLine("Duration of training model: " + gTagger.GetTrainingTimeMs() + " ms!");
 
             foreach (var model in gTagger.Models)
             {

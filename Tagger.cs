@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace NLP
 {
     public class GrammarTagger
     {
         public List<WordModel> Models;
+        private Stopwatch TrainingTime;
 
         public class WordModel
         {
@@ -19,6 +21,8 @@ namespace NLP
 
         public GrammarTagger(List<Tokenizer.WordTag> wordsInput)
         {
+            TrainingTime = new Stopwatch();
+            TrainingTime.Start();
             Models = new List<WordModel>();
             foreach(var w in wordsInput)
             {
@@ -52,6 +56,12 @@ namespace NLP
                     Models.Add(wModel);
                 }
             }
+            TrainingTime.Stop();
+        }
+
+        public long GetTrainingTimeMs()
+        {
+            return this.TrainingTime.ElapsedMilliseconds;
         }
 
     }
