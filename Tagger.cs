@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 
 namespace NLP
 {
@@ -13,9 +14,9 @@ namespace NLP
         {
             public string Word;
             public Dictionary<string, int> TagFreq;
-            public WordModel()
+            public WordModel() 
             {
-                TagFreq = new Dictionary<string, int>();
+                this.TagFreq = new Dictionary<string, int>();
             }
         }
 
@@ -23,39 +24,63 @@ namespace NLP
         {
             TrainingTime = new Stopwatch();
             TrainingTime.Start();
+
             Models = new List<WordModel>();
             foreach(var w in wordsInput)
             {
-                bool wordFound = false;
-                foreach (var model in Models)
-                {
-                    if (model.Word == w.word)
-                    {
-                        wordFound = true;
-                        bool tagFound = false;
-                        foreach (var tag in model.TagFreq)
-                        {
-                            if (tag.Key == w.tag) 
-                            {
-                                tagFound = true;
-                                model.TagFreq[tag.Key] += 1;
-                                break;
-                            }
-                        }
-                        if (!tagFound)
-                        {
-                            model.TagFreq.Add(w.tag, 1);
-                        }
-                    }
-                }
-                if (!wordFound) 
+                WordModel wmFind = Models.Find(x => x.Word == w.word);
+                if (wmFind == null)
                 {
                     WordModel wModel = new WordModel();
                     wModel.Word = w.word;
                     wModel.TagFreq.Add(w.tag, 1);
                     Models.Add(wModel);
                 }
+                else
+                {
+                    var tag = wmFind.TagFreq.FirstOrDefault(x => x.Key == w.tag);
+                    if (tag.Key == null)
+                    {
+                        wmFind.TagFreq.Add(w.tag, 1);
+                    }
+                    else
+                    {
+                        wmFind.TagFreq[tag.Key] += 1;
+                    }
+                }
+
+
+                //bool wordFound = false;
+                //foreach (var model in Models)
+                //{
+                //    if (model.Word == w.word)
+                //    {
+                //        wordFound = true;
+                //        bool tagFound = false;
+                //        foreach (var tag in model.TagFreq)
+                //        {
+                //            if (tag.Key == w.tag)
+                //            {
+                //                tagFound = true;
+                //                model.TagFreq[tag.Key] += 1;
+                //                break;
+                //            }
+                //        }
+                //        if (!tagFound)
+                //        {
+                //            model.TagFreq.Add(w.tag, 1);
+                //        }
+                //    }
+                //}
+                //if (!wordFound)
+                //{
+                //    WordModel wModel = new WordModel();
+                //    wModel.Word = w.word;
+                //    wModel.TagFreq.Add(w.tag, 1);
+                //    Models.Add(wModel);
+                //}
             }
+
             TrainingTime.Stop();
         }
 
