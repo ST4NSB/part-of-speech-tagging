@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Newtonsoft.Json;
 using NLP;
 
 namespace PostAppConsole
@@ -16,7 +17,7 @@ namespace PostAppConsole
             return text;
         }
 
-        static void WriteToTxtFile(string fileName, Tagger gTagger)
+        static void WriteToTxtFile(string fileName, string jsonFile)
         {
             string path = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.Parent.FullName + "\\Informations\\" + fileName;
             Console.WriteLine("Write File Path: [" + path + "]");
@@ -24,17 +25,7 @@ namespace PostAppConsole
             {
                 using (StreamWriter sw = File.CreateText(path))
                 {
-                    int k = 0;
-                    sw.WriteLine("Duration of training model: " + gTagger.GetTrainingTimeMs() + " ms!");
-                    foreach (var model in gTagger.Models)
-                    {
-                        sw.WriteLine("[" + k + "]  " + model.Word);
-                        foreach (var item in model.TagFreq)
-                        {
-                            sw.WriteLine("          - " + item.Key + " -> " + item.Value);
-                        }
-                        k++;
-                    }
+                    sw.Write(jsonFile);
                     sw.Dispose();
                 }
             }
@@ -47,42 +38,12 @@ namespace PostAppConsole
             var text = LoadAndReadFolderFiles(Brownfolder);
             var words = Tokenizer.SeparateTagFromWord(Tokenizer.WordTokenizeCorpus(text));
 
-            //  foreach (var item in words)
-            //     Console.WriteLine(item.word + " -> " + item.tag);
-
             var tags = SpeechPart.SpeechPartFrequence(words);
-            var sortedDict = from entry in tags orderby entry.Value descending select entry;
+            var sorted = from entry in tags orderby entry.Value descending select entry;
 
-            //Console.WriteLine(tags.Count);
-            // foreach (var item in sortedDict)
-            //   Console.WriteLine(item.Key + " -> " + item.Value);
-
-            string path = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.Parent.FullName + "\\Informations\\" + "FULL_LIST.tags.txt";
-            using (StreamWriter sw = File.CreateText(path))
-            {
-                int k = 0;
-                sw.WriteLine("Nr of tags: " + tags.Count);
-                foreach (var model in sortedDict)
-                {
-                    sw.WriteLine(k + ": " + model);
-                    k++;
-                }
-                sw.Dispose();
-            }
-
-            path = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.Parent.FullName + "\\Informations\\" + "words.txt";
-            using (StreamWriter sw = File.CreateText(path))
-            {
-                int k = 0;
-                sw.WriteLine("Nr of words: " + words.Count);
-                foreach (var model in words)
-                {
-                    sw.WriteLine(k + ": " + model.word);
-                    k++;
-                }
-                sw.Dispose();
-            }
-
+            var sortedDict = new Dictionary<string, int>(sorted);
+            WriteToTxtFile("fullListTags.json", JsonConvert.SerializeObject(sortedDict));
+            WriteToTxtFile("wordAndTag.json", JsonConvert.SerializeObject(words));
             var dictionar = new Dictionary<string, int>();
             foreach (var item in sortedDict)
                 if (item.Key.Contains('-') || item.Key.Contains('+') || item.Key.Contains('*') || item.Key.Contains('$') && item.Key.Length > 1)
@@ -91,19 +52,8 @@ namespace PostAppConsole
                 {
                     dictionar.Add(item.Key, item.Value);
                 }
+            WriteToTxtFile("mainTags.json", JsonConvert.SerializeObject(dictionar));
 
-            path = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.Parent.FullName + "\\Informations\\" + "ONLY.tags.txt";
-            using (StreamWriter sw = File.CreateText(path))
-            {
-                int k = 0;
-                sw.WriteLine("Nr of tags: " + dictionar.Count);
-                foreach (var model in dictionar)
-                {
-                    sw.WriteLine(k + ": " + model);
-                    k++;
-                }
-                sw.Dispose();
-            }
 
 
             //Console.WriteLine("Done with loading and creating tokens!");
@@ -118,6 +68,11 @@ namespace PostAppConsole
             //        Console.WriteLine("     " + item.Key + " -> " + item.Value);
             //    }
             //}
+
+
+
+
+
 
             //Console.WriteLine("Duration of training model: " + gTagger.GetTrainingTimeMs() + " ms!");
 
