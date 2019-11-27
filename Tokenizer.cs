@@ -33,13 +33,13 @@ namespace NLP
             {
                 if (!Char.IsWhiteSpace(c))
                     word += c;
-                else if (word.Length > 0)
+                else if (!String.IsNullOrEmpty(word))
                 {
                     tokenizedText.Add(word);
                     word = "";
                 }
             }
-            if (word.Length > 0)
+            if (!String.IsNullOrEmpty(word))
                 tokenizedText.Add(word);
             return tokenizedText;
         }
@@ -49,40 +49,40 @@ namespace NLP
         /// </summary>
         /// <param name="Text"></param>
         /// <returns></returns>
-        public static List<string> WordsOnlyTokenize(string Text)
-        {
-            List<string> tokenized = new List<string>();
-            string word = "";
-            foreach (char c in Text) 
-            {
-                if (!Char.IsWhiteSpace(c) && !Char.IsPunctuation(c))
-                {
-                    word += c;
-                }
-                else if (word.Length > 0)
-                {
-                    if (c != '\'')
-                    {
-                        tokenized.Add(word);
-                        word = "";
-                        if (Char.IsPunctuation(c))
-                            tokenized.Add(c.ToString());
-                    }
-                    else
-                    {
-                        word += c;
-                    }
-                }
-                else if(word.Length == 0)
-                {
-                    if (c == '\'')
-                        tokenized.Add(c.ToString());
-                }
-            }
-            if (word.Length > 0)
-                tokenized.Add(word);
-            return tokenized;
-        }
+        //public static List<string> WordsOnlyTokenize(string Text)
+        //{
+        //    List<string> tokenized = new List<string>();
+        //    string word = "";
+        //    foreach (char c in Text) 
+        //    {
+        //        if (!Char.IsWhiteSpace(c) && !Char.IsPunctuation(c))
+        //        {
+        //            word += c;
+        //        }
+        //        else if (word.Length > 0)
+        //        {
+        //            if (c != '\'')
+        //            {
+        //                tokenized.Add(word);
+        //                word = "";
+        //                if (Char.IsPunctuation(c))
+        //                    tokenized.Add(c.ToString());
+        //            }
+        //            else
+        //            {
+        //                word += c;
+        //            }
+        //        }
+        //        else if(word.Length == 0)
+        //        {
+        //            if (c == '\'')
+        //                tokenized.Add(c.ToString());
+        //        }
+        //    }
+        //    if (word.Length > 0)
+        //        tokenized.Add(word);
+        //    return tokenized;
+        //}
 
         /// <summary>
         /// Static method to separate the tag from the word, eg. "The/at" -> (The, at) 
@@ -92,10 +92,22 @@ namespace NLP
         public static List<WordTag> SeparateTagFromWord(List<string> Words)
         {
             List<WordTag> wordTags = new List<WordTag>();
+            int k = 0;
             foreach (var word in Words) 
             {
                 string[] separated = word.Split('/');
-                wordTags.Add(new WordTag(separated[0], separated[1]));
+                string separatedTag = separated[separated.Length - 1];
+
+                string combWord = "";
+                if (separated.Length > 2)
+                {
+                    for (int i = 0; i < separated.Length - 1; i++) 
+                        combWord += separated[i] + "/";
+                    combWord = combWord.Remove(combWord.Length - 1);
+                }
+                else combWord = separated[0];
+                wordTags.Add(new WordTag(combWord, separatedTag));
+                k++;
             }
             return wordTags;
         }
