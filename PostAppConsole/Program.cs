@@ -41,7 +41,7 @@ namespace PostAppConsole
             var tags = SpeechPart.SpeechPartFrequence(words);
             var sorted = from entry in tags orderby entry.Value descending select entry;
 
-            var sortedDict = new Dictionary<string, int>(sorted);
+            var sortedDict = new Dictionary<string, int>(sorted.ToDictionary(x => x.Key, x => x.Value));
             WriteToTxtFile("Informations", "fullListTags.json", JsonConvert.SerializeObject(sortedDict));
             WriteToTxtFile("Informations", "wordAndTag.json", JsonConvert.SerializeObject(words));
             var dictionar = new Dictionary<string, int>();

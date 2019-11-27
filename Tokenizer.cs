@@ -44,11 +44,11 @@ namespace NLP
             return tokenizedText;
         }
 
-        /// <summary>
-        /// Static method to tokenize every word from input, eg. "The man is here." -> (The, man, is, here, .) 
-        /// </summary>
-        /// <param name="Text"></param>
-        /// <returns></returns>
+        ///// <summary>
+        ///// Static method to tokenize every word from input, eg. "The man is here." -> (The, man, is, here, .) 
+        ///// </summary>
+        ///// <param name="Text"></param>
+        ///// <returns></returns>
         //public static List<string> WordsOnlyTokenize(string Text)
         //{
         //    List<string> tokenized = new List<string>();
