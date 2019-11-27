@@ -42,18 +42,17 @@ namespace PostAppConsole
             var sorted = from entry in tags orderby entry.Value descending select entry;
 
             var sortedDict = new Dictionary<string, int>(sorted.ToDictionary(x => x.Key, x => x.Value));
-            WriteToTxtFile("Informations", "fullListTags.json", JsonConvert.SerializeObject(sortedDict));
-            WriteToTxtFile("Informations", "wordAndTag.json", JsonConvert.SerializeObject(words));
+            //WriteToTxtFile("Informations", "List_Tags.json", JsonConvert.SerializeObject(sortedDict));
+           // WriteToTxtFile("Informations", "wordAndTag.json", JsonConvert.SerializeObject(words));
             var dictionar = new Dictionary<string, int>();
             foreach (var item in sortedDict)
-                if (item.Key.Contains('-') || item.Key.Contains('+') || item.Key.Contains('*') || item.Key.Contains('$') && item.Key.Length > 1)
+                if (item.Key.Contains('-') || item.Key.Contains('+'))
                     continue;
                 else
                 {
                     dictionar.Add(item.Key, item.Value);
                 }
-            WriteToTxtFile("Informations", "mainTags.json", JsonConvert.SerializeObject(dictionar));
-
+            // WriteToTxtFile("Informations", "Unique_Tags.json", JsonConvert.SerializeObject(dictionar));
 
 
             //Console.WriteLine("Done with loading and creating tokens!");
