@@ -17,9 +17,9 @@ namespace PostAppConsole
             return text;
         }
 
-        static void WriteToTxtFile(string fileName, string jsonFile)
+        static void WriteToTxtFile(string folderName, string fileName, string jsonFile)
         {
-            string path = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.Parent.FullName + "\\Informations\\" + fileName;
+            string path = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.Parent.FullName + "\\" + folderName + "\\" + fileName;
             Console.WriteLine("Write File Path: [" + path + "]");
             if (!File.Exists(path))
             {
@@ -34,7 +34,7 @@ namespace PostAppConsole
 
         static void Main(string[] args)
         {
-            const string Brownfolder = "Brown Corpus", testFile2 = "test_files2", testFile = "test_files";
+            const string Brownfolder = "Brown Corpus", testFile = "Test Files";
             var text = LoadAndReadFolderFiles(Brownfolder);
             var words = Tokenizer.SeparateTagFromWord(Tokenizer.WordTokenizeCorpus(text));
 
@@ -42,8 +42,8 @@ namespace PostAppConsole
             var sorted = from entry in tags orderby entry.Value descending select entry;
 
             var sortedDict = new Dictionary<string, int>(sorted);
-            WriteToTxtFile("fullListTags.json", JsonConvert.SerializeObject(sortedDict));
-            WriteToTxtFile("wordAndTag.json", JsonConvert.SerializeObject(words));
+            WriteToTxtFile("Informations", "fullListTags.json", JsonConvert.SerializeObject(sortedDict));
+            WriteToTxtFile("Informations", "wordAndTag.json", JsonConvert.SerializeObject(words));
             var dictionar = new Dictionary<string, int>();
             foreach (var item in sortedDict)
                 if (item.Key.Contains('-') || item.Key.Contains('+') || item.Key.Contains('*') || item.Key.Contains('$') && item.Key.Length > 1)
@@ -52,7 +52,7 @@ namespace PostAppConsole
                 {
                     dictionar.Add(item.Key, item.Value);
                 }
-            WriteToTxtFile("mainTags.json", JsonConvert.SerializeObject(dictionar));
+            WriteToTxtFile("Informations", "mainTags.json", JsonConvert.SerializeObject(dictionar));
 
 
 
