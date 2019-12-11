@@ -22,5 +22,65 @@ namespace NLP
             }
             return speechCount;
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="tagIndex"></param>
+        /// <returns></returns>
+        public static string ConvertBrownTagToAbstractTag(int tagIndex)
+        {
+            string tag = "Tag NOT found! Something went wrong!";
+            if (tagIndex >= 0 && tagIndex <= 8)
+                tag = "NN";
+            else if (tagIndex >= 9 && tagIndex <= 20)
+                tag = "PN";
+            else if (tagIndex >= 21 && tagIndex <= 40)
+                tag = "VB";
+            else if (tagIndex >= 41 && tagIndex <= 44)
+                tag = "JJ";
+            else if (tagIndex >= 45 && tagIndex <= 52)
+                tag = "RB";
+            else if (tagIndex >= 53 && tagIndex <= 54)
+                tag = "PP";
+            else if (tagIndex >= 55 && tagIndex <= 57)
+                tag = "CC";
+            else if (tagIndex >= 58 && tagIndex <= 70)
+                tag = "AT/DT";
+            else if (tagIndex >= 71 && tagIndex <= 72)
+                tag = ".";
+            else
+                tag = "OT";
+            return tag;
+        }
+
+        public static int GetTagIndexToConvert(List<Tokenizer.WordTag> Words)
+        {
+            int tagIndex = -1;
+            List<string> BrownCorpusTags = new List<string>()
+            {
+                "nn", "nns", "nns$", "np", "np$", "nps", "nps$", "nr", "nrs",
+                "pn", "pn$", "pp$", "pp$$", "ppl", "ppls", "ppo", "pps", "ppss", "wp$", "wpo", "wps",
+                "vb", "vbd", "vbg", "vbn", "vbz", "bem", "ber", "bez", "bed", "bedz", "ben", "do", "dod", "doz", "hv",
+                "hvd", "hvg", "hvn", "hvz", "md",
+                "jj", "jjr", "jjs", "jjt", 
+                "rb", "rbr", "rbt", "rn", "rp", "wrb", "ql", "qlp",
+                "in", "to", 
+                "cc", "cs", "wql", 
+                "at", "ap", "abl", "abn", "abx", "dt", "dti", "dts", "dtx", "be", "beg", "ex", "wdt",
+                ".", "hl"
+            };
+
+            foreach (var w in Words)
+                for (int i = 0; i < BrownCorpusTags.Count; i++)
+                    if (w.tag.Contains(BrownCorpusTags[i]))
+                    {
+                        tagIndex = i;
+                        return tagIndex;
+                    }
+            return tagIndex;
+        }
+
+
     }
 }
