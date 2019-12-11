@@ -34,10 +34,10 @@ namespace PostAppConsole
 
         static void Main(string[] args)
         {
-            const string Brownfolder = "Brown Corpus", testFile = "Test Files";
+            const string Brownfolder = "Brown Corpus\\1_Train", testFile = "Test Files";
             var text = LoadAndReadFolderFiles(Brownfolder);
             var oldWords = Tokenizer.SeparateTagFromWord(Tokenizer.WordTokenizeCorpus(text));
-            var words = SpeechPart.GetNewAbstractTags(oldWords);
+            //var words = SpeechPart.GetNewAbstractTags(oldWords);
 
             //WriteToTxtFile("Informations", "Words with Abstract Tag.json", JsonConvert.SerializeObject(words));
             
@@ -51,13 +51,13 @@ namespace PostAppConsole
             //    k++;
             //}
 
-             var tags = SpeechPart.SpeechPartFrequence(words);
-             var sorted = from entry in tags orderby entry.Value descending select entry;
-             var sortedDict = new Dictionary<string, int>(sorted.ToDictionary(x => x.Key, x => x.Value));
+             //var tags = SpeechPart.SpeechPartFrequence(words);
+             //var sorted = from entry in tags orderby entry.Value descending select entry;
+             //var sortedDict = new Dictionary<string, int>(sorted.ToDictionary(x => x.Key, x => x.Value));
             
             // foreach (var item in sortedDict)
             //     Console.WriteLine(item);
-            WriteToTxtFile("Informations", "[new]List_Tags_Abstract.json", JsonConvert.SerializeObject(sortedDict));
+           // WriteToTxtFile("Informations", "[new]List_Tags_Abstract.json", JsonConvert.SerializeObject(sortedDict));
             //// WriteToTxtFile("Informations", "wordAndTag.json", JsonConvert.SerializeObject(words));
             // var dictionar = new Dictionary<string, int>();
             // foreach (var item in sortedDict)
@@ -70,9 +70,9 @@ namespace PostAppConsole
             // WriteToTxtFile("Informations", "Unique_Tags.json", JsonConvert.SerializeObject(dictionar));
 
 
-            //Console.WriteLine("Done with loading and creating tokens!");
-            //Tagger gTagger = new Tagger(words);
-            //Console.WriteLine("Done with training MODEL!");
+            Console.WriteLine("Done with loading and creating tokens!");
+            Tagger gTagger = new Tagger(oldWords);
+            Console.WriteLine("Done with training MODEL!");
 
             //foreach (var model in gTagger.Models)
             //{
@@ -83,14 +83,8 @@ namespace PostAppConsole
             //    }
             //}
 
-
-
-
-
-
-            //Console.WriteLine("Duration of training model: " + gTagger.GetTrainingTimeMs() + " ms!");
-
-            //WriteToTxtFile("svm_brown_corpus.txt", gTagger);
+            Console.WriteLine("Duration of training model: " + gTagger.GetTrainingTimeMs() + " ms!");
+            WriteToTxtFile("Trained Files","SVM_Freq_WordPlusTags_OLD_TAGS.json", JsonConvert.SerializeObject(gTagger.Models));
 
             //Console.WriteLine("\n\n. . .");
             //string tester = "I think perhaps you miss the point entirely.";
