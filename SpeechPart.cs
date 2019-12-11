@@ -23,12 +23,27 @@ namespace NLP
             return speechCount;
         }
 
+        public static List<Tokenizer.WordTag> GetNewAbstractTags(List<Tokenizer.WordTag> Words)
+        {
+            List<Tokenizer.WordTag> newWords = new List<Tokenizer.WordTag>();
+            foreach (var w in Words)
+            {
+                int tagIndex = GetTagIndexForConversion(w);
+                string newTag = ConvertBrownTagToAbstractTag(tagIndex);
+                Tokenizer.WordTag newWord = new Tokenizer.WordTag();
+                newWord.word = w.word;
+                newWord.tag = newTag;
+                newWords.Add(newWord);
+            }
+            return newWords;
+        }
+
         /// <summary>
         /// 
         /// </summary>
         /// <param name="tagIndex"></param>
         /// <returns></returns>
-        public static string ConvertBrownTagToAbstractTag(int tagIndex)
+        private static string ConvertBrownTagToAbstractTag(int tagIndex)
         {
             string tag = "Tag NOT found! Something went wrong!";
             if (tagIndex >= 0 && tagIndex <= 8)
@@ -54,7 +69,7 @@ namespace NLP
             return tag;
         }
 
-        public static int GetTagIndexToConvert(List<Tokenizer.WordTag> Words)
+        private static int GetTagIndexForConversion(Tokenizer.WordTag Word)
         {
             int tagIndex = -1;
             List<string> BrownCorpusTags = new List<string>()
@@ -71,13 +86,14 @@ namespace NLP
                 ".", "hl"
             };
 
-            foreach (var w in Words)
-                for (int i = 0; i < BrownCorpusTags.Count; i++)
-                    if (w.tag.Contains(BrownCorpusTags[i]))
-                    {
-                        tagIndex = i;
-                        return tagIndex;
-                    }
+            for (int i = 0; i < BrownCorpusTags.Count; i++)
+            {
+                if (Word.tag.Contains(BrownCorpusTags[i]))
+                {
+                    tagIndex = i;
+                    return tagIndex;
+                }
+            }
             return tagIndex;
         }
 

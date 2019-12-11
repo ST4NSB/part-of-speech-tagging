@@ -37,26 +37,30 @@ namespace PostAppConsole
             const string Brownfolder = "Brown Corpus", testFile = "Test Files";
             var text = LoadAndReadFolderFiles(testFile);
             var words = Tokenizer.SeparateTagFromWord(Tokenizer.WordTokenizeCorpus(text));
-
+            
             foreach (var item in words)
                 Console.WriteLine(item.word + "->" + item.tag);
 
-            var tags = SpeechPart.SpeechPartFrequence(words);
-            var sorted = from entry in tags orderby entry.Value descending select entry;
+            var newWords = SpeechPart.GetNewAbstractTags(words);
+            foreach (var item in newWords)
+                Console.WriteLine(item.word + "->" + item.tag);
 
-            var sortedDict = new Dictionary<string, int>(sorted.ToDictionary(x => x.Key, x => x.Value));
-            foreach (var item in sortedDict)
-                Console.WriteLine(item);
-            //WriteToTxtFile("Informations", "List_Tags.json", JsonConvert.SerializeObject(sortedDict));
-           // WriteToTxtFile("Informations", "wordAndTag.json", JsonConvert.SerializeObject(words));
-            var dictionar = new Dictionary<string, int>();
-            foreach (var item in sortedDict)
-                if (item.Key.Contains('-') || item.Key.Contains('+'))
-                    continue;
-                else
-                {
-                    dictionar.Add(item.Key, item.Value);
-                }
+            // var tags = SpeechPart.SpeechPartFrequence(words);
+            // var sorted = from entry in tags orderby entry.Value descending select entry;
+
+            // var sortedDict = new Dictionary<string, int>(sorted.ToDictionary(x => x.Key, x => x.Value));
+            // foreach (var item in sortedDict)
+            //     Console.WriteLine(item);
+            // //WriteToTxtFile("Informations", "List_Tags.json", JsonConvert.SerializeObject(sortedDict));
+            //// WriteToTxtFile("Informations", "wordAndTag.json", JsonConvert.SerializeObject(words));
+            // var dictionar = new Dictionary<string, int>();
+            // foreach (var item in sortedDict)
+            //     if (item.Key.Contains('-') || item.Key.Contains('+'))
+            //         continue;
+            //     else
+            //     {
+            //         dictionar.Add(item.Key, item.Value);
+            //     }
             // WriteToTxtFile("Informations", "Unique_Tags.json", JsonConvert.SerializeObject(dictionar));
 
 
