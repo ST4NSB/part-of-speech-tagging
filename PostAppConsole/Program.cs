@@ -35,27 +35,29 @@ namespace PostAppConsole
         static void Main(string[] args)
         {
             const string Brownfolder = "Brown Corpus", testFile = "Test Files";
-            var text = LoadAndReadFolderFiles(testFile);
-            var words = Tokenizer.SeparateTagFromWord(Tokenizer.WordTokenizeCorpus(text));
+            var text = LoadAndReadFolderFiles(Brownfolder);
+            var oldWords = Tokenizer.SeparateTagFromWord(Tokenizer.WordTokenizeCorpus(text));
+            var words = SpeechPart.GetNewAbstractTags(oldWords);
+
+            //WriteToTxtFile("Informations", "Words with Abstract Tag.json", JsonConvert.SerializeObject(words));
             
-           // foreach (var item in words)
-           //     Console.WriteLine(item.word + "->" + item.tag);
+            // foreach (var item in oldWords)
+            //     Console.WriteLine(item.word + "->" + item.tag);
 
-            var newWords = SpeechPart.GetNewAbstractTags(words);
-            int k = 0;
-            foreach (var item in newWords)
-            {
-                Console.WriteLine(k+1 + ": " + item.word + "->" + item.tag);
-                k++;
-            }
+            //int k = 0;
+            //foreach (var item in words)
+            //{
+            //    Console.WriteLine(k+1 + ": " + item.word + "->" + item.tag);
+            //    k++;
+            //}
 
-            // var tags = SpeechPart.SpeechPartFrequence(words);
-            // var sorted = from entry in tags orderby entry.Value descending select entry;
-
-            // var sortedDict = new Dictionary<string, int>(sorted.ToDictionary(x => x.Key, x => x.Value));
+             var tags = SpeechPart.SpeechPartFrequence(words);
+             var sorted = from entry in tags orderby entry.Value descending select entry;
+             var sortedDict = new Dictionary<string, int>(sorted.ToDictionary(x => x.Key, x => x.Value));
+            
             // foreach (var item in sortedDict)
             //     Console.WriteLine(item);
-            // //WriteToTxtFile("Informations", "List_Tags.json", JsonConvert.SerializeObject(sortedDict));
+            WriteToTxtFile("Informations", "[new]List_Tags_Abstract.json", JsonConvert.SerializeObject(sortedDict));
             //// WriteToTxtFile("Informations", "wordAndTag.json", JsonConvert.SerializeObject(words));
             // var dictionar = new Dictionary<string, int>();
             // foreach (var item in sortedDict)

@@ -102,9 +102,6 @@ namespace NLP
                         return tagIndex;
                     }
                 }
-                // if (Word.tag.Contains(BrownCorpusTags[i]))
-                //if(BrownCorpusTags[i].Contains(Word.tag))
-
             }
             return tagIndex;
         }
