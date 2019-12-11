@@ -88,11 +88,23 @@ namespace NLP
 
             for (int i = 0; i < BrownCorpusTags.Count; i++)
             {
-                if (Word.tag.Contains(BrownCorpusTags[i]))
+                string[] splittedWord = Word.tag.Split(new Char[] { '+', '-' });
+                foreach (string w in splittedWord)
                 {
-                    tagIndex = i;
-                    return tagIndex;
+                    if (Word.tag.Equals("wql") || Word.tag.Equals("wql-tl")) // special case where wql is found in RB at ql
+                    {
+                        tagIndex = 57;
+                        return tagIndex;
+                    }
+                    else if (Word.tag.Contains(BrownCorpusTags[i]))
+                    {
+                        tagIndex = i;
+                        return tagIndex;
+                    }
                 }
+                // if (Word.tag.Contains(BrownCorpusTags[i]))
+                //if(BrownCorpusTags[i].Contains(Word.tag))
+
             }
             return tagIndex;
         }

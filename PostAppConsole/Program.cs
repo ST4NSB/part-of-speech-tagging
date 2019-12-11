@@ -38,12 +38,16 @@ namespace PostAppConsole
             var text = LoadAndReadFolderFiles(testFile);
             var words = Tokenizer.SeparateTagFromWord(Tokenizer.WordTokenizeCorpus(text));
             
-            foreach (var item in words)
-                Console.WriteLine(item.word + "->" + item.tag);
+           // foreach (var item in words)
+           //     Console.WriteLine(item.word + "->" + item.tag);
 
             var newWords = SpeechPart.GetNewAbstractTags(words);
+            int k = 0;
             foreach (var item in newWords)
-                Console.WriteLine(item.word + "->" + item.tag);
+            {
+                Console.WriteLine(k+1 + ": " + item.word + "->" + item.tag);
+                k++;
+            }
 
             // var tags = SpeechPart.SpeechPartFrequence(words);
             // var sorted = from entry in tags orderby entry.Value descending select entry;
