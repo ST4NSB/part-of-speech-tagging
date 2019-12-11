@@ -23,6 +23,11 @@ namespace NLP
             return speechCount;
         }
 
+        /// <summary>
+        /// Public Static method to transform Brown Corpus tags to more abstract tags.
+        /// </summary>
+        /// <param name="Words"></param>
+        /// <returns>new list of words with tags</returns>
         public static List<Tokenizer.WordTag> GetNewAbstractTags(List<Tokenizer.WordTag> Words)
         {
             List<Tokenizer.WordTag> newWords = new List<Tokenizer.WordTag>();
@@ -39,10 +44,10 @@ namespace NLP
         }
 
         /// <summary>
-        /// 
+        /// Private static method for tag conversion, it looks for the index returned by GetTagIndexForConversion(..).
         /// </summary>
         /// <param name="tagIndex"></param>
-        /// <returns></returns>
+        /// <returns>new tag as string</returns>
         private static string ConvertBrownTagToAbstractTag(int tagIndex)
         {
             string tag = "Tag NOT found! Something went wrong!";
@@ -69,6 +74,11 @@ namespace NLP
             return tag;
         }
 
+        /// <summary>
+        /// Private static method to get index from a list of tags from Brown Corpus.
+        /// </summary>
+        /// <param name="Word"></param>
+        /// <returns>tag index in list</returns>
         private static int GetTagIndexForConversion(Tokenizer.WordTag Word)
         {
             int tagIndex = -1;

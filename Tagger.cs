@@ -60,17 +60,17 @@ namespace NLP
             this.TrainingTime.Stop();
         }
 
-        public Dictionary<string, string> EasyWordTag(List<string> inputWords)
-        {
-            Dictionary<string, string> output = new Dictionary<string, string>();
-            foreach(string word in inputWords)
-            {
-                WordModel wordModelFinder = this.Models.Find(x => x.Word == word);
-                var maxValueTag = wordModelFinder.TagFreq.OrderByDescending(x => x.Value).FirstOrDefault().Key;
-                output.Add(word, maxValueTag);
-            }
-            return output;
-        } 
+        //public Dictionary<string, string> EasyWordTag(List<string> inputWords)
+        //{
+        //    Dictionary<string, string> output = new Dictionary<string, string>();
+        //    foreach(string word in inputWords)
+        //    {
+        //        WordModel wordModelFinder = this.Models.Find(x => x.Word == word);
+        //        var maxValueTag = wordModelFinder.TagFreq.OrderByDescending(x => x.Value).FirstOrDefault().Key;
+        //        output.Add(word, maxValueTag);
+        //    }
+        //    return output;
+        //} 
 
         /// <summary>
         /// Method that returns the elapsed time, loading SVM (ms)

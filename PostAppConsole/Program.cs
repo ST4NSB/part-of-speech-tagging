@@ -34,12 +34,10 @@ namespace PostAppConsole
 
         static void Main(string[] args)
         {
-            const string Brownfolder = "Brown Corpus\\1_Train", testFile = "Test Files";
-            var text = LoadAndReadFolderFiles(Brownfolder);
+            const string BrownfolderTrain = "Brown Corpus\\1_Train", BrownfolderTest = "Brown Corpus\\2_Test", testFile = "Test Files";
+            var text = LoadAndReadFolderFiles(BrownfolderTrain);
             var oldWords = Tokenizer.SeparateTagFromWord(Tokenizer.WordTokenizeCorpus(text));
-            //var words = SpeechPart.GetNewAbstractTags(oldWords);
-
-            //WriteToTxtFile("Informations", "Words with Abstract Tag.json", JsonConvert.SerializeObject(words));
+            var words = SpeechPart.GetNewAbstractTags(oldWords);
             
             // foreach (var item in oldWords)
             //     Console.WriteLine(item.word + "->" + item.tag);
@@ -54,48 +52,50 @@ namespace PostAppConsole
              //var tags = SpeechPart.SpeechPartFrequence(words);
              //var sorted = from entry in tags orderby entry.Value descending select entry;
              //var sortedDict = new Dictionary<string, int>(sorted.ToDictionary(x => x.Key, x => x.Value));
-            
-            // foreach (var item in sortedDict)
-            //     Console.WriteLine(item);
            // WriteToTxtFile("Informations", "[new]List_Tags_Abstract.json", JsonConvert.SerializeObject(sortedDict));
-            //// WriteToTxtFile("Informations", "wordAndTag.json", JsonConvert.SerializeObject(words));
-            // var dictionar = new Dictionary<string, int>();
-            // foreach (var item in sortedDict)
-            //     if (item.Key.Contains('-') || item.Key.Contains('+'))
-            //         continue;
-            //     else
-            //     {
-            //         dictionar.Add(item.Key, item.Value);
-            //     }
-            // WriteToTxtFile("Informations", "Unique_Tags.json", JsonConvert.SerializeObject(dictionar));
-
 
             Console.WriteLine("Done with loading and creating tokens!");
-            Tagger gTagger = new Tagger(oldWords);
+            Tagger gTagger = new Tagger(words);
             Console.WriteLine("Done with training MODEL!");
-
-            //foreach (var model in gTagger.Models)
-            //{
-            //    Console.WriteLine(model.Word);
-            //    foreach (var item in model.TagFreq)
-            //    {
-            //        Console.WriteLine("     " + item.Key + " -> " + item.Value);
-            //    }
-            //}
-
+            foreach (var model in gTagger.Models)
+            {
+                Console.WriteLine(model.Word);
+                foreach (var item in model.TagFreq)
+                {
+                    Console.WriteLine("     " + item.Key + " -> " + item.Value);
+                }
+            }
             Console.WriteLine("Duration of training model: " + gTagger.GetTrainingTimeMs() + " ms!");
-            WriteToTxtFile("Trained Files","SVM_Freq_WordPlusTags_OLD_TAGS.json", JsonConvert.SerializeObject(gTagger.Models));
 
-            //Console.WriteLine("\n\n. . .");
-            //string tester = "I think perhaps you miss the point entirely.";
-            //var testText = Tokenizer.WordsOnlyTokenize(tester);
-            //foreach (var item in testText)
-            //    Console.WriteLine(item);
+            var textTest = LoadAndReadFolderFiles(BrownfolderTest);
+            var oldWordsTest = Tokenizer.SeparateTagFromWord(Tokenizer.WordTokenizeCorpus(textTest));
+            var wordsTest = SpeechPart.GetNewAbstractTags(oldWordsTest);
 
-            //Console.WriteLine("\n");
-            //var grammar = gTagger.EasyWordTag(testText);
-            //foreach (var elem in grammar)
-            //    Console.WriteLine(elem.Key + " -> " + elem.Value);
+            WriteToTxtFile("Trained Files", "Test_WordsAndTags.json", JsonConvert.SerializeObject(wordsTest));
+
+            int wordsFound = 0;
+            List<Tokenizer.WordTag> notFoundWords = new List<Tokenizer.WordTag>();
+            foreach(var w in wordsTest)
+            {
+                Tagger.WordModel wordModelFinder = gTagger.Models.Find(x => x.Word == w.word);
+                if (wordModelFinder == null)
+                {
+                    notFoundWords.Add(w);
+                    continue;
+                }
+                var maxValueTag = wordModelFinder.TagFreq.OrderByDescending(x => x.Value).FirstOrDefault().Key;
+                if (maxValueTag == null)
+                {
+                    notFoundWords.Add(w);
+                    continue;
+                }
+                if (maxValueTag.Equals(w.tag))
+                    wordsFound++;
+            }
+
+            Console.WriteLine("Accuracy: " + (float)wordsFound / wordsTest.Count);
+
+            WriteToTxtFile("Trained Files", "Words_Not_Found.json", JsonConvert.SerializeObject(notFoundWords));
 
         }
     }
