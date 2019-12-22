@@ -38,6 +38,8 @@ namespace PostAppConsole
             var text = LoadAndReadFolderFiles(BrownfolderTrain);
             var oldWords = Tokenizer.SeparateTagFromWord(Tokenizer.WordTokenizeCorpus(text));
             var words = SpeechPart.GetNewAbstractTags(oldWords);
+
+        
             
             // foreach (var item in oldWords)
             //     Console.WriteLine(item.word + "->" + item.tag);
@@ -57,45 +59,68 @@ namespace PostAppConsole
             Console.WriteLine("Done with loading and creating tokens!");
             Tagger gTagger = new Tagger(words);
             Console.WriteLine("Done with training MODEL!");
-            foreach (var model in gTagger.Models)
-            {
-                Console.WriteLine(model.Word);
-                foreach (var item in model.TagFreq)
-                {
-                    Console.WriteLine("     " + item.Key + " -> " + item.Value);
-                }
-            }
+            //foreach (var model in gTagger.Models)
+            //{
+            //    Console.WriteLine(model.Word);
+            //    foreach (var item in model.TagFreq)
+            //    {
+            //        Console.WriteLine("     " + item.Key + " -> " + item.Value);
+            //    }
+            //}
             Console.WriteLine("Duration of training model: " + gTagger.GetTrainingTimeMs() + " ms!");
 
             var textTest = LoadAndReadFolderFiles(BrownfolderTest);
             var oldWordsTest = Tokenizer.SeparateTagFromWord(Tokenizer.WordTokenizeCorpus(textTest));
             var wordsTest = SpeechPart.GetNewAbstractTags(oldWordsTest);
 
-            WriteToTxtFile("Trained Files", "Test_WordsAndTags.json", JsonConvert.SerializeObject(wordsTest));
+            //WriteToTxtFile("Trained Files", "Test_WordsAndTags.json", JsonConvert.SerializeObject(wordsTest));
 
             int wordsFound = 0;
             List<Tokenizer.WordTag> notFoundWords = new List<Tokenizer.WordTag>();
-            foreach(var w in wordsTest)
+            List<string> algPredictions = new List<string>();
+            foreach (var w in wordsTest)
             {
                 Tagger.WordModel wordModelFinder = gTagger.Models.Find(x => x.Word == w.word);
                 if (wordModelFinder == null)
                 {
                     notFoundWords.Add(w);
+                    algPredictions.Add("NULL");
+                  //  if ("NN".Equals(w.tag))
+                  //      wordsFound++;
                     continue;
                 }
-                var maxValueTag = wordModelFinder.TagFreq.OrderByDescending(x => x.Value).FirstOrDefault().Key;
+                string maxValueTag = wordModelFinder.TagFreq.OrderByDescending(x => x.Value).FirstOrDefault().Key;
                 if (maxValueTag == null)
                 {
+                   // if ("NN".Equals(w.tag))
+                   //     wordsFound++;
                     notFoundWords.Add(w);
+                    algPredictions.Add("NULL");
+                    Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~entered here LOL");
                     continue;
                 }
                 if (maxValueTag.Equals(w.tag))
                     wordsFound++;
+                else
+                {
+                    notFoundWords.Add(w);
+                    algPredictions.Add(maxValueTag);
+                }
             }
 
             Console.WriteLine("Accuracy: " + (float)wordsFound / wordsTest.Count);
 
-            WriteToTxtFile("Trained Files", "Words_Not_Found.json", JsonConvert.SerializeObject(notFoundWords));
+            using (System.IO.StreamWriter file = new System.IO.StreamWriter("cuvinte_nepredictionate.csv"))
+            {
+                file.WriteLine("Word,My Prediction Tag,Actual Tag");
+                for (int i = 0; i < notFoundWords.Count; i++)
+                {
+                    file.WriteLine(notFoundWords[i].word + "," + algPredictions[i] + "," + notFoundWords[i].tag);
+                }
+            }
+
+
+            //WriteToTxtFile("Trained Files", "Words_Not_Found.json", JsonConvert.SerializeObject(notFoundWords));
 
         }
     }
