@@ -37,10 +37,14 @@ namespace PostAppConsole
             const string BrownfolderTrain = "Brown Corpus\\1_Train", BrownfolderTest = "Brown Corpus\\2_Test", testFile = "Test Files";
             var text = LoadAndReadFolderFiles(BrownfolderTrain);
             var oldWords = Tokenizer.SeparateTagFromWord(Tokenizer.WordTokenizeCorpus(text));
-            var words = SpeechPart.GetNewAbstractTags(oldWords);
+            var words = SpeechPart.GetNewHierarchicTags(oldWords);
 
-        
-            
+            //using (System.IO.StreamWriter file = new System.IO.StreamWriter("Brown_Corpus_cu_tagurile_mele.txt"))
+            //{
+            //    foreach (var item in words)
+            //        file.WriteLine(item.word + " " + item.tag);
+            //}
+
             // foreach (var item in oldWords)
             //     Console.WriteLine(item.word + "->" + item.tag);
 
@@ -51,10 +55,10 @@ namespace PostAppConsole
             //    k++;
             //}
 
-             //var tags = SpeechPart.SpeechPartFrequence(words);
-             //var sorted = from entry in tags orderby entry.Value descending select entry;
-             //var sortedDict = new Dictionary<string, int>(sorted.ToDictionary(x => x.Key, x => x.Value));
-           // WriteToTxtFile("Informations", "[new]List_Tags_Abstract.json", JsonConvert.SerializeObject(sortedDict));
+            //var tags = SpeechPart.SpeechPartFrequence(words);
+            //var sorted = from entry in tags orderby entry.Value descending select entry;
+            //var sortedDict = new Dictionary<string, int>(sorted.ToDictionary(x => x.Key, x => x.Value));
+            //WriteToTxtFile("Informations", "[new]List_Tags_Abstract.json", JsonConvert.SerializeObject(sortedDict));
 
             Console.WriteLine("Done with loading and creating tokens!");
             Tagger gTagger = new Tagger(words);
@@ -68,12 +72,18 @@ namespace PostAppConsole
             //    }
             //}
             Console.WriteLine("Duration of training model: " + gTagger.GetTrainingTimeMs() + " ms!");
+            //WriteToTxtFile("Trained Files", "SVM_trained_file.json", JsonConvert.SerializeObject(gTagger.Models));
 
             var textTest = LoadAndReadFolderFiles(BrownfolderTest);
             var oldWordsTest = Tokenizer.SeparateTagFromWord(Tokenizer.WordTokenizeCorpus(textTest));
-            var wordsTest = SpeechPart.GetNewAbstractTags(oldWordsTest);
+            var wordsTest = SpeechPart.GetNewHierarchicTags(oldWordsTest);
 
-            //WriteToTxtFile("Trained Files", "Test_WordsAndTags.json", JsonConvert.SerializeObject(wordsTest));
+            //using (System.IO.StreamWriter file = new System.IO.StreamWriter("cuvinte_pt_testare.csv"))
+            //{
+            //    file.WriteLine("Word, Tag");
+            //    foreach (var item in wordsTest)
+            //        file.WriteLine(item.word + "," + item.tag);
+            //}
 
             int wordsFound = 0;
             List<Tokenizer.WordTag> notFoundWords = new List<Tokenizer.WordTag>();
@@ -85,15 +95,15 @@ namespace PostAppConsole
                 {
                     notFoundWords.Add(w);
                     algPredictions.Add("NULL");
-                  //  if ("NN".Equals(w.tag))
-                  //      wordsFound++;
+                    if ("NN".Equals(w.tag))
+                        wordsFound++;
                     continue;
                 }
                 string maxValueTag = wordModelFinder.TagFreq.OrderByDescending(x => x.Value).FirstOrDefault().Key;
                 if (maxValueTag == null)
                 {
-                   // if ("NN".Equals(w.tag))
-                   //     wordsFound++;
+                    if ("NN".Equals(w.tag))
+                        wordsFound++;
                     notFoundWords.Add(w);
                     algPredictions.Add("NULL");
                     Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~entered here LOL");
@@ -110,17 +120,15 @@ namespace PostAppConsole
 
             Console.WriteLine("Accuracy: " + (float)wordsFound / wordsTest.Count);
 
-            using (System.IO.StreamWriter file = new System.IO.StreamWriter("cuvinte_nepredictionate.csv"))
-            {
-                file.WriteLine("Word,My Prediction Tag,Actual Tag");
-                for (int i = 0; i < notFoundWords.Count; i++)
-                {
-                    file.WriteLine(notFoundWords[i].word + "," + algPredictions[i] + "," + notFoundWords[i].tag);
-                }
-            }
+            //using (System.IO.StreamWriter file = new System.IO.StreamWriter("cuvinte_nepredictionate.csv"))
+            //{
+            //    file.WriteLine("Word,My Prediction Tag,Actual Tag");
+            //    for (int i = 0; i < notFoundWords.Count; i++)
+            //    {
+            //        file.WriteLine(notFoundWords[i].word + "," + algPredictions[i] + "," + notFoundWords[i].tag);
+            //    }
+            //}
 
-
-            //WriteToTxtFile("Trained Files", "Words_Not_Found.json", JsonConvert.SerializeObject(notFoundWords));
 
         }
     }

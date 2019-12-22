@@ -24,17 +24,17 @@ namespace NLP
         }
 
         /// <summary>
-        /// Public Static method to transform Brown Corpus tags to more abstract tags.
+        /// Public Static method to transform Brown Corpus tags to more hierarchic tags.
         /// </summary>
         /// <param name="Words"></param>
         /// <returns>new list of words with tags</returns>
-        public static List<Tokenizer.WordTag> GetNewAbstractTags(List<Tokenizer.WordTag> Words)
+        public static List<Tokenizer.WordTag> GetNewHierarchicTags(List<Tokenizer.WordTag> Words)
         {
             List<Tokenizer.WordTag> newWords = new List<Tokenizer.WordTag>();
             foreach (var w in Words)
             {
                 int tagIndex = GetTagIndexForConversion(w);
-                string newTag = ConvertBrownTagToAbstractTag(tagIndex);
+                string newTag = ConvertBrownTagToHierarchicTag(tagIndex);
                 Tokenizer.WordTag newWord = new Tokenizer.WordTag();
                 newWord.word = w.word;
                 newWord.tag = newTag;
@@ -48,7 +48,7 @@ namespace NLP
         /// </summary>
         /// <param name="tagIndex"></param>
         /// <returns>new tag as string</returns>
-        private static string ConvertBrownTagToAbstractTag(int tagIndex)
+        private static string ConvertBrownTagToHierarchicTag(int tagIndex)
         {
             string tag = "Tag NOT found! Something went wrong!";
             if (tagIndex >= 0 && tagIndex <= 8)
@@ -67,7 +67,7 @@ namespace NLP
                 tag = "CC";
             else if (tagIndex >= 58 && tagIndex <= 70)
                 tag = "AT/DT";
-            else if (tagIndex >= 71 && tagIndex <= 72)
+            else if (tagIndex == 71)
                 tag = ".";
             else
                 tag = "OT";
@@ -93,7 +93,7 @@ namespace NLP
                 "in", "to", 
                 "cc", "cs", "wql", 
                 "at", "ap", "abl", "abn", "abx", "dt", "dti", "dts", "dtx", "be", "beg", "ex", "wdt",
-                ".", "hl"
+                "."
             };
 
             for (int i = 0; i < BrownCorpusTags.Count; i++)
