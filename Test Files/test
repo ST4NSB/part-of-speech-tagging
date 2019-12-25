@@ -1,22 +1,5 @@
 
 
-	NN//nn NN/nns NN//nns$-fw+in-fw NN/np NN/np$+in 
-	NN/nps+jj NN//nps$ NN/nr NN/nrs 
-	PN/pn PN/pn$ PN/pp$ PN//pp$$-fw+hr PN/ppl PN/ppo
-	PN/pps PN/ppss PN/wp$ PN/wpo PN/wps
-	
-	VB//vb VB/vbd VB/vbg VB/vbn VB/vbz VB/bem VB/ber  VB/bez
-	VB/bed VB/bedz VB/ben VB/do VB/dod VB/doz VB/hv VB/hvd
-	VB/hvg VB/hvn VB/hvz VB//md
-	
-	JJ//jj JJ/jjr JJ/jjs JJ/jjt
-	RB/rb RB/rbr RB/rbt RB/rn RB/rp RB/wrb RB/ql RB/qlp
-	
-	PP//in PP/to
-	CC//cc CC/cs CC/wql
-	AT/DT/at AT/DT/ap AT/DT/abl AT/DT/abn AT/DT/abx AT/DT/dt AT/DT/dti
-	AT/DT/dts AT/DT/dtx AT/DT/be AT/DT/beg AT/DT/ex AT/DT/wdt
-	
-	./.-fw+hl-fw ./hl
+	Testing's/testing'/nn is4823o/vb HErE/cc [/[ "/" }/] ./.
 	
 	
