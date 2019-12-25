@@ -35,27 +35,23 @@ namespace PostAppConsole
         static void Main(string[] args)
         {
             const string BrownfolderTrain = "Brown Corpus\\1_Train", BrownfolderTest = "Brown Corpus\\2_Test", testFile = "Test Files";
-            var text = LoadAndReadFolderFiles(testFile);
+            var text = LoadAndReadFolderFiles(BrownfolderTrain);
             var oldWords = Tokenizer.SeparateTagFromWord(Tokenizer.WordTokenizeCorpus(text));
             var words = SpeechPart.GetNewHierarchicTags(oldWords);
 
             var wordsNormalizedTrain = TextNormalization.Pipeline(words);
 
-            //using (System.IO.StreamWriter file = new System.IO.StreamWriter("Brown_Corpus_cu_tagurile_mele.txt"))
+            //int k = 0;
+            //foreach (var item in wordsNormalizedTrain)
             //{
-            //    foreach (var item in words)
-            //        file.WriteLine(item.word + " " + item.tag);
+            //    Console.WriteLine(k + 1 + ": " + item.word + "->" + item.tag);
+            //    k++;
+            //    if (k == 18)
+            //    {
+            //        Console.WriteLine("cuv: " + item.word);
+            //        break;
+            //    }
             //}
-
-            // foreach (var item in oldWords)
-            //     Console.WriteLine(item.word + "->" + item.tag);
-
-            int k = 0;
-            foreach (var item in wordsNormalizedTrain)
-            {
-                Console.WriteLine(k + 1 + ": " + item.word + "->" + item.tag);
-                k++;
-            }
 
             //var tags = SpeechPart.SpeechPartFrequence(words);
             //var sorted = from entry in tags orderby entry.Value descending select entry;
@@ -63,7 +59,7 @@ namespace PostAppConsole
             //WriteToTxtFile("Informations", "[new]List_Tags_Abstract.json", JsonConvert.SerializeObject(sortedDict));
 
             Console.WriteLine("Done with loading and creating tokens!");
-            //Tagger gTagger = new Tagger(words);
+            Tagger gTagger = new Tagger(wordsNormalizedTrain);
             Console.WriteLine("Done with training MODEL!");
             //foreach (var model in gTagger.Models)
             //{
@@ -73,8 +69,8 @@ namespace PostAppConsole
             //        Console.WriteLine("     " + item.Key + " -> " + item.Value);
             //    }
             //}
-            //Console.WriteLine("Duration of training model: " + gTagger.GetTrainingTimeMs() + " ms!");
-            //WriteToTxtFile("Trained Files", "SVM_trained_file.json", JsonConvert.SerializeObject(gTagger.Models));
+            Console.WriteLine("Duration of training model: " + gTagger.GetTrainingTimeMs() + " ms!");
+            WriteToTxtFile("Trained Files", "SVM_trained_file.json", JsonConvert.SerializeObject(gTagger.Models));
 
             //var textTest = LoadAndReadFolderFiles(BrownfolderTest);
             //var oldWordsTest = Tokenizer.SeparateTagFromWord(Tokenizer.WordTokenizeCorpus(textTest));

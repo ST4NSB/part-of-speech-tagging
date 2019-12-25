@@ -33,7 +33,7 @@ namespace NLP
 
         private static bool IsStopWord(string word)
         {
-            string[] stopWords = { "``", "\"", "(", ")", "[", "]", "{", "}" };
+            string[] stopWords = { "``", "\"", "\'", "''", "(", ")", "[", "]", "{", "}" };
             foreach (var sword in stopWords)
                 if (word.Equals(sword))
                     return true;
@@ -47,7 +47,9 @@ namespace NLP
             else
             {
                 string output = Regex.Replace(word, @"[\d-]", string.Empty);
-                if (output.Length >= 3)
+                //int count = Regex.Matches(output, @"[a-zA-z]").Count;
+                var count = output.Count(char.IsLetter);
+                if (count >= 3) // verifies if has at least 3 letters left
                     return output;
                 return "";
             }
