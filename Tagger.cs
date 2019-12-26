@@ -23,6 +23,11 @@ namespace NLP
             }
         }
 
+        public Tagger(List<WordModel> Models)
+        {
+            this.Models = new List<WordModel>(Models);
+        }
+
         /// <summary>
         /// Constructor that creates the list of models (SVM) for every individual word with a dictionary of grammar tags
         /// </summary>

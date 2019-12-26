@@ -72,60 +72,54 @@ namespace PostAppConsole
             Console.WriteLine("Duration of training model: " + gTagger.GetTrainingTimeMs() + " ms!");
             WriteToTxtFile("Trained Files", "SVM_trained_file.json", JsonConvert.SerializeObject(gTagger.Models));
 
-            //var textTest = LoadAndReadFolderFiles(BrownfolderTest);
-            //var oldWordsTest = Tokenizer.SeparateTagFromWord(Tokenizer.WordTokenizeCorpus(textTest));
-            //var wordsTest = SpeechPart.GetNewHierarchicTags(oldWordsTest);
+            var textTest = LoadAndReadFolderFiles(BrownfolderTest);
+            var oldWordsTest = Tokenizer.SeparateTagFromWord(Tokenizer.WordTokenizeCorpus(textTest));
+            var wordsTest = SpeechPart.GetNewHierarchicTags(oldWordsTest);
+            wordsTest = TextNormalization.Pipeline(wordsTest);
 
-            ////using (System.IO.StreamWriter file = new System.IO.StreamWriter("cuvinte_pt_testare.csv"))
-            ////{
-            ////    file.WriteLine("Word, Tag");
-            ////    foreach (var item in wordsTest)
-            ////        file.WriteLine(item.word + "," + item.tag);
-            ////}
+            int wordsFound = 0;
+           // List<Tokenizer.WordTag> notFoundWords = new List<Tokenizer.WordTag>();
+            List<string> algPredictions = new List<string>();
+            foreach (var w in wordsTest)
+            {
+                Tagger.WordModel wordModelFinder = gTagger.Models.Find(x => x.Word == w.word);
+                if (wordModelFinder == null)
+                {
+                    algPredictions.Add("NULL");
+                    //if ("NN".Equals(w.tag))
+                    //    wordsFound++;
+                    continue;
+                }
+                string maxValueTag = wordModelFinder.TagFreq.OrderByDescending(x => x.Value).FirstOrDefault().Key;
+                //if (maxValueTag == null)
+                //{
+                //    if ("NN".Equals(w.tag))
+                //        wordsFound++;
+                //    algPredictions.Add("NULL");
+                //    Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~entered here LOL");
+                //    continue;
+                //}
+                if (maxValueTag.Equals(w.tag))
+                {
+                    wordsFound++;
+                    algPredictions.Add(maxValueTag);
+                }
+                else
+                {
+                    algPredictions.Add(maxValueTag);
+                }
+            }
 
-            //int wordsFound = 0;
-            //List<Tokenizer.WordTag> notFoundWords = new List<Tokenizer.WordTag>();
-            //List<string> algPredictions = new List<string>();
-            //foreach (var w in wordsTest)
+            Console.WriteLine("Accuracy: " + (float)wordsFound / wordsTest.Count);
+
+            //using (System.IO.StreamWriter file = new System.IO.StreamWriter("cuvinte_nepredictionate.csv"))
             //{
-            //    Tagger.WordModel wordModelFinder = gTagger.Models.Find(x => x.Word == w.word);
-            //    if (wordModelFinder == null)
+            //    file.WriteLine("Word,My Prediction Tag,Actual Tag");
+            //    for (int i = 0; i < wordsTest.Count; i++)
             //    {
-            //        notFoundWords.Add(w);
-            //        algPredictions.Add("NULL");
-            //        if ("NN".Equals(w.tag))
-            //            wordsFound++;
-            //        continue;
-            //    }
-            //    string maxValueTag = wordModelFinder.TagFreq.OrderByDescending(x => x.Value).FirstOrDefault().Key;
-            //    if (maxValueTag == null)
-            //    {
-            //        if ("NN".Equals(w.tag))
-            //            wordsFound++;
-            //        notFoundWords.Add(w);
-            //        algPredictions.Add("NULL");
-            //        Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~entered here LOL");
-            //        continue;
-            //    }
-            //    if (maxValueTag.Equals(w.tag))
-            //        wordsFound++;
-            //    else
-            //    {
-            //        notFoundWords.Add(w);
-            //        algPredictions.Add(maxValueTag);
+            //        file.WriteLine("\"" + wordsTest[i].word + "\"," + algPredictions[i] + "," + wordsTest[i].tag);
             //    }
             //}
-
-            //Console.WriteLine("Accuracy: " + (float)wordsFound / wordsTest.Count);
-
-            ////using (System.IO.StreamWriter file = new System.IO.StreamWriter("cuvinte_nepredictionate.csv"))
-            ////{
-            ////    file.WriteLine("Word,My Prediction Tag,Actual Tag");
-            ////    for (int i = 0; i < notFoundWords.Count; i++)
-            ////    {
-            ////        file.WriteLine(notFoundWords[i].word + "," + algPredictions[i] + "," + notFoundWords[i].tag);
-            ////    }
-            ////}
 
 
         }
