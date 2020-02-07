@@ -40,15 +40,10 @@ namespace PostAppConsole
 
             var words = SpeechPart.GetNewHierarchicTags(oldWords);
             words = TextNormalization.Pipeline(words);
-            var stem = new PorterStemmer();
-
-            var stemWords = new List<Tokenizer.WordTag>();
-            foreach(var item in words)
-                stemWords.Add(new Tokenizer.WordTag(stem.StemWord(item.word), item.tag));
 
 
             Console.WriteLine("Done with loading and creating tokens!");
-            Tagger gTagger = new Tagger(stemWords);
+            Tagger gTagger = new Tagger(words);
             Console.WriteLine("Done with training MODEL!");
             //foreach (var model in gTagger.Models)
             //{
@@ -66,16 +61,12 @@ namespace PostAppConsole
             var wordsTest = SpeechPart.GetNewHierarchicTags(oldWordsTest);
             wordsTest = TextNormalization.Pipeline(wordsTest);
 
-            var stemWordsTest = new List<Tokenizer.WordTag>();
-            foreach (var item in wordsTest)
-                stemWordsTest.Add(new Tokenizer.WordTag(stem.StemWord(item.word), item.tag));
-
 
 
             int wordsFound = 0;
             // List<Tokenizer.WordTag> notFoundWords = new List<Tokenizer.WordTag>();
             List<string> algPredictions = new List<string>();
-            foreach (var w in stemWordsTest)
+            foreach (var w in wordsTest)
             {
                 Tagger.WordModel wordModelFinder = gTagger.Models.Find(x => x.Word == w.word);
                 if (wordModelFinder == null)
@@ -97,7 +88,7 @@ namespace PostAppConsole
                 }
             }
 
-            Console.WriteLine("Accuracy: " + (float)wordsFound / stemWordsTest.Count);
+            Console.WriteLine("Accuracy: " + (float)wordsFound / wordsTest.Count);
 
             //using (System.IO.StreamWriter file = new System.IO.StreamWriter("cuvinte_nepredictionate.csv"))
             //{
@@ -107,6 +98,7 @@ namespace PostAppConsole
             //        file.WriteLine("\"" + wordsTest[i].word + "\"," + algPredictions[i] + "," + wordsTest[i].tag);
             //    }
             //}
+
 
             Evaluation eval = new Evaluation();
             eval.CreateSupervizedEvaluationsMatrix(wordsTest, algPredictions, fbeta:1);
