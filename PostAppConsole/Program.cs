@@ -39,11 +39,16 @@ namespace PostAppConsole
             var oldWords = Tokenizer.SeparateTagFromWord(Tokenizer.WordTokenizeCorpus(text));
 
             var words = SpeechPart.GetNewHierarchicTags(oldWords);
-            // words = TextNormalization.Pipeline(words);
+            words = TextNormalization.Pipeline(words);
+            var stem = new PorterStemmer();
+
+            var stemWords = new List<Tokenizer.WordTag>();
+            foreach(var item in words)
+                stemWords.Add(new Tokenizer.WordTag(stem.StemWord(item.word), item.tag));
 
 
             Console.WriteLine("Done with loading and creating tokens!");
-            Tagger gTagger = new Tagger(words);
+            Tagger gTagger = new Tagger(stemWords);
             Console.WriteLine("Done with training MODEL!");
             //foreach (var model in gTagger.Models)
             //{
@@ -59,30 +64,28 @@ namespace PostAppConsole
             var textTest = LoadAndReadFolderFiles(BrownfolderTest);
             var oldWordsTest = Tokenizer.SeparateTagFromWord(Tokenizer.WordTokenizeCorpus(textTest));
             var wordsTest = SpeechPart.GetNewHierarchicTags(oldWordsTest);
-           // wordsTest = TextNormalization.Pipeline(wordsTest);
+            wordsTest = TextNormalization.Pipeline(wordsTest);
+
+            var stemWordsTest = new List<Tokenizer.WordTag>();
+            foreach (var item in wordsTest)
+                stemWordsTest.Add(new Tokenizer.WordTag(stem.StemWord(item.word), item.tag));
+
+
 
             int wordsFound = 0;
             // List<Tokenizer.WordTag> notFoundWords = new List<Tokenizer.WordTag>();
             List<string> algPredictions = new List<string>();
-            foreach (var w in wordsTest)
+            foreach (var w in stemWordsTest)
             {
                 Tagger.WordModel wordModelFinder = gTagger.Models.Find(x => x.Word == w.word);
                 if (wordModelFinder == null)
                 {
-                    algPredictions.Add("NULL");
+                    algPredictions.Add("NULL"); // NULL / NN
                     //if ("NN".Equals(w.tag))
-                    //    wordsFound++;
+                    //     wordsFound++;
                     continue;
                 }
                 string maxValueTag = wordModelFinder.TagFreq.OrderByDescending(x => x.Value).FirstOrDefault().Key;
-                //if (maxValueTag == null)
-                //{
-                //    if ("NN".Equals(w.tag))
-                //        wordsFound++;
-                //    algPredictions.Add("NULL");
-                //    Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~entered here LOL");
-                //    continue;
-                //}
                 if (maxValueTag.Equals(w.tag))
                 {
                     wordsFound++;
@@ -94,7 +97,7 @@ namespace PostAppConsole
                 }
             }
 
-            Console.WriteLine("Accuracy: " + (float)wordsFound / wordsTest.Count);
+            Console.WriteLine("Accuracy: " + (float)wordsFound / stemWordsTest.Count);
 
             //using (System.IO.StreamWriter file = new System.IO.StreamWriter("cuvinte_nepredictionate.csv"))
             //{
