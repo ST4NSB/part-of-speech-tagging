@@ -37,29 +37,13 @@ namespace PostAppConsole
             const string BrownfolderTrain = "Brown Corpus\\1_Train", BrownfolderTest = "Brown Corpus\\2_Test", testFile = "Test Files";
             var text = LoadAndReadFolderFiles(BrownfolderTrain);
             var oldWords = Tokenizer.SeparateTagFromWord(Tokenizer.WordTokenizeCorpus(text));
+
             var words = SpeechPart.GetNewHierarchicTags(oldWords);
+            // words = TextNormalization.Pipeline(words);
 
-            var wordsNormalizedTrain = TextNormalization.Pipeline(words);
-
-            //int k = 0;
-            //foreach (var item in wordsNormalizedTrain)
-            //{
-            //    Console.WriteLine(k + 1 + ": " + item.word + "->" + item.tag);
-            //    k++;
-            //    if (k == 18)
-            //    {
-            //        Console.WriteLine("cuv: " + item.word);
-            //        break;
-            //    }
-            //}
-
-            //var tags = SpeechPart.SpeechPartFrequence(words);
-            //var sorted = from entry in tags orderby entry.Value descending select entry;
-            //var sortedDict = new Dictionary<string, int>(sorted.ToDictionary(x => x.Key, x => x.Value));
-            //WriteToTxtFile("Informations", "[new]List_Tags_Abstract.json", JsonConvert.SerializeObject(sortedDict));
 
             Console.WriteLine("Done with loading and creating tokens!");
-            Tagger gTagger = new Tagger(wordsNormalizedTrain);
+            Tagger gTagger = new Tagger(words);
             Console.WriteLine("Done with training MODEL!");
             //foreach (var model in gTagger.Models)
             //{
@@ -75,10 +59,10 @@ namespace PostAppConsole
             var textTest = LoadAndReadFolderFiles(BrownfolderTest);
             var oldWordsTest = Tokenizer.SeparateTagFromWord(Tokenizer.WordTokenizeCorpus(textTest));
             var wordsTest = SpeechPart.GetNewHierarchicTags(oldWordsTest);
-            wordsTest = TextNormalization.Pipeline(wordsTest);
+           // wordsTest = TextNormalization.Pipeline(wordsTest);
 
             int wordsFound = 0;
-           // List<Tokenizer.WordTag> notFoundWords = new List<Tokenizer.WordTag>();
+            // List<Tokenizer.WordTag> notFoundWords = new List<Tokenizer.WordTag>();
             List<string> algPredictions = new List<string>();
             foreach (var w in wordsTest)
             {
@@ -121,7 +105,16 @@ namespace PostAppConsole
             //    }
             //}
 
-
+            Evaluation eval = new Evaluation();
+            eval.CreateSupervizedEvaluationsMatrix(wordsTest, algPredictions, fbeta:1);
+            Console.WriteLine("TAG       ACCURACY       PRECISION       RECALL       F-MEASURE");
+            var fullMatrix = eval.GetFullClassificationMatrix();
+            for (int i = 0; i < eval.GetFullMatrixLineLength(); i++)
+            {
+                for (int j = 0; j < eval.GetFullMatrixColLength(); j++)
+                    Console.Write(fullMatrix[i][j] + "       ");
+                Console.WriteLine();
+            }
         }
     }
 }
