@@ -28,11 +28,12 @@ namespace NLP
 
         public Tagger(List<EmissionModel> Models)
         {
+            // TODO: modify later for unigram + others
             this.EmissionFreq = new List<EmissionModel>(Models);
         }
 
         /// <summary>
-        /// Constructor that creates the list of models (SVM) for every individual word with a dictionary of grammar tags
+        /// Constructor that creates the Emission & Transition Matrix
         /// </summary>
         /// <param name="wordsInput">List of words - tag, eg. The - at)</param>
         public Tagger(List<Tokenizer.WordTag> wordsInput, string model = "bigram")
@@ -47,46 +48,6 @@ namespace NLP
                 this.CalculateBigramOccurences(wordsInput);
 
             this.TrainingTime.Stop();
-        }
-
-        private void CalculateBigramOccurences(List<Tokenizer.WordTag> wordsInput)
-        {
-            this.BigramTransition = new Dictionary<Tuple<string, string>, int>();
-            bool firstFileChecked = false;
-            for (int i = -1; i < wordsInput.Count - 1; i++) 
-            {
-                if(!firstFileChecked)
-                {
-                    this.BigramTransition.Add(new Tuple<string, string>(".", wordsInput[i + 1].tag), 1);
-                    firstFileChecked = true;
-                    continue;
-                }
-
-                var tuple = new Tuple<string, string>(wordsInput[i].tag, wordsInput[i + 1].tag);
-                var tag = this.BigramTransition.FirstOrDefault(x => x.Key.Equals(tuple));
-                if(tag.Key == null)
-                {
-                    this.BigramTransition.Add(tuple, 1);
-                }
-                else
-                {
-                    this.BigramTransition[tag.Key] += 1;
-                }
-            }
-        }
-
-        private void AddTagToUnigramOccurences(string wordTag)
-        {
-            var tag = this.UnigramFreq.FirstOrDefault(x => x.Key == wordTag);
-            if (tag.Key == null)
-            {
-                this.UnigramFreq.Add(wordTag, 1);
-            }
-            else
-            {
-                this.UnigramFreq[tag.Key] += 1;
-            }
-            
         }
 
         private void CalculateEmissionAndTransitionOccurrences(List<Tokenizer.WordTag> wordsInput)
@@ -120,22 +81,47 @@ namespace NLP
             }
         }
 
+        private void AddTagToUnigramOccurences(string wordTag)
+        {
+            var tag = this.UnigramFreq.FirstOrDefault(x => x.Key == wordTag);
+            if (tag.Key == null)
+            {
+                this.UnigramFreq.Add(wordTag, 1);
+            }
+            else
+            {
+                this.UnigramFreq[tag.Key] += 1;
+            }
+        }
 
+        private void CalculateBigramOccurences(List<Tokenizer.WordTag> wordsInput)
+        {
+            this.BigramTransition = new Dictionary<Tuple<string, string>, int>();
+            bool firstFileChecked = false;
+            for (int i = -1; i < wordsInput.Count - 1; i++)
+            {
+                if (!firstFileChecked)
+                {
+                    this.BigramTransition.Add(new Tuple<string, string>(".", wordsInput[i + 1].tag), 1);
+                    firstFileChecked = true;
+                    continue;
+                }
 
-        //public Dictionary<string, string> EasyWordTag(List<string> inputWords)
-        //{
-        //    Dictionary<string, string> output = new Dictionary<string, string>();
-        //    foreach(string word in inputWords)
-        //    {
-        //        WordModel wordModelFinder = this.Models.Find(x => x.Word == word);
-        //        var maxValueTag = wordModelFinder.TagFreq.OrderByDescending(x => x.Value).FirstOrDefault().Key;
-        //        output.Add(word, maxValueTag);
-        //    }
-        //    return output;
-        //} 
+                var tuple = new Tuple<string, string>(wordsInput[i].tag, wordsInput[i + 1].tag);
+                var tag = this.BigramTransition.FirstOrDefault(x => x.Key.Equals(tuple));
+                if (tag.Key == null)
+                {
+                    this.BigramTransition.Add(tuple, 1);
+                }
+                else
+                {
+                    this.BigramTransition[tag.Key] += 1;
+                }
+            }
+        }
 
         /// <summary>
-        /// Method that returns the elapsed time, loading SVM (ms)
+        /// Method that returns the elapsed time of trained model(Emission + Transition) (ms)
         /// </summary>
         public long GetTrainingTimeMs()
         {

@@ -34,8 +34,8 @@ namespace PostAppConsole
 
         static void Main(string[] args)
         {
-            const string BrownfolderTrain = "Brown Corpus\\1_Train", BrownfolderTest = "Brown Corpus\\2_Test", demoFile = "demo files";
-            var text = LoadAndReadFolderFiles(demoFile);
+            const string BrownfolderTrain = "Brown Corpus\\1_Train", BrownfolderTest = "Brown Corpus\\2_Test", demoFileTrain = "demo files\\train", demoFileTest = "demo files\\test";
+            var text = LoadAndReadFolderFiles(demoFileTrain);
             var oldWords = Tokenizer.SeparateTagFromWord(Tokenizer.WordTokenizeCorpus(text));
 
             var words = SpeechPart.GetNewHierarchicTags(oldWords);
@@ -61,15 +61,24 @@ namespace PostAppConsole
             {
                 Console.WriteLine(item.Key + " -> " + item.Value);
             }
+            
             Console.WriteLine("Duration of training model: " + tagger.GetTrainingTimeMs() + " ms!");
            // WriteToTxtFile("Trained Files", "SVM_trained_file.json", JsonConvert.SerializeObject(tagger.EmissionFreq));
 
-            var textTest = LoadAndReadFolderFiles(BrownfolderTest);
+            var textTest = LoadAndReadFolderFiles(demoFileTest);
             var oldWordsTest = Tokenizer.SeparateTagFromWord(Tokenizer.WordTokenizeCorpus(textTest));
             var wordsTest = SpeechPart.GetNewHierarchicTags(oldWordsTest);
             wordsTest = TextNormalization.Pipeline(wordsTest);
 
-
+            Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+            Decoder decoder = new Decoder(tagger.EmissionFreq, tagger.UnigramFreq, tagger.BigramTransition);
+            decoder.CalculateProbabilitiesForTestFiles(wordsTest);
+            foreach (var item in decoder.EmissionProbabilities)
+            {
+                Console.WriteLine(item.Word);
+                foreach (var item2 in item.TagFreq)
+                    Console.WriteLine("\t" + item2.Key + " -> " + item2.Value);
+            }
 
             //int wordsFound = 0;
             //// List<Tokenizer.WordTag> notFoundWords = new List<Tokenizer.WordTag>();
