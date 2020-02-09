@@ -43,7 +43,7 @@ namespace PostAppConsole
 
 
             Console.WriteLine("Done with loading and creating tokens!");
-            Tagger tagger = new Tagger(words, model:"bigram");
+            HMMTagger tagger = new HMMTagger(words, model:"bigram");
             Console.WriteLine("Done with training MODEL!");
             foreach (var model in tagger.EmissionFreq)
             {

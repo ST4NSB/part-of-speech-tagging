@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace NLP
 {
-    public class Tagger
+    public class HMMTagger
     {
         public List<EmissionModel> EmissionFreq;
         public Dictionary<string, int> UnigramFreq = new Dictionary<string, int>();
@@ -14,7 +14,7 @@ namespace NLP
 
         private Stopwatch TrainingTime;
         
-        public Tagger(
+        public HMMTagger(
             List<EmissionModel> EmissionFreq,
             Dictionary<string, int> UnigramFreq,
             Dictionary<Tuple<string, string>, int> BigramTransition,
@@ -30,7 +30,7 @@ namespace NLP
         /// Constructor that creates the Emission & Transition Matrix
         /// </summary>
         /// <param name="wordsInput">List of words - tag, eg. The - at)</param>
-        public Tagger(List<Tokenizer.WordTag> wordsInput, string model = "bigram")
+        public HMMTagger(List<Tokenizer.WordTag> wordsInput, string model = "bigram")
         {
             this.TrainingTime = new Stopwatch();
             this.TrainingTime.Start();

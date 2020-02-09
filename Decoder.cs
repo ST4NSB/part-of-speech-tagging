@@ -8,7 +8,7 @@ namespace NLP
 {
     public class Decoder
     {
-        private List<Tagger.EmissionModel> EmissionFreq;
+        private List<HMMTagger.EmissionModel> EmissionFreq;
         private Dictionary<string, int> UnigramFreq;
         private Dictionary<Tuple<string, string>, int> BigramFreq;
         private Dictionary<Tuple<string, string, string>, int> TrigramFreq;
@@ -16,12 +16,12 @@ namespace NLP
         public List<EmissionProbabilisticModel> EmissionProbabilities;
         public Dictionary<Tuple<string, string>, double> BigramTransitionProbabilities;
 
-        public List<List<ViterbiNode>> ViterbiMatrix;
+        public List<List<ViterbiNode>> ViterbiGraph;
 
         private Stopwatch ViterbiDecodeTime;
 
         public Decoder(
-            List<Tagger.EmissionModel> EmissionFreq,
+            List<HMMTagger.EmissionModel> EmissionFreq,
             Dictionary<string, int> UnigramFreq,
             Dictionary<Tuple<string, string>, int> BigramFreq)
         {
@@ -31,7 +31,7 @@ namespace NLP
         }
 
         public Decoder(
-            List<Tagger.EmissionModel> EmissionFreq, 
+            List<HMMTagger.EmissionModel> EmissionFreq, 
             Dictionary<string, int> UnigramFreq, 
             Dictionary<Tuple<string, string>, int> BigramFreq,
             Dictionary<Tuple<string, string, string>, int> TrigramFreq)
@@ -75,7 +75,7 @@ namespace NLP
             // emission stage
             foreach(var tw in testWords)
             {
-                Tagger.EmissionModel wmFind = EmissionFreq.Find(x => x.Word == tw.word);
+                HMMTagger.EmissionModel wmFind = EmissionFreq.Find(x => x.Word == tw.word);
                 EmissionProbabilisticModel wFind = EmissionProbabilities.Find(x => x.Word == tw.word);
                 if(wmFind != null && wFind == null)
                 {
@@ -111,8 +111,8 @@ namespace NLP
             this.ViterbiDecodeTime = new Stopwatch();
             this.ViterbiDecodeTime.Start();
 
-            this.ViterbiMatrix = new List<List<ViterbiNode>>();
-
+            this.ViterbiGraph = new List<List<ViterbiNode>>();
+            
 
 
             if(model.Equals("trigram"))
