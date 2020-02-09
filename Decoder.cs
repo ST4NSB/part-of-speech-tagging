@@ -52,18 +52,18 @@ namespace NLP
             }
         }
 
-        public struct ViterbiNode
+        public class ViterbiNode
         {
             public double value;
-            public string CurrentNodeTag;
-            public string PreviousNodeTag;
-            public string NextNodeTag; // + bidirectionality
-            public ViterbiNode(double value, string CurrentNodeTag, string PreviousNodeTag = null, string NextNodeTag = null)
+            public string CurrentTag;
+            public ViterbiNode PrevNode;
+            public ViterbiNode NextNode; // + bidirectionality
+            public ViterbiNode(double value, string CurrentTag, ViterbiNode PrevNode = null, ViterbiNode NextNode = null)
             {
                 this.value = value;
-                this.CurrentNodeTag = CurrentNodeTag;
-                this.PreviousNodeTag = PreviousNodeTag;
-                this.NextNodeTag = NextNodeTag;
+                this.CurrentTag = CurrentTag;
+                this.PrevNode = PrevNode;
+                this.NextNode = NextNode;
             }
         }
 
