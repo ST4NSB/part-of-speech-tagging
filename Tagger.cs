@@ -13,20 +13,7 @@ namespace NLP
         public Dictionary<Tuple<string, string, string>, int> TrigramTransition;
 
         private Stopwatch TrainingTime;
-
-        /// <summary>
-        /// The Model struct definition (Word - Dic[Tag, Tag_Frequency]), eg. (The, [at, 1]) 
-        /// </summary>
-        public class EmissionModel
-        {
-            public string Word;
-            public Dictionary<string, int> TagFreq;
-            public EmissionModel() 
-            {
-                this.TagFreq = new Dictionary<string, int>();
-            }
-        }
-
+        
         public Tagger(
             List<EmissionModel> EmissionFreq,
             Dictionary<string, int> UnigramFreq,
@@ -55,6 +42,20 @@ namespace NLP
 
             this.TrainingTime.Stop();
         }
+
+        /// <summary>
+        /// The Model struct definition (Word - Dic[Tag, Tag_Frequency]), eg. (The, [at, 1]) 
+        /// </summary>
+        public class EmissionModel
+        {
+            public string Word;
+            public Dictionary<string, int> TagFreq;
+            public EmissionModel()
+            {
+                this.TagFreq = new Dictionary<string, int>();
+            }
+        }
+
 
         private void CalculateEmissionAndTransitionOccurrences(List<Tokenizer.WordTag> wordsInput)
         {

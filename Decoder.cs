@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 
@@ -13,7 +14,11 @@ namespace NLP
         private Dictionary<Tuple<string, string, string>, int> TrigramFreq;
 
         public List<EmissionProbabilisticModel> EmissionProbabilities;
-        public Dictionary<Tuple<string, string>, float> BigramTransitionProbabilities;
+        public Dictionary<Tuple<string, string>, double> BigramTransitionProbabilities;
+
+        public List<List<ViterbiNode>> ViterbiMatrix;
+
+        private Stopwatch ViterbiDecodeTime;
 
         public Decoder(
             List<Tagger.EmissionModel> EmissionFreq,
@@ -40,17 +45,32 @@ namespace NLP
         public class EmissionProbabilisticModel
         {
             public string Word;
-            public Dictionary<string, float> TagFreq;
+            public Dictionary<string, double> TagFreq;
             public EmissionProbabilisticModel()
             {
-                this.TagFreq = new Dictionary<string, float>();
+                this.TagFreq = new Dictionary<string, double>();
+            }
+        }
+
+        public struct ViterbiNode
+        {
+            public double value;
+            public string CurrentNodeTag;
+            public string PreviousNodeTag;
+            public string NextNodeTag; // + bidirectionality
+            public ViterbiNode(double value, string CurrentNodeTag, string PreviousNodeTag = null, string NextNodeTag = null)
+            {
+                this.value = value;
+                this.CurrentNodeTag = CurrentNodeTag;
+                this.PreviousNodeTag = PreviousNodeTag;
+                this.NextNodeTag = NextNodeTag;
             }
         }
 
         public void CalculateProbabilitiesForTestFiles(List<Tokenizer.WordTag> testWords, string model = "bigram")
         {
             this.EmissionProbabilities = new List<EmissionProbabilisticModel>();
-            this.BigramTransitionProbabilities = new Dictionary<Tuple<string, string>, float>();
+            this.BigramTransitionProbabilities = new Dictionary<Tuple<string, string>, double>();
 
             // emission stage
             foreach(var tw in testWords)
@@ -80,22 +100,32 @@ namespace NLP
                 
             }
 
-            if(model.Equals("trigram")) // TODO: add condition later for tri-gram
+            if(model.Equals("trigram")) 
             {
-
+                // TODO: add condition later for tri-gram
             }
         }
 
-        //public Dictionary<string, string> EasyWordTag(List<string> inputWords)
-        //{
-        //    Dictionary<string, string> output = new Dictionary<string, string>();
-        //    foreach(string word in inputWords)
-        //    {
-        //        WordModel wordModelFinder = this.Models.Find(x => x.Word == word);
-        //        var maxValueTag = wordModelFinder.TagFreq.OrderByDescending(x => x.Value).FirstOrDefault().Key;
-        //        output.Add(word, maxValueTag);
-        //    }
-        //    return output;
-        //} 
+        public void ViterbiDecoding(List<Tokenizer.WordTag> testWords, string model = "bigram")
+        {
+            this.ViterbiDecodeTime = new Stopwatch();
+            this.ViterbiDecodeTime.Start();
+
+            this.ViterbiMatrix = new List<List<ViterbiNode>>();
+
+
+
+            if(model.Equals("trigram"))
+            {
+                // TODO: add condition later for tri-gram
+            }
+
+            this.ViterbiDecodeTime.Stop();
+        }
+
+        public long GetViterbiDecodingTime()
+        {
+            return this.ViterbiDecodeTime.ElapsedMilliseconds;
+        }
     }
 }
