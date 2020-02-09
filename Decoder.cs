@@ -12,7 +12,7 @@ namespace NLP
         private Dictionary<Tuple<string, string>, int> BigramFreq;
 
         public List<EmissionProbabilisticModel> EmissionProbabilities;
-        public Dictionary<Tuple<string, string>, float> BigramProbabilities;
+        public Dictionary<Tuple<string, string>, float> BigramTransitionProbabilities;
 
         public Decoder(
             List<Tagger.EmissionModel> EmissionFreq, 
@@ -37,26 +37,36 @@ namespace NLP
         public void CalculateProbabilitiesForTestFiles(List<Tokenizer.WordTag> testWords, string model = "bigram")
         {
             this.EmissionProbabilities = new List<EmissionProbabilisticModel>();
-            this.BigramProbabilities = new Dictionary<Tuple<string, string>, float>();
+            this.BigramTransitionProbabilities = new Dictionary<Tuple<string, string>, float>();
 
             // emission stage
             foreach(var tw in testWords)
             {
                 Tagger.EmissionModel wmFind = EmissionFreq.Find(x => x.Word == tw.word);
-                if(wmFind != null)
+                EmissionProbabilisticModel wFind = EmissionProbabilities.Find(x => x.Word == tw.word);
+                if(wmFind != null && wFind == null)
                 {
                     EmissionProbabilisticModel epModel = new EmissionProbabilisticModel();
                     epModel.Word = wmFind.Word;
-                    foreach(var tf in wmFind.TagFreq)
+                    foreach (var tf in wmFind.TagFreq)
                     {
-                        int pti = this.UnigramFreq.FirstOrDefault(x => x.Key == tf.Key).Value;
-                        float prob = (float)tf.Value / pti; // Emission probability: p(wi/ti) = C(ti, wi) / C(ti)
-                        epModel.TagFreq.Add(tf.Key, prob);
+                        int cti = this.UnigramFreq.FirstOrDefault(x => x.Key == tf.Key).Value;
+                        float pwiti = (float)tf.Value / cti; // Emission probability: p(wi/ti) = C(ti, wi) / C(ti)
+                        epModel.TagFreq.Add(tf.Key, pwiti);
                     }
                     this.EmissionProbabilities.Add(epModel);
                 }
             }
 
+            // transition stage
+            foreach(var tuple in this.BigramFreq)
+            {
+                var cti = this.UnigramFreq.FirstOrDefault(x => x.Key.Equals(tuple.Key.Item1)).Value;
+
+                float pti = (float)tuple.Value / cti; // Transition probability: p(ti|ti-1) = C(ti-1, ti) / C(ti-1)
+                this.BigramTransitionProbabilities.Add(tuple.Key, pti);
+                
+            }
 
             if(model.Equals("trigram")) // TODO: add condition later for tri-gram
             {

@@ -79,6 +79,8 @@ namespace PostAppConsole
                 foreach (var item2 in item.TagFreq)
                     Console.WriteLine("\t" + item2.Key + " -> " + item2.Value);
             }
+            foreach (var item in decoder.BigramTransitionProbabilities)
+                Console.WriteLine(item.Key + " -> " + item.Value);
 
             //int wordsFound = 0;
             //// List<Tokenizer.WordTag> notFoundWords = new List<Tokenizer.WordTag>();
