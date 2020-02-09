@@ -6,7 +6,7 @@ namespace NLP
 {
     /// <summary>
     /// The Stemmer class transforms a word into its root form.
-	/// Implementing the Porter Stemming Algorithm
+    /// Implementing the Porter Stemming Algorithm
     /// By Brad Patton
     /// </summary>
     public class PorterStemmer
