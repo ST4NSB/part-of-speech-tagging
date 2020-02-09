@@ -34,8 +34,8 @@ namespace PostAppConsole
 
         static void Main(string[] args)
         {
-            const string BrownfolderTrain = "Brown Corpus\\1_Train", BrownfolderTest = "Brown Corpus\\2_Test", testFile = "Test Files";
-            var text = LoadAndReadFolderFiles(BrownfolderTrain);
+            const string BrownfolderTrain = "Brown Corpus\\1_Train", BrownfolderTest = "Brown Corpus\\2_Test", demoFile = "demo files";
+            var text = LoadAndReadFolderFiles(demoFile);
             var oldWords = Tokenizer.SeparateTagFromWord(Tokenizer.WordTokenizeCorpus(text));
 
             var words = SpeechPart.GetNewHierarchicTags(oldWords);
@@ -43,18 +43,26 @@ namespace PostAppConsole
 
 
             Console.WriteLine("Done with loading and creating tokens!");
-            Tagger gTagger = new Tagger(words);
+            Tagger tagger = new Tagger(words);
             Console.WriteLine("Done with training MODEL!");
-            //foreach (var model in gTagger.Models)
-            //{
-            //    Console.WriteLine(model.Word);
-            //    foreach (var item in model.TagFreq)
-            //    {
-            //        Console.WriteLine("     " + item.Key + " -> " + item.Value);
-            //    }
-            //}
-            Console.WriteLine("Duration of training model: " + gTagger.GetTrainingTimeMs() + " ms!");
-            WriteToTxtFile("Trained Files", "SVM_trained_file.json", JsonConvert.SerializeObject(gTagger.Models));
+            foreach (var model in tagger.EmissionFreq)
+            {
+                Console.WriteLine(model.Word);
+                foreach (var item in model.TagFreq)
+                {
+                    Console.WriteLine("     " + item.Key + " -> " + item.Value);
+                }
+            }
+            foreach(var item in tagger.UnigramFreq)
+            {
+                Console.WriteLine(item.Key + " -> " + item.Value);
+            }
+            foreach(var item in tagger.BigramTransition)
+            {
+                Console.WriteLine(item.Key + " -> " + item.Value);
+            }
+            Console.WriteLine("Duration of training model: " + tagger.GetTrainingTimeMs() + " ms!");
+           // WriteToTxtFile("Trained Files", "SVM_trained_file.json", JsonConvert.SerializeObject(tagger.EmissionFreq));
 
             var textTest = LoadAndReadFolderFiles(BrownfolderTest);
             var oldWordsTest = Tokenizer.SeparateTagFromWord(Tokenizer.WordTokenizeCorpus(textTest));
@@ -63,53 +71,53 @@ namespace PostAppConsole
 
 
 
-            int wordsFound = 0;
-            // List<Tokenizer.WordTag> notFoundWords = new List<Tokenizer.WordTag>();
-            List<string> algPredictions = new List<string>();
-            foreach (var w in wordsTest)
-            {
-                Tagger.WordModel wordModelFinder = gTagger.Models.Find(x => x.Word == w.word);
-                if (wordModelFinder == null)
-                {
-                    algPredictions.Add("NULL"); // NULL / NN
-                    //if ("NN".Equals(w.tag))
-                    //     wordsFound++;
-                    continue;
-                }
-                string maxValueTag = wordModelFinder.TagFreq.OrderByDescending(x => x.Value).FirstOrDefault().Key;
-                if (maxValueTag.Equals(w.tag))
-                {
-                    wordsFound++;
-                    algPredictions.Add(maxValueTag);
-                }
-                else
-                {
-                    algPredictions.Add(maxValueTag);
-                }
-            }
-
-            Console.WriteLine("Accuracy: " + (float)wordsFound / wordsTest.Count);
-
-            //using (System.IO.StreamWriter file = new System.IO.StreamWriter("cuvinte_nepredictionate.csv"))
+            //int wordsFound = 0;
+            //// List<Tokenizer.WordTag> notFoundWords = new List<Tokenizer.WordTag>();
+            //List<string> algPredictions = new List<string>();
+            //foreach (var w in wordsTest)
             //{
-            //    file.WriteLine("Word,My Prediction Tag,Actual Tag");
-            //    for (int i = 0; i < wordsTest.Count; i++)
+            //    Tagger.EmissionModel wordModelFinder = gTagger.EmissionFreq.Find(x => x.Word == w.word);
+            //    if (wordModelFinder == null)
             //    {
-            //        file.WriteLine("\"" + wordsTest[i].word + "\"," + algPredictions[i] + "," + wordsTest[i].tag);
+            //        algPredictions.Add("NULL"); // NULL / NN
+            //        //if ("NN".Equals(w.tag))
+            //        //     wordsFound++;
+            //        continue;
+            //    }
+            //    string maxValueTag = wordModelFinder.TagFreq.OrderByDescending(x => x.Value).FirstOrDefault().Key;
+            //    if (maxValueTag.Equals(w.tag))
+            //    {
+            //        wordsFound++;
+            //        algPredictions.Add(maxValueTag);
+            //    }
+            //    else
+            //    {
+            //        algPredictions.Add(maxValueTag);
             //    }
             //}
 
+            //Console.WriteLine("Accuracy: " + (float)wordsFound / wordsTest.Count);
 
-            Evaluation eval = new Evaluation();
-            eval.CreateSupervizedEvaluationsMatrix(wordsTest, algPredictions, fbeta:1);
-            Console.WriteLine("TAG       ACCURACY       PRECISION       RECALL       F-MEASURE");
-            var fullMatrix = eval.GetFullClassificationMatrix();
-            for (int i = 0; i < eval.GetFullMatrixLineLength(); i++)
-            {
-                for (int j = 0; j < eval.GetFullMatrixColLength(); j++)
-                    Console.Write(fullMatrix[i][j] + "       ");
-                Console.WriteLine();
-            }
+            ////using (System.IO.StreamWriter file = new System.IO.StreamWriter("cuvinte_nepredictionate.csv"))
+            ////{
+            ////    file.WriteLine("Word,My Prediction Tag,Actual Tag");
+            ////    for (int i = 0; i < wordsTest.Count; i++)
+            ////    {
+            ////        file.WriteLine("\"" + wordsTest[i].word + "\"," + algPredictions[i] + "," + wordsTest[i].tag);
+            ////    }
+            ////}
+
+
+            //Evaluation eval = new Evaluation();
+            //eval.CreateSupervizedEvaluationsMatrix(wordsTest, algPredictions, fbeta:1);
+            //Console.WriteLine("TAG       ACCURACY       PRECISION       RECALL       F-MEASURE");
+            //var fullMatrix = eval.GetFullClassificationMatrix();
+            //for (int i = 0; i < eval.GetFullMatrixLineLength(); i++)
+            //{
+            //    for (int j = 0; j < eval.GetFullMatrixColLength(); j++)
+            //        Console.Write(fullMatrix[i][j] + "       ");
+            //    Console.WriteLine();
+            //}
         }
     }
 }
