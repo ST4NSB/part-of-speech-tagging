@@ -10,18 +10,31 @@ namespace NLP
         private List<Tagger.EmissionModel> EmissionFreq;
         private Dictionary<string, int> UnigramFreq;
         private Dictionary<Tuple<string, string>, int> BigramFreq;
+        private Dictionary<Tuple<string, string, string>, int> TrigramFreq;
 
         public List<EmissionProbabilisticModel> EmissionProbabilities;
         public Dictionary<Tuple<string, string>, float> BigramTransitionProbabilities;
 
         public Decoder(
-            List<Tagger.EmissionModel> EmissionFreq, 
-            Dictionary<string, int> UnigramFreq, 
+            List<Tagger.EmissionModel> EmissionFreq,
+            Dictionary<string, int> UnigramFreq,
             Dictionary<Tuple<string, string>, int> BigramFreq)
         {
             this.EmissionFreq = EmissionFreq;
             this.UnigramFreq = UnigramFreq;
             this.BigramFreq = BigramFreq;
+        }
+
+        public Decoder(
+            List<Tagger.EmissionModel> EmissionFreq, 
+            Dictionary<string, int> UnigramFreq, 
+            Dictionary<Tuple<string, string>, int> BigramFreq,
+            Dictionary<Tuple<string, string, string>, int> TrigramFreq)
+        {
+            this.EmissionFreq = EmissionFreq;
+            this.UnigramFreq = UnigramFreq;
+            this.BigramFreq = BigramFreq;
+            this.TrigramFreq = TrigramFreq;
         }
 
         public class EmissionProbabilisticModel
@@ -62,7 +75,6 @@ namespace NLP
             foreach(var tuple in this.BigramFreq)
             {
                 var cti = this.UnigramFreq.FirstOrDefault(x => x.Key.Equals(tuple.Key.Item1)).Value;
-
                 float pti = (float)tuple.Value / cti; // Transition probability: p(ti|ti-1) = C(ti-1, ti) / C(ti-1)
                 this.BigramTransitionProbabilities.Add(tuple.Key, pti);
                 

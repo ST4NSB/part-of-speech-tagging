@@ -43,7 +43,7 @@ namespace PostAppConsole
 
 
             Console.WriteLine("Done with loading and creating tokens!");
-            Tagger tagger = new Tagger(words);
+            Tagger tagger = new Tagger(words, model:"bigram");
             Console.WriteLine("Done with training MODEL!");
             foreach (var model in tagger.EmissionFreq)
             {
@@ -54,23 +54,20 @@ namespace PostAppConsole
                 }
             }
             foreach(var item in tagger.UnigramFreq)
-            {
                 Console.WriteLine(item.Key + " -> " + item.Value);
-            }
+            
             foreach(var item in tagger.BigramTransition)
-            {
                 Console.WriteLine(item.Key + " -> " + item.Value);
-            }
             
             Console.WriteLine("Duration of training model: " + tagger.GetTrainingTimeMs() + " ms!");
-           // WriteToTxtFile("Trained Files", "SVM_trained_file.json", JsonConvert.SerializeObject(tagger.EmissionFreq));
+            // WriteToTxtFile("Trained Files", "SVM_trained_file.json", JsonConvert.SerializeObject(tagger.EmissionFreq));
 
+            Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
             var textTest = LoadAndReadFolderFiles(demoFileTest);
             var oldWordsTest = Tokenizer.SeparateTagFromWord(Tokenizer.WordTokenizeCorpus(textTest));
             var wordsTest = SpeechPart.GetNewHierarchicTags(oldWordsTest);
             wordsTest = TextNormalization.Pipeline(wordsTest);
 
-            Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
             Decoder decoder = new Decoder(tagger.EmissionFreq, tagger.UnigramFreq, tagger.BigramTransition);
             decoder.CalculateProbabilitiesForTestFiles(wordsTest);
             foreach (var item in decoder.EmissionProbabilities)

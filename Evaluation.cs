@@ -8,11 +8,20 @@ namespace NLP
     {
         HashSet<string> ClassTags;
         List<List<float>> finalMatrix;
+
+        public float GetSimpleAccuracy(List<Tokenizer.WordTag> realTags, List<string> predictedTags)
+        {
+            int wordsHit = 0;
+            for (int i = 0; i < realTags.Count; i++)
+                if (realTags[i].tag == predictedTags[i])
+                    wordsHit++;
+            return (float)wordsHit / realTags.Count;
+        }
+
         public void CreateSupervizedEvaluationsMatrix(List<Tokenizer.WordTag> realTags, List<string> predictedTags, int fbeta = 1)
         {
             ClassTags = new HashSet<string>();
             finalMatrix = new List<List<float>>();
-
 
             foreach (var item in realTags)
                 this.ClassTags.Add(item.tag);

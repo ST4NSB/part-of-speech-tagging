@@ -10,6 +10,7 @@ namespace NLP
         public List<EmissionModel> EmissionFreq;
         public Dictionary<string, int> UnigramFreq = new Dictionary<string, int>();
         public Dictionary<Tuple<string, string>, int> BigramTransition;
+        public Dictionary<Tuple<string, string, string>, int> TrigramTransition;
 
         private Stopwatch TrainingTime;
 
@@ -26,10 +27,16 @@ namespace NLP
             }
         }
 
-        public Tagger(List<EmissionModel> Models)
+        public Tagger(
+            List<EmissionModel> EmissionFreq,
+            Dictionary<string, int> UnigramFreq,
+            Dictionary<Tuple<string, string>, int> BigramTransition,
+            Dictionary<Tuple<string, string, string>, int> TrigramTransition)
         {
-            // TODO: modify later for unigram + others
-            this.EmissionFreq = new List<EmissionModel>(Models);
+            this.EmissionFreq = EmissionFreq;
+            this.UnigramFreq = UnigramFreq;
+            this.BigramTransition = BigramTransition;
+            this.TrigramTransition = TrigramTransition;
         }
 
         /// <summary>
@@ -41,11 +48,10 @@ namespace NLP
             this.TrainingTime = new Stopwatch();
             this.TrainingTime.Start();
 
-          //  this.CalculateUnigramOccurences(wordsInput);
             this.CalculateEmissionAndTransitionOccurrences(wordsInput);
-
-            if (model.Equals("bigram"))
-                this.CalculateBigramOccurences(wordsInput);
+            this.CalculateBigramOccurences(wordsInput); // calculated automatically
+            if (model.Equals("trigram"))
+                this.CalculateTrigramOccurences(wordsInput);
 
             this.TrainingTime.Stop();
         }
@@ -116,6 +122,36 @@ namespace NLP
                 else
                 {
                     this.BigramTransition[tag.Key] += 1;
+                }
+            }
+        }
+
+        private void CalculateTrigramOccurences(List<Tokenizer.WordTag> wordsInput)
+        {
+            this.TrigramTransition = new Dictionary<Tuple<string, string, string>, int>();
+            bool firstFileChecked = false;
+            for (int i = -1; i < wordsInput.Count - 2; i++)
+            {
+                if (!firstFileChecked)
+                {
+                    this.TrigramTransition.Add(new Tuple<string, string, string>(".", wordsInput[i + 1].tag, wordsInput[i + 2].tag), 1);
+                    firstFileChecked = true;
+                    continue;
+                }
+
+                var tuple = new Tuple<string, string, string>(wordsInput[i].tag, wordsInput[i + 1].tag, wordsInput[i + 2].tag);
+
+                if (tuple.Item2.Equals("."))
+                    continue;
+                
+                var tag = this.TrigramTransition.FirstOrDefault(x => x.Key.Equals(tuple));
+                if (tag.Key == null)
+                {
+                    this.TrigramTransition.Add(tuple, 1);
+                }
+                else
+                {
+                    this.TrigramTransition[tag.Key] += 1;
                 }
             }
         }
