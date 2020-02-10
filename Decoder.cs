@@ -8,14 +8,9 @@ namespace NLP
 {
     public class Decoder
     {
-        private List<HMMTagger.EmissionModel> EmissionFreq;
-        private Dictionary<string, int> UnigramFreq;
-        private Dictionary<Tuple<string, string>, int> BigramFreq;
-        private Dictionary<Tuple<string, string, string>, int> TrigramFreq;
-
-        public List<EmissionProbabilisticModel> EmissionProbabilities;
+        public List<HMMTagger.EmissionProbabilisticModel> EmissionProbabilities;
         public Dictionary<Tuple<string, string>, double> BigramTransitionProbabilities;
-
+        public Dictionary<Tuple<string, string, string>, double> TrigramTransitionProbabilities;
 
         public List<string> PredictedTags;
 
@@ -24,35 +19,21 @@ namespace NLP
         private Stopwatch ViterbiDecodeTime;
 
         public Decoder(
-            List<HMMTagger.EmissionModel> EmissionFreq,
-            Dictionary<string, int> UnigramFreq,
-            Dictionary<Tuple<string, string>, int> BigramFreq)
+            List<HMMTagger.EmissionProbabilisticModel> EmissionProbabilities,
+            Dictionary<Tuple<string, string>, double> BigramTransitionProbabilities)
         {
-            this.EmissionFreq = EmissionFreq;
-            this.UnigramFreq = UnigramFreq;
-            this.BigramFreq = BigramFreq;
+            this.EmissionProbabilities = EmissionProbabilities;
+            this.BigramTransitionProbabilities = BigramTransitionProbabilities;
         }
 
         public Decoder(
-            List<HMMTagger.EmissionModel> EmissionFreq, 
-            Dictionary<string, int> UnigramFreq, 
-            Dictionary<Tuple<string, string>, int> BigramFreq,
-            Dictionary<Tuple<string, string, string>, int> TrigramFreq)
+            List<HMMTagger.EmissionProbabilisticModel> EmissionProbabilities,
+            Dictionary<Tuple<string, string>, double> BigramTransitionProbabilities,
+            Dictionary<Tuple<string, string, string>, double> TrigramTransitionProbabilities)
         {
-            this.EmissionFreq = EmissionFreq;
-            this.UnigramFreq = UnigramFreq;
-            this.BigramFreq = BigramFreq;
-            this.TrigramFreq = TrigramFreq;
-        }
-
-        public class EmissionProbabilisticModel
-        {
-            public string Word;
-            public Dictionary<string, double> TagFreq;
-            public EmissionProbabilisticModel()
-            {
-                this.TagFreq = new Dictionary<string, double>();
-            }
+            this.EmissionProbabilities = EmissionProbabilities;
+            this.BigramTransitionProbabilities = BigramTransitionProbabilities;
+            this.TrigramTransitionProbabilities = TrigramTransitionProbabilities;
         }
 
         public class ViterbiNode
@@ -67,45 +48,6 @@ namespace NLP
                 this.CurrentTag = CurrentTag;
                 this.PrevNode = PrevNode;
                 this.NextNode = NextNode;
-            }
-        }
-
-        public void CalculateProbabilitiesForTestFiles(List<Tokenizer.WordTag> testWords, string model = "bigram")
-        {
-            this.EmissionProbabilities = new List<EmissionProbabilisticModel>();
-            this.BigramTransitionProbabilities = new Dictionary<Tuple<string, string>, double>();
-
-            // emission stage
-            foreach(var tw in testWords)
-            {
-                HMMTagger.EmissionModel wmFind = EmissionFreq.Find(x => x.Word == tw.word);
-                EmissionProbabilisticModel wFind = EmissionProbabilities.Find(x => x.Word == tw.word);
-                if(wmFind != null && wFind == null)
-                {
-                    EmissionProbabilisticModel epModel = new EmissionProbabilisticModel();
-                    epModel.Word = wmFind.Word;
-                    foreach (var tf in wmFind.TagFreq)
-                    {
-                        int cti = this.UnigramFreq.FirstOrDefault(x => x.Key == tf.Key).Value;
-                        float pwiti = (float)tf.Value / cti; // Emission probability: p(wi/ti) = C(ti, wi) / C(ti)
-                        epModel.TagFreq.Add(tf.Key, pwiti);
-                    }
-                    this.EmissionProbabilities.Add(epModel);
-                }
-            }
-
-            // transition stage
-            foreach(var tuple in this.BigramFreq)
-            {
-                var cti = this.UnigramFreq.FirstOrDefault(x => x.Key.Equals(tuple.Key.Item1)).Value;
-                float pti = (float)tuple.Value / cti; // Transition probability: p(ti|ti-1) = C(ti-1, ti) / C(ti-1)
-                this.BigramTransitionProbabilities.Add(tuple.Key, pti);
-                
-            }
-
-            if(model.Equals("trigram")) 
-            {
-                // TODO: add condition later for tri-gram
             }
         }
 
@@ -136,10 +78,10 @@ namespace NLP
             {
                 if (startPoint)
                 {
-                   // ViterbiNode vnode = new ViterbiNode(0.0d, ".");
-                   // this.ViterbiGraph.Add(new List<ViterbiNode>() { vnode });
+                    // ViterbiNode vnode = new ViterbiNode(0.0d, ".");
+                    // this.ViterbiGraph.Add(new List<ViterbiNode>() { vnode });
 
-                    EmissionProbabilisticModel foundWord = this.EmissionProbabilities.Find(x => x.Word.Equals(testWords[i].word));
+                    HMMTagger.EmissionProbabilisticModel foundWord = this.EmissionProbabilities.Find(x => x.Word.Equals(testWords[i].word));
                     if (foundWord == null)
                     {
                         Console.WriteLine("Error: word not found[start]");
@@ -168,7 +110,7 @@ namespace NLP
                 {
                     List<ViterbiNode> vList = new List<ViterbiNode>();
 
-                    EmissionProbabilisticModel foundWord = this.EmissionProbabilities.Find(x => x.Word.Equals(testWords[i].word));
+                    HMMTagger.EmissionProbabilisticModel foundWord = this.EmissionProbabilities.Find(x => x.Word.Equals(testWords[i].word));
                     if (foundWord == null)
                     {
                         Console.WriteLine("Error: word not found");

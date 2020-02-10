@@ -12,8 +12,13 @@ namespace NLP
         public Dictionary<Tuple<string, string>, int> BigramTransition;
         public Dictionary<Tuple<string, string, string>, int> TrigramTransition;
 
+        public List<EmissionProbabilisticModel> EmissionProbabilities;
+        public Dictionary<Tuple<string, string>, double> BigramTransitionProbabilities;
+
         private Stopwatch TrainingTime;
-        
+
+        public HMMTagger() { }
+
         public HMMTagger(
             List<EmissionModel> EmissionFreq,
             Dictionary<string, int> UnigramFreq,
@@ -27,10 +32,33 @@ namespace NLP
         }
 
         /// <summary>
-        /// Constructor that creates the Emission & Transition Matrix
+        /// The Model struct definition (Word - Dic[Tag, Tag_Frequency]), eg. (The, [at, 1]) 
+        /// </summary>
+        public class EmissionModel
+        {
+            public string Word;
+            public Dictionary<string, int> TagFreq;
+            public EmissionModel()
+            {
+                this.TagFreq = new Dictionary<string, int>();
+            }
+        }
+
+        public class EmissionProbabilisticModel
+        {
+            public string Word;
+            public Dictionary<string, double> TagFreq;
+            public EmissionProbabilisticModel()
+            {
+                this.TagFreq = new Dictionary<string, double>();
+            }
+        }
+
+        /// <summary>
+        /// Function that creates the Emission & Transition Matrix
         /// </summary>
         /// <param name="wordsInput">List of words - tag, eg. The - at)</param>
-        public HMMTagger(List<Tokenizer.WordTag> wordsInput, string model = "bigram")
+        public void TrainModel(List<Tokenizer.WordTag> wordsInput, string model = "bigram")
         {
             this.TrainingTime = new Stopwatch();
             this.TrainingTime.Start();
@@ -43,16 +71,42 @@ namespace NLP
             this.TrainingTime.Stop();
         }
 
-        /// <summary>
-        /// The Model struct definition (Word - Dic[Tag, Tag_Frequency]), eg. (The, [at, 1]) 
-        /// </summary>
-        public class EmissionModel
+        public void CalculateProbabilitiesForTestFiles(List<Tokenizer.WordTag> testWords, string model = "bigram")
         {
-            public string Word;
-            public Dictionary<string, int> TagFreq;
-            public EmissionModel()
+            this.EmissionProbabilities = new List<EmissionProbabilisticModel>();
+            this.BigramTransitionProbabilities = new Dictionary<Tuple<string, string>, double>();
+
+            // emission stage
+            foreach (var tw in testWords)
             {
-                this.TagFreq = new Dictionary<string, int>();
+                HMMTagger.EmissionModel wmFind = EmissionFreq.Find(x => x.Word == tw.word);
+                EmissionProbabilisticModel wFind = EmissionProbabilities.Find(x => x.Word == tw.word);
+                if (wmFind != null && wFind == null)
+                {
+                    EmissionProbabilisticModel epModel = new EmissionProbabilisticModel();
+                    epModel.Word = wmFind.Word;
+                    foreach (var tf in wmFind.TagFreq)
+                    {
+                        int cti = this.UnigramFreq.FirstOrDefault(x => x.Key == tf.Key).Value;
+                        float pwiti = (float)tf.Value / cti; // Emission probability: p(wi/ti) = C(ti, wi) / C(ti)
+                        epModel.TagFreq.Add(tf.Key, pwiti);
+                    }
+                    this.EmissionProbabilities.Add(epModel);
+                }
+            }
+
+            // transition stage
+            foreach (var tuple in this.BigramTransition)
+            {
+                var cti = this.UnigramFreq.FirstOrDefault(x => x.Key.Equals(tuple.Key.Item1)).Value;
+                float pti = (float)tuple.Value / cti; // Transition probability: p(ti|ti-1) = C(ti-1, ti) / C(ti-1)
+                this.BigramTransitionProbabilities.Add(tuple.Key, pti);
+
+            }
+
+            if (model.Equals("trigram"))
+            {
+                // TODO: add condition later for tri-gram
             }
         }
 
