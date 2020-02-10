@@ -76,6 +76,10 @@ namespace NLP
             this.EmissionProbabilities = new List<EmissionProbabilisticModel>();
             this.BigramTransitionProbabilities = new Dictionary<Tuple<string, string>, double>();
 
+            for (int i = 0; i < testWords.Count - 1; i++)
+                if (testWords[i].tag == "." && testWords[i].tag == testWords[i + 1].tag)
+                    testWords.RemoveAt(i);
+
             // emission stage
             foreach (var tw in testWords)
             {

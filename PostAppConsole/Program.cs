@@ -34,7 +34,9 @@ namespace PostAppConsole
 
         static void Main(string[] args)
         {
-            const string BrownfolderTrain = "Brown Corpus\\1_Train", BrownfolderTest = "Brown Corpus\\2_Test", demoFileTrain = "demo files\\train", demoFileTest = "demo files\\test";
+            const string BrownfolderTrain = "Brown Corpus\\1_Train", BrownfolderTest = "Brown Corpus\\2_Test", 
+                demoFileTrain = "demo files\\train", demoFileTest = "demo files\\test";
+
             var text = LoadAndReadFolderFiles(demoFileTrain);
             var oldWords = Tokenizer.SeparateTagFromWord(Tokenizer.WordTokenizeCorpus(text));
 
@@ -46,19 +48,19 @@ namespace PostAppConsole
             HMMTagger tagger = new HMMTagger();
             tagger.TrainModel(words, model: "bigram");
             Console.WriteLine("Done with training MODEL!");
-            foreach (var model in tagger.EmissionFreq)
-            {
-                Console.WriteLine(model.Word);
-                foreach (var item in model.TagFreq)
-                {
-                    Console.WriteLine("     " + item.Key + " -> " + item.Value);
-                }
-            }
-            foreach (var item in tagger.UnigramFreq)
-                Console.WriteLine(item.Key + " -> " + item.Value);
+            //foreach (var model in tagger.EmissionFreq)
+            //{
+            //    Console.WriteLine(model.Word);
+            //    foreach (var item in model.TagFreq)
+            //    {
+            //        Console.WriteLine("     " + item.Key + " -> " + item.Value);
+            //    }
+            //}
+            //foreach (var item in tagger.UnigramFreq)
+            //    Console.WriteLine(item.Key + " -> " + item.Value);
 
-            foreach (var item in tagger.BigramTransition)
-                Console.WriteLine(item.Key + " -> " + item.Value);
+            //foreach (var item in tagger.BigramTransition)
+            //    Console.WriteLine(item.Key + " -> " + item.Value);
 
             Console.WriteLine("Duration of training model: " + tagger.GetTrainingTimeMs() + " ms!");
             // WriteToTxtFile("Trained Files", "SVM_trained_file.json", JsonConvert.SerializeObject(tagger.EmissionFreq));
@@ -83,28 +85,31 @@ namespace PostAppConsole
 
 
             decoder.ViterbiDecoding(wordsTest, model: "bigram", mode: "f+b");
-            foreach (var line in decoder.ViterbiGraph)
-            {
-                foreach (var col in line)
-                    Console.Write("[" + col.CurrentTag + " -> " + col.value + "]    ");
-                Console.WriteLine();
-            }
+            //foreach (var line in decoder.ViterbiGraph)
+            //{
+            //    foreach (var col in line)
+            //        Console.Write("[" + col.CurrentTag + " -> " + col.value + "]    ");
+            //    Console.WriteLine();
+            //}
+
+           
 
             foreach (var item in decoder.PredictedTags)
-                Console.Write(item + " ");
+               Console.Write(item + " ");
 
             Console.WriteLine("\nDuration of Viterbi Decoding: " + decoder.GetViterbiDecodingTime() + " ms!\n");
 
+            Console.WriteLine("testwords: " + wordsTest.Count + " , predwords: " + decoder.PredictedTags.Count);
             Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 
-           // foreach (var item in wordsTest)
-           ///     Console.WriteLine(item.word + "  ");
+           //foreach (var item in wordsTest)
+             //  Console.WriteLine(item.word + "  ");
 
 
             Evaluation eval = new Evaluation();
             eval.CreateSupervizedEvaluationsMatrix(wordsTest, decoder.PredictedTags, fbeta: 1);
             Console.WriteLine("Simple Accuracy: " + eval.GetSimpleAccuracy(wordsTest, decoder.PredictedTags));
-            Console.WriteLine("TAG\tACCURACY\tPRECISION\t\tRECALL\t\tF-MEASURE");
+            Console.WriteLine("TAG\t\tACCURACY\t\tPRECISION\t\tRECALL\t\t\tF-MEASURE");
             var fullMatrix = eval.GetFullClassificationMatrix();
             for (int i = 0; i < eval.GetFullMatrixLineLength(); i++)
             {
@@ -114,6 +119,7 @@ namespace PostAppConsole
             }
 
             Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+
 
             ////using (System.IO.StreamWriter file = new System.IO.StreamWriter("cuvinte_nepredictionate.csv"))
             ////{

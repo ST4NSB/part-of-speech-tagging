@@ -5,10 +5,10 @@ D:\Projects\github\Nlp-PosTagger\PostAppConsole\bin\Debug\netcoreapp2.1\PostAppC
 D:\Projects\github\Nlp-PosTagger\PostAppConsole\bin\Debug\netcoreapp2.1\PostAppConsole.pdb
 D:\Projects\github\Nlp-PosTagger\PostAppConsole\bin\Debug\netcoreapp2.1\Nlp-PosTagger.dll
 D:\Projects\github\Nlp-PosTagger\PostAppConsole\bin\Debug\netcoreapp2.1\Nlp-PosTagger.pdb
-D:\Projects\github\Nlp-PosTagger\PostAppConsole\obj\Debug\netcoreapp2.1\PostAppConsole.csprojAssemblyReference.cache
 D:\Projects\github\Nlp-PosTagger\PostAppConsole\obj\Debug\netcoreapp2.1\PostAppConsole.csproj.CoreCompileInputs.cache
 D:\Projects\github\Nlp-PosTagger\PostAppConsole\obj\Debug\netcoreapp2.1\PostAppConsole.AssemblyInfoInputs.cache
 D:\Projects\github\Nlp-PosTagger\PostAppConsole\obj\Debug\netcoreapp2.1\PostAppConsole.AssemblyInfo.cs
 D:\Projects\github\Nlp-PosTagger\PostAppConsole\obj\Debug\netcoreapp2.1\PostAppConsole.csproj.CopyComplete
 D:\Projects\github\Nlp-PosTagger\PostAppConsole\obj\Debug\netcoreapp2.1\PostAppConsole.dll
 D:\Projects\github\Nlp-PosTagger\PostAppConsole\obj\Debug\netcoreapp2.1\PostAppConsole.pdb
+D:\Projects\github\Nlp-PosTagger\PostAppConsole\obj\Debug\netcoreapp2.1\PostAppConsole.csprojAssemblyReference.cache

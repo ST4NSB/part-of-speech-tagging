@@ -73,6 +73,10 @@ namespace NLP
                 BiDirectionalModelTrace();
 
             this.ViterbiDecodeTime.Stop();
+
+            for (int i = 0; i < testWords.Count; i++)
+                if (testWords[i].tag == ".")
+                    testWords.RemoveAt(i);
         }
 
 
@@ -95,7 +99,7 @@ namespace NLP
                         string nextTag = "NULL";
 
                         foreach (var item in orderedTransitions)
-                            if (item.Key.Item1.Equals("."))
+                            if (item.Key.Item1.Equals(".") && item.Key.Item2 != ".")
                             {
                                 product = item.Value;
                                 nextTag = item.Key.Item2;
@@ -115,6 +119,11 @@ namespace NLP
                             {
                                 double product = (double)emissionFreqValue * biTransition.Value;
                                 ViterbiNode node = new ViterbiNode(product, wt.Key); //,PrevNode: new List<ViterbiNode>() { vnode });
+                                vList.Add(node);
+                            } 
+                            else // case 1
+                            {
+                                ViterbiNode node = new ViterbiNode(0.0d, "NN"); //,PrevNode: new List<ViterbiNode>() { vnode });
                                 vList.Add(node);
                             }
                         }
@@ -139,12 +148,12 @@ namespace NLP
                         double product = 0.0d;
                         string nextTag = "NULL";
 
-                        foreach(var item in orderedTransitions)
-                            if(item.Key.Item1.Equals(elem.CurrentTag))
+                        foreach (var item in orderedTransitions)
+                            if (item.Key.Item1.Equals(elem.CurrentTag) && item.Key.Item2 != ".")
                             {
                                 product = (double)elem.value * item.Value;
                                 nextTag = item.Key.Item2;
-                                if (product > vGoodNode.value)
+                                if (product >= vGoodNode.value)
                                 {
                                     vGoodNode.value = product;
                                     vGoodNode.CurrentTag = nextTag;
@@ -168,7 +177,7 @@ namespace NLP
                                 if (!biTransition.Equals(null))
                                 {
                                     double product = (double)vn.value * biTransition.Value * tf.Value;
-                                    if (product > vGoodNode.value)
+                                    if (product >= vGoodNode.value)
                                     {
                                         vGoodNode.value = product;
                                         vGoodNode.CurrentTag = tf.Key;
@@ -177,19 +186,32 @@ namespace NLP
                                         vGoodNode.PrevNode = prevNodesGoodNode;
                                     }
                                 }
+                                else // case 2
+                                {
+                                    vGoodNode.value = 0.0d;
+                                    vGoodNode.CurrentTag = "NN";
+                                    List<ViterbiNode> prevNodesGoodNode = new List<ViterbiNode>();
+                                    prevNodesGoodNode.Add(vn);
+                                    vGoodNode.PrevNode = prevNodesGoodNode;
+                                }
                             }
                             vList.Add(vGoodNode);
                         }
                     }
                     this.ViterbiGraph.Add(vList);
                     this.ViterbiGraph[this.ViterbiGraph.Count - 1] = this.ViterbiGraph[this.ViterbiGraph.Count - 1].OrderByDescending(x => x.value).ToList();
-                    if (this.ViterbiGraph[this.ViterbiGraph.Count - 1][0].CurrentTag.Equals("."))
+                    if (this.ViterbiGraph[this.ViterbiGraph.Count - 1][0].CurrentTag == ".")
+                    //if (testWords[i].tag == ".")
                     {
+                        
                         Backtrace(method: "forward");
+                       
                         startPoint = true;
                         continue;
                     }
                 }
+
+                //Console.WriteLine("COD: " + testWords[i].word + "   " + ViterbiGraph.Count);
             }
         }
 
@@ -212,7 +234,7 @@ namespace NLP
                         string nextTag = "NULL";
 
                         foreach (var item in orderedTransitions)
-                            if (item.Key.Item2.Equals("."))
+                            if (item.Key.Item2.Equals(".") && item.Key.Item1 != ".")
                             {
                                 product = item.Value;
                                 nextTag = item.Key.Item1;
@@ -232,6 +254,11 @@ namespace NLP
                             {
                                 double product = (double)emissionFreqValue * biTransition.Value;
                                 ViterbiNode node = new ViterbiNode(product, wt.Key); //,PrevNode: new List<ViterbiNode>() { vnode });
+                                vList.Add(node);
+                            }
+                            else // case 1
+                            {
+                                ViterbiNode node = new ViterbiNode(0.0d, "NN"); //,PrevNode: new List<ViterbiNode>() { vnode });
                                 vList.Add(node);
                             }
                         }
@@ -257,11 +284,11 @@ namespace NLP
                         string nextTag = "NULL";
 
                         foreach (var item in orderedTransitions)
-                            if (item.Key.Item2.Equals(elem.CurrentTag))
+                            if (item.Key.Item2.Equals(elem.CurrentTag) && item.Key.Item1 != ".")
                             {
                                 product = (double)elem.value * item.Value;
                                 nextTag = item.Key.Item1;
-                                if (product > vGoodNode.value)
+                                if (product >= vGoodNode.value)
                                 {
                                     vGoodNode.value = product;
                                     vGoodNode.CurrentTag = nextTag;
@@ -285,7 +312,7 @@ namespace NLP
                                 if (!biTransition.Equals(null))
                                 {
                                     double product = (double)vn.value * biTransition.Value * tf.Value;
-                                    if (product > vGoodNode.value)
+                                    if (product >= vGoodNode.value)
                                     {
                                         vGoodNode.value = product;
                                         vGoodNode.CurrentTag = tf.Key;
@@ -294,13 +321,22 @@ namespace NLP
                                         vGoodNode.NextNode = nextGoodNode;
                                     }
                                 }
+                                else // case 2
+                                {
+                                    vGoodNode.value = 0.0d;
+                                    vGoodNode.CurrentTag = "NN";
+                                    List<ViterbiNode> prevNodesGoodNode = new List<ViterbiNode>();
+                                    prevNodesGoodNode.Add(vn);
+                                    vGoodNode.PrevNode = prevNodesGoodNode;
+                                }
                             }
                             vList.Add(vGoodNode);
                         }
                     }
                     this.ViterbiGraph.Add(vList);
                     this.ViterbiGraph[this.ViterbiGraph.Count - 1] = this.ViterbiGraph[this.ViterbiGraph.Count - 1].OrderByDescending(x => x.value).ToList();
-                    if (this.ViterbiGraph[this.ViterbiGraph.Count - 1][0].CurrentTag.Equals(".") || i == 0)
+                    // if (this.ViterbiGraph[this.ViterbiGraph.Count - 1][0].CurrentTag.Equals(".") || i == 0)
+                    if (testWords[i].tag == "." || i == 0)
                     {
                         Backtrace(method: "backward");
                         startPoint = true;
@@ -316,14 +352,15 @@ namespace NLP
                 List<string> tagsViterbi = new List<string>();
                 while (true)
                 {
-                    tagsViterbi.Add(historyCopy[i].CurrentTag);
+                    if (historyCopy[i].CurrentTag != ".")
+                        tagsViterbi.Add(historyCopy[i].CurrentTag);
                     if (historyCopy[i].NextNode == null)
                         break;
                     historyCopy[i] = historyCopy[i].NextNode[0];
                 }
                 this.PredictedTags.AddRange(tagsViterbi);
             }
-            this.PredictedTags.Add("."); // last one added manually
+            //this.PredictedTags.Add("."); // last one added manually
         }
 
         private void Backtrace(string method)
@@ -335,7 +372,8 @@ namespace NLP
                 ForwardHistory.Add(lastElement);
                 while (true)
                 {
-                    tagsViterbi.Insert(0, lastElement.CurrentTag);
+                    if (lastElement.CurrentTag != ".")
+                        tagsViterbi.Insert(0, lastElement.CurrentTag);
                     if (lastElement.PrevNode == null)
                         break;
                     lastElement = lastElement.PrevNode[0];
@@ -348,7 +386,7 @@ namespace NLP
                 BackwardHistory.Insert(0, lastElement);
             }
             
-            //this.ViterbiGraph = new List<List<ViterbiNode>>(); // can be deleted, also saves ALL forward states and backwards states
+            this.ViterbiGraph = new List<List<ViterbiNode>>(); // can be deleted, also saves ALL forward states and backwards states
         }
 
         private void BiDirectionalModelTrace()
@@ -362,13 +400,14 @@ namespace NLP
                     List<string> tagsViterbi = new List<string>();
                     while (true)
                     {
-                        tagsViterbi.Add(BackwardHistory[i].CurrentTag);
+                        if (BackwardHistory[i].CurrentTag != ".")
+                            tagsViterbi.Add(BackwardHistory[i].CurrentTag);
                         if (BackwardHistory[i].NextNode == null)
                             break;
                         BackwardHistory[i] = BackwardHistory[i].NextNode[0];
                     }
                     this.PredictedTags.AddRange(tagsViterbi);
-                    this.PredictedTags.Add("."); // last one added manually
+                    //this.PredictedTags.Add("."); // last one added manually
                 }
                 else
                 {
@@ -376,7 +415,8 @@ namespace NLP
                     List<string> tagsViterbi = new List<string>();
                     while (true)
                     {
-                        tagsViterbi.Insert(0, ForwardHistory[i].CurrentTag);
+                        if(ForwardHistory[i].CurrentTag != ".")
+                            tagsViterbi.Insert(0, ForwardHistory[i].CurrentTag);
                         if (ForwardHistory[i].PrevNode == null)
                             break;
                         ForwardHistory[i] = ForwardHistory[i].PrevNode[0];
@@ -386,9 +426,9 @@ namespace NLP
             }
 
             // inefficient method to remove double dots ".", "."
-            for (int i = 0; i < this.PredictedTags.Count - 2; i++)
-                if (this.PredictedTags[i] == this.PredictedTags[i + 1] && this.PredictedTags[i] == ".")
-                    this.PredictedTags.RemoveAt(i);
+            //for (int i = 0; i < this.PredictedTags.Count - 2; i++)
+            //    if (this.PredictedTags[i] == this.PredictedTags[i + 1] && this.PredictedTags[i] == ".")
+            //        this.PredictedTags.RemoveAt(i);
         }
 
         public long GetViterbiDecodingTime()
