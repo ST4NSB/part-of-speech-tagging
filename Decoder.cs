@@ -56,9 +56,9 @@ namespace NLP
         {
             public double value;
             public string CurrentTag;
-            public ViterbiNode PrevNode;
-            public ViterbiNode NextNode; // + bidirectionality
-            public ViterbiNode(double value, string CurrentTag, ViterbiNode PrevNode = null, ViterbiNode NextNode = null)
+            public List<ViterbiNode> PrevNode;
+            public List<ViterbiNode> NextNode; // + bidirectionality
+            public ViterbiNode(double value, string CurrentTag, List<ViterbiNode> PrevNode = null, List<ViterbiNode> NextNode = null)
             {
                 this.value = value;
                 this.CurrentTag = CurrentTag;
@@ -111,9 +111,7 @@ namespace NLP
             this.ViterbiDecodeTime = new Stopwatch();
             this.ViterbiDecodeTime.Start();
 
-            this.ViterbiGraph = new List<List<ViterbiNode>>();
-            
-
+            this.ForwardAlgorithm(testWords, model);
 
             if(model.Equals("trigram"))
             {
@@ -121,6 +119,95 @@ namespace NLP
             }
 
             this.ViterbiDecodeTime.Stop();
+        }
+
+
+        private void ForwardAlgorithm(List<Tokenizer.WordTag> testWords, string model)
+        {
+            this.ViterbiGraph = new List<List<ViterbiNode>>();
+
+            // left to right encoding - forward approach
+            bool startPoint = true;
+            for (int i = 0; i < testWords.Count; i++)
+            {
+                if (startPoint)
+                {
+                    ViterbiNode vnode = new ViterbiNode(0.0d, ".");
+                    this.ViterbiGraph.Add(new List<ViterbiNode>() { vnode });
+
+                    EmissionProbabilisticModel foundWord = this.EmissionProbabilities.Find(x => x.Word == testWords[i].word);
+                    if (foundWord == null)
+                    {
+                        Console.WriteLine("Error: word not found[start]");
+                        return;
+                    }
+
+                    List<ViterbiNode> vList = new List<ViterbiNode>();
+                    foreach (var wt in foundWord.TagFreq)
+                    {
+                        double emissionFreqValue = wt.Value; // eg. Jane -> 0.1111 (NN)
+                        Tuple<string, string> tuple = new Tuple<string, string>(".", wt.Key);
+                        var biTransition = BigramTransitionProbabilities.FirstOrDefault(x => x.Key.Equals(tuple)); // eg. NN->VB - 0.25
+                        if (biTransition.Equals(null))
+                        {
+                            Console.WriteLine("Error: transition not found[start]");
+                            return;
+                        }
+                        double product = (double)emissionFreqValue * biTransition.Value;
+                        ViterbiNode node = new ViterbiNode(product, testWords[i].tag, PrevNode: new List<ViterbiNode>() { vnode });
+                        vList.Add(node);
+                    }
+                    this.ViterbiGraph.Add(vList);
+                    startPoint = false;
+                }
+                else
+                {
+                    List<ViterbiNode> vList = new List<ViterbiNode>();
+
+                    EmissionProbabilisticModel foundWord = this.EmissionProbabilities.Find(x => x.Word == testWords[i].word);
+                    if (foundWord == null)
+                    {
+                        Console.WriteLine("Error: word not found");
+                        return;
+                    }
+
+                    foreach (var tf in foundWord.TagFreq)
+                    {
+                        ViterbiNode vGoodNode = new ViterbiNode(0.0d, "NULL");
+                        foreach(ViterbiNode vn in this.ViterbiGraph[this.ViterbiGraph.Count - 1])
+                        {
+                            Tuple<string, string> tuple = new Tuple<string, string>(vn.CurrentTag, tf.Key);
+                            var biTransition = BigramTransitionProbabilities.FirstOrDefault(x => x.Key.Equals(tuple)); // eg. NN->VB - 0.25
+                            if (biTransition.Equals(null))
+                            {
+                                Console.WriteLine("Error: transition not found");
+                                //return;
+                                continue;
+                            }
+
+                            double product = (double)vn.value * biTransition.Value * tf.Value; 
+                            if(product > vGoodNode.value)
+                            {
+                                vGoodNode.value = product;
+                                vGoodNode.CurrentTag = tf.Key;
+                                List<ViterbiNode> prevNodesGoodNode = new List<ViterbiNode>();
+                                prevNodesGoodNode.Add(vn);
+                                vGoodNode.PrevNode = prevNodesGoodNode;
+                            }
+                        }
+                        vList.Add(vGoodNode);
+                    }
+                    this.ViterbiGraph.Add(vList);
+
+
+                    if (testWords[i].word.Equals("."))
+                    {
+                        Console.WriteLine("Finish!");
+                        startPoint = true;
+                        return;
+                    }
+                }
+            }
         }
 
         public long GetViterbiDecodingTime()

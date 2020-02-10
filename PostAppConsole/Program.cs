@@ -79,6 +79,16 @@ namespace PostAppConsole
             foreach (var item in decoder.BigramTransitionProbabilities)
                 Console.WriteLine(item.Key + " -> " + item.Value);
 
+            decoder.ViterbiDecoding(wordsTest);
+            foreach (var line in decoder.ViterbiGraph)
+            {
+                foreach (var col in line)
+                    Console.Write("[" + col.CurrentTag + " -> " + col.value + "]    ");
+                Console.WriteLine();
+            }
+
+            Console.WriteLine("Duration of Viterbi Decoding: " + decoder.GetViterbiDecodingTime() + " ms!");
+            Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
             //int wordsFound = 0;
             //// List<Tokenizer.WordTag> notFoundWords = new List<Tokenizer.WordTag>();
             //List<string> algPredictions = new List<string>();
