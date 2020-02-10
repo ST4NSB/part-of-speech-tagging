@@ -18,6 +18,8 @@ namespace NLP
 
         private Stopwatch ViterbiDecodeTime;
 
+        private List<ViterbiNode> ForwardHistory, BackwardHistory; 
+
         public Decoder(
             List<HMMTagger.EmissionProbabilisticModel> EmissionProbabilities,
             Dictionary<Tuple<string, string>, double> BigramTransitionProbabilities)
@@ -56,19 +58,25 @@ namespace NLP
             this.ViterbiDecodeTime = new Stopwatch();
             this.ViterbiDecodeTime.Start();
 
+            this.ForwardHistory = new List<ViterbiNode>();
+            this.BackwardHistory = new List<ViterbiNode>();
+
             this.PredictedTags = new List<string>();
             this.ViterbiGraph = new List<List<ViterbiNode>>();
 
             if(mode.Equals("forward") || mode.Equals("f+b"))
-                this.ForwardAlgorithm(testWords, model);
+                this.ForwardAlgorithm(testWords, model, mode);
             if (mode.Equals("backward") || mode.Equals("f+b"))
-                this.BackwardAlgorithm(testWords, model);
+                this.BackwardAlgorithm(testWords, model, mode);
+
+            if(mode.Equals("f+b"))
+                BiDirectionalModelTrace();
 
             this.ViterbiDecodeTime.Stop();
         }
 
 
-        private void ForwardAlgorithm(List<Tokenizer.WordTag> testWords, string model)
+        private void ForwardAlgorithm(List<Tokenizer.WordTag> testWords, string model, string mode)
         {
             // left to right encoding - forward approach
             bool startPoint = true;
@@ -185,9 +193,137 @@ namespace NLP
             }
         }
 
-        private void BackwardAlgorithm(List<Tokenizer.WordTag> testWords, string model)
+        private void BackwardAlgorithm(List<Tokenizer.WordTag> testWords, string model, string mode)
         {
-            return;
+            // left to right encoding - forward approach
+            bool startPoint = true;
+            for (int i = testWords.Count - 2; i >= 0; i--)
+            {
+                if (startPoint)
+                {
+                    HMMTagger.EmissionProbabilisticModel foundWord = this.EmissionProbabilities.Find(x => x.Word.Equals(testWords[i].word));
+                    List<ViterbiNode> vList = new List<ViterbiNode>();
+
+                    if (foundWord == null)
+                    {
+                        // we take the best transition case where first item is "."
+                        var orderedTransitions = BigramTransitionProbabilities.OrderByDescending(x => x.Value).ToList();
+                        double product = 0.0d;
+                        string nextTag = "NULL";
+
+                        foreach (var item in orderedTransitions)
+                            if (item.Key.Item2.Equals("."))
+                            {
+                                product = item.Value;
+                                nextTag = item.Key.Item1;
+                                break;
+                            }
+                        ViterbiNode node = new ViterbiNode(product, nextTag);
+                        vList.Add(node);
+                    }
+                    else
+                    {
+                        foreach (var wt in foundWord.TagFreq)
+                        {
+                            double emissionFreqValue = wt.Value; // eg. Jane -> 0.1111 (NN)
+                            Tuple<string, string> tuple = new Tuple<string, string>(wt.Key, ".");
+                            var biTransition = BigramTransitionProbabilities.FirstOrDefault(x => x.Key.Equals(tuple)); // eg. NN->VB - 0.25
+                            if (!biTransition.Equals(null))
+                            {
+                                double product = (double)emissionFreqValue * biTransition.Value;
+                                ViterbiNode node = new ViterbiNode(product, wt.Key); //,PrevNode: new List<ViterbiNode>() { vnode });
+                                vList.Add(node);
+                            }
+                        }
+                    }
+                    this.ViterbiGraph.Add(vList);
+                    startPoint = false;
+                }
+                else
+                {
+                    HMMTagger.EmissionProbabilisticModel foundWord = this.EmissionProbabilities.Find(x => x.Word.Equals(testWords[i].word));
+                    List<ViterbiNode> vList = new List<ViterbiNode>();
+
+                    if (foundWord == null)
+                    {
+                        ViterbiNode elem = this.ViterbiGraph[this.ViterbiGraph.Count - 1][0];
+                        // we take the best transition case where first item is "."
+                        var orderedTransitions = BigramTransitionProbabilities.OrderByDescending(x => x.Value).ToList();
+                        // trigram cond.
+
+
+                        ViterbiNode vGoodNode = new ViterbiNode(0.0d, "NULL");
+                        double product = 0.0d;
+                        string nextTag = "NULL";
+
+                        foreach (var item in orderedTransitions)
+                            if (item.Key.Item2.Equals(elem.CurrentTag))
+                            {
+                                product = (double)elem.value * item.Value;
+                                nextTag = item.Key.Item1;
+                                if (product > vGoodNode.value)
+                                {
+                                    vGoodNode.value = product;
+                                    vGoodNode.CurrentTag = nextTag;
+                                    List<ViterbiNode> nextGoodNodes = new List<ViterbiNode>();
+                                    nextGoodNodes.Add(elem);
+                                    vGoodNode.NextNode = nextGoodNodes;
+                                    break;
+                                }
+                            }
+                        vList.Add(vGoodNode);
+                    }
+                    else
+                    {
+                        foreach (var tf in foundWord.TagFreq)
+                        {
+                            ViterbiNode vGoodNode = new ViterbiNode(0.0d, "NULL");
+                            foreach (ViterbiNode vn in this.ViterbiGraph[this.ViterbiGraph.Count - 1])
+                            {
+                                Tuple<string, string> tuple = new Tuple<string, string>(tf.Key, vn.CurrentTag);
+                                var biTransition = BigramTransitionProbabilities.FirstOrDefault(x => x.Key.Equals(tuple)); // eg. NN->VB - 0.25
+                                if (!biTransition.Equals(null))
+                                {
+                                    double product = (double)vn.value * biTransition.Value * tf.Value;
+                                    if (product > vGoodNode.value)
+                                    {
+                                        vGoodNode.value = product;
+                                        vGoodNode.CurrentTag = tf.Key;
+                                        List<ViterbiNode> nextGoodNode = new List<ViterbiNode>();
+                                        nextGoodNode.Add(vn);
+                                        vGoodNode.NextNode = nextGoodNode;
+                                    }
+                                }
+                            }
+                            vList.Add(vGoodNode);
+                        }
+                    }
+                    this.ViterbiGraph.Add(vList);
+                    this.ViterbiGraph[this.ViterbiGraph.Count - 1] = this.ViterbiGraph[this.ViterbiGraph.Count - 1].OrderByDescending(x => x.value).ToList();
+                    if (this.ViterbiGraph[this.ViterbiGraph.Count - 1][0].CurrentTag.Equals(".") || i == 0)
+                    {
+                        Backtrace(method: "backward");
+                        startPoint = true;
+                        continue;
+                    }
+                }
+            }
+
+            this.PredictedTags = new List<string>();
+            List<ViterbiNode> historyCopy = new List<ViterbiNode>(BackwardHistory);
+            for (int i = 0; i < historyCopy.Count; i++)
+            {
+                List<string> tagsViterbi = new List<string>();
+                while (true)
+                {
+                    tagsViterbi.Add(historyCopy[i].CurrentTag);
+                    if (historyCopy[i].NextNode == null)
+                        break;
+                    historyCopy[i] = historyCopy[i].NextNode[0];
+                }
+                this.PredictedTags.AddRange(tagsViterbi);
+            }
+            this.PredictedTags.Add("."); // last one added manually
         }
 
         private void Backtrace(string method)
@@ -196,6 +332,7 @@ namespace NLP
             List<string> tagsViterbi = new List<string>();
             if(method.Equals("forward"))
             {
+                ForwardHistory.Add(lastElement);
                 while (true)
                 {
                     tagsViterbi.Insert(0, lastElement.CurrentTag);
@@ -203,10 +340,55 @@ namespace NLP
                         break;
                     lastElement = lastElement.PrevNode[0];
                 }
+                this.PredictedTags.AddRange(tagsViterbi);
+
+            }
+            else if(method.Equals("backward"))
+            {
+                BackwardHistory.Insert(0, lastElement);
+            }
+            
+            //this.ViterbiGraph = new List<List<ViterbiNode>>(); // can be deleted, also saves ALL forward states and backwards states
+        }
+
+        private void BiDirectionalModelTrace()
+        {
+            this.PredictedTags = new List<string>();
+            for(int i = 0; i < BackwardHistory.Count; i++)
+            {
+                if(BackwardHistory[i].value > ForwardHistory[i].value)
+                {
+                    Console.WriteLine("backward!!!");
+                    List<string> tagsViterbi = new List<string>();
+                    while (true)
+                    {
+                        tagsViterbi.Add(BackwardHistory[i].CurrentTag);
+                        if (BackwardHistory[i].NextNode == null)
+                            break;
+                        BackwardHistory[i] = BackwardHistory[i].NextNode[0];
+                    }
+                    this.PredictedTags.AddRange(tagsViterbi);
+                    this.PredictedTags.Add("."); // last one added manually
+                }
+                else
+                {
+                    Console.WriteLine("forward!!!");
+                    List<string> tagsViterbi = new List<string>();
+                    while (true)
+                    {
+                        tagsViterbi.Insert(0, ForwardHistory[i].CurrentTag);
+                        if (ForwardHistory[i].PrevNode == null)
+                            break;
+                        ForwardHistory[i] = ForwardHistory[i].PrevNode[0];
+                    }
+                    this.PredictedTags.AddRange(tagsViterbi);
+                }
             }
 
-            this.PredictedTags.AddRange(tagsViterbi);
-            this.ViterbiGraph = new List<List<ViterbiNode>>();
+            // inefficient method to remove double dots ".", "."
+            for (int i = 0; i < this.PredictedTags.Count - 2; i++)
+                if (this.PredictedTags[i] == this.PredictedTags[i + 1] && this.PredictedTags[i] == ".")
+                    this.PredictedTags.RemoveAt(i);
         }
 
         public long GetViterbiDecodingTime()

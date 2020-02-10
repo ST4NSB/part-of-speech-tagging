@@ -81,7 +81,8 @@ namespace PostAppConsole
             foreach (var item in decoder.BigramTransitionProbabilities)
                 Console.WriteLine(item.Key + " -> " + item.Value);
 
-            decoder.ViterbiDecoding(wordsTest);
+
+            decoder.ViterbiDecoding(wordsTest, model: "bigram", mode: "f+b");
             foreach (var line in decoder.ViterbiGraph)
             {
                 foreach (var col in line)
@@ -92,16 +93,18 @@ namespace PostAppConsole
             foreach (var item in decoder.PredictedTags)
                 Console.Write(item + " ");
 
-            Console.WriteLine("\nDuration of Viterbi Decoding: " + decoder.GetViterbiDecodingTime() + " ms!");
+            Console.WriteLine("\nDuration of Viterbi Decoding: " + decoder.GetViterbiDecodingTime() + " ms!\n");
+
             Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 
-            foreach (var item in wordsTest)
-                Console.WriteLine(item.word + "  ");
+           // foreach (var item in wordsTest)
+           ///     Console.WriteLine(item.word + "  ");
 
 
             Evaluation eval = new Evaluation();
             eval.CreateSupervizedEvaluationsMatrix(wordsTest, decoder.PredictedTags, fbeta: 1);
-            Console.WriteLine("TAG\t\tACCURACY\t\tPRECISION\t\tRECALL\t\tF-MEASURE");
+            Console.WriteLine("Simple Accuracy: " + eval.GetSimpleAccuracy(wordsTest, decoder.PredictedTags));
+            Console.WriteLine("TAG\tACCURACY\tPRECISION\t\tRECALL\t\tF-MEASURE");
             var fullMatrix = eval.GetFullClassificationMatrix();
             for (int i = 0; i < eval.GetFullMatrixLineLength(); i++)
             {
@@ -110,34 +113,7 @@ namespace PostAppConsole
                 Console.WriteLine();
             }
 
-
-
-            //int wordsFound = 0;
-            //// List<Tokenizer.WordTag> notFoundWords = new List<Tokenizer.WordTag>();
-            //List<string> algPredictions = new List<string>();
-            //foreach (var w in wordsTest)
-            //{
-            //    Tagger.EmissionModel wordModelFinder = gTagger.EmissionFreq.Find(x => x.Word == w.word);
-            //    if (wordModelFinder == null)
-            //    {
-            //        algPredictions.Add("NULL"); // NULL / NN
-            //        //if ("NN".Equals(w.tag))
-            //        //     wordsFound++;
-            //        continue;
-            //    }
-            //    string maxValueTag = wordModelFinder.TagFreq.OrderByDescending(x => x.Value).FirstOrDefault().Key;
-            //    if (maxValueTag.Equals(w.tag))
-            //    {
-            //        wordsFound++;
-            //        algPredictions.Add(maxValueTag);
-            //    }
-            //    else
-            //    {
-            //        algPredictions.Add(maxValueTag);
-            //    }
-            //}
-
-            //Console.WriteLine("Accuracy: " + (float)wordsFound / wordsTest.Count);
+            Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 
             ////using (System.IO.StreamWriter file = new System.IO.StreamWriter("cuvinte_nepredictionate.csv"))
             ////{
@@ -147,18 +123,6 @@ namespace PostAppConsole
             ////        file.WriteLine("\"" + wordsTest[i].word + "\"," + algPredictions[i] + "," + wordsTest[i].tag);
             ////    }
             ////}
-
-
-            //Evaluation eval = new Evaluation();
-            //eval.CreateSupervizedEvaluationsMatrix(wordsTest, algPredictions, fbeta:1);
-            //Console.WriteLine("TAG       ACCURACY       PRECISION       RECALL       F-MEASURE");
-            //var fullMatrix = eval.GetFullClassificationMatrix();
-            //for (int i = 0; i < eval.GetFullMatrixLineLength(); i++)
-            //{
-            //    for (int j = 0; j < eval.GetFullMatrixColLength(); j++)
-            //        Console.Write(fullMatrix[i][j] + "       ");
-            //    Console.WriteLine();
-            //}
         }
     }
 }
