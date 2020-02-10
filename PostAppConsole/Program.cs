@@ -101,15 +101,14 @@ namespace PostAppConsole
 
             Evaluation eval = new Evaluation();
             eval.CreateSupervizedEvaluationsMatrix(wordsTest, decoder.PredictedTags, fbeta: 1);
-            Console.WriteLine("TAG       ACCURACY       PRECISION       RECALL       F-MEASURE");
+            Console.WriteLine("TAG\t\tACCURACY\t\tPRECISION\t\tRECALL\t\tF-MEASURE");
             var fullMatrix = eval.GetFullClassificationMatrix();
             for (int i = 0; i < eval.GetFullMatrixLineLength(); i++)
             {
                 for (int j = 0; j < eval.GetFullMatrixColLength(); j++)
-                    Console.Write(fullMatrix[i][j] + "       ");
+                    Console.Write(fullMatrix[i][j] + "\t\t");
                 Console.WriteLine();
             }
-
 
 
 
