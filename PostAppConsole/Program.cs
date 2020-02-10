@@ -87,8 +87,15 @@ namespace PostAppConsole
                 Console.WriteLine();
             }
 
-            Console.WriteLine("Duration of Viterbi Decoding: " + decoder.GetViterbiDecodingTime() + " ms!");
+            foreach (var item in decoder.PredictedTags)
+                Console.Write(item + " ");
+
+
+            Console.WriteLine("\nDuration of Viterbi Decoding: " + decoder.GetViterbiDecodingTime() + " ms!");
             Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+
+            foreach (var item in wordsTest)
+                Console.WriteLine(item.word + "  ");
             //int wordsFound = 0;
             //// List<Tokenizer.WordTag> notFoundWords = new List<Tokenizer.WordTag>();
             //List<string> algPredictions = new List<string>();

@@ -16,6 +16,9 @@ namespace NLP
         public List<EmissionProbabilisticModel> EmissionProbabilities;
         public Dictionary<Tuple<string, string>, double> BigramTransitionProbabilities;
 
+
+        public List<string> PredictedTags;
+
         public List<List<ViterbiNode>> ViterbiGraph;
 
         private Stopwatch ViterbiDecodeTime;
@@ -124,6 +127,7 @@ namespace NLP
 
         private void ForwardAlgorithm(List<Tokenizer.WordTag> testWords, string model)
         {
+            this.PredictedTags = new List<string>();
             this.ViterbiGraph = new List<List<ViterbiNode>>();
 
             // left to right encoding - forward approach
@@ -132,10 +136,10 @@ namespace NLP
             {
                 if (startPoint)
                 {
-                    ViterbiNode vnode = new ViterbiNode(0.0d, ".");
-                    this.ViterbiGraph.Add(new List<ViterbiNode>() { vnode });
+                   // ViterbiNode vnode = new ViterbiNode(0.0d, ".");
+                   // this.ViterbiGraph.Add(new List<ViterbiNode>() { vnode });
 
-                    EmissionProbabilisticModel foundWord = this.EmissionProbabilities.Find(x => x.Word == testWords[i].word);
+                    EmissionProbabilisticModel foundWord = this.EmissionProbabilities.Find(x => x.Word.Equals(testWords[i].word));
                     if (foundWord == null)
                     {
                         Console.WriteLine("Error: word not found[start]");
@@ -154,7 +158,7 @@ namespace NLP
                             return;
                         }
                         double product = (double)emissionFreqValue * biTransition.Value;
-                        ViterbiNode node = new ViterbiNode(product, testWords[i].tag, PrevNode: new List<ViterbiNode>() { vnode });
+                        ViterbiNode node = new ViterbiNode(product, testWords[i].tag); //,PrevNode: new List<ViterbiNode>() { vnode });
                         vList.Add(node);
                     }
                     this.ViterbiGraph.Add(vList);
@@ -164,7 +168,7 @@ namespace NLP
                 {
                     List<ViterbiNode> vList = new List<ViterbiNode>();
 
-                    EmissionProbabilisticModel foundWord = this.EmissionProbabilities.Find(x => x.Word == testWords[i].word);
+                    EmissionProbabilisticModel foundWord = this.EmissionProbabilities.Find(x => x.Word.Equals(testWords[i].word));
                     if (foundWord == null)
                     {
                         Console.WriteLine("Error: word not found");
@@ -198,16 +202,35 @@ namespace NLP
                         vList.Add(vGoodNode);
                     }
                     this.ViterbiGraph.Add(vList);
-
-
-                    if (testWords[i].word.Equals("."))
+                    this.ViterbiGraph[this.ViterbiGraph.Count - 1] = this.ViterbiGraph[this.ViterbiGraph.Count - 1].OrderByDescending(x => x.value).ToList();
+                    if (this.ViterbiGraph[this.ViterbiGraph.Count - 1][0].CurrentTag.Equals("."))
                     {
-                        Console.WriteLine("Finish!");
+                        Backtrace(mode: "forward");
                         startPoint = true;
-                        return;
+                        continue;
                     }
                 }
             }
+        }
+
+        private void Backtrace(string mode = "forward")
+        {
+            ViterbiNode lastElement = this.ViterbiGraph[this.ViterbiGraph.Count - 1][0];
+            List<string> tagsViterbi = new List<string>();
+            if(mode.Equals("forward"))
+            {
+                while (true)
+                {
+                    tagsViterbi.Insert(0, lastElement.CurrentTag);
+                    // lastElement.PrevNode = lastElement.PrevNode.OrderByDescending(x => x.value).ToList();
+                    if (lastElement.PrevNode == null)
+                        break;
+                    lastElement = lastElement.PrevNode[0];
+                }
+            }
+
+            this.PredictedTags.AddRange(tagsViterbi);
+            this.ViterbiGraph = new List<List<ViterbiNode>>();
         }
 
         public long GetViterbiDecodingTime()
