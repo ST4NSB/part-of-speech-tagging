@@ -9,6 +9,7 @@ namespace NLP
     public class Decoder
     {
         public List<HMMTagger.EmissionProbabilisticModel> EmissionProbabilities;
+        public Dictionary<string, double> UnigramProbabilities;
         public Dictionary<Tuple<string, string>, double> BigramTransitionProbabilities;
         public Dictionary<Tuple<string, string, string>, double> TrigramTransitionProbabilities;
 
@@ -24,18 +25,22 @@ namespace NLP
 
         public Decoder(
             List<HMMTagger.EmissionProbabilisticModel> EmissionProbabilities,
+            Dictionary<string, double> UnigramProbabilities,
             Dictionary<Tuple<string, string>, double> BigramTransitionProbabilities)
         {
             this.EmissionProbabilities = EmissionProbabilities;
+            this.UnigramProbabilities = UnigramProbabilities;
             this.BigramTransitionProbabilities = BigramTransitionProbabilities;
         }
 
         public Decoder(
             List<HMMTagger.EmissionProbabilisticModel> EmissionProbabilities,
+            Dictionary<string, double> UnigramProbabilities,
             Dictionary<Tuple<string, string>, double> BigramTransitionProbabilities,
             Dictionary<Tuple<string, string, string>, double> TrigramTransitionProbabilities)
         {
             this.EmissionProbabilities = EmissionProbabilities;
+            this.UnigramProbabilities = UnigramProbabilities;
             this.BigramTransitionProbabilities = BigramTransitionProbabilities;
             this.TrigramTransitionProbabilities = TrigramTransitionProbabilities;
         }

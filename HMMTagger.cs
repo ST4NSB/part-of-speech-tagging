@@ -7,12 +7,15 @@ namespace NLP
 {
     public class HMMTagger
     {
+        private const int N = 10; // tokens - all individual tags number , const = 10
+
         public List<EmissionModel> EmissionFreq;
         public Dictionary<string, int> UnigramFreq = new Dictionary<string, int>();
         public Dictionary<Tuple<string, string>, int> BigramTransition;
         public Dictionary<Tuple<string, string, string>, int> TrigramTransition;
 
         public List<EmissionProbabilisticModel> EmissionProbabilities;
+        public Dictionary<string, double> UnigramProbabilities;
         public Dictionary<Tuple<string, string>, double> BigramTransitionProbabilities;
         public Dictionary<Tuple<string, string, string>, double> TrigramTransitionProbabilities;
 
@@ -97,6 +100,7 @@ namespace NLP
         public void CalculateProbabilitiesForTestFiles(List<Tokenizer.WordTag> testWords, string model = "bigram")
         {
             this.EmissionProbabilities = new List<EmissionProbabilisticModel>();
+            this.UnigramProbabilities = new Dictionary<string, double>();
             this.BigramTransitionProbabilities = new Dictionary<Tuple<string, string>, double>();
 
          
@@ -120,14 +124,23 @@ namespace NLP
             }
 
             // transition stage
+            // unigram
+            foreach(var uni in this.UnigramFreq)
+            {
+                double pi = (double)uni.Value / N;
+                this.UnigramProbabilities.Add(uni.Key, pi);
+            }
+
+            // bigram
             foreach (var bi in this.BigramTransition)
             {
                 var cti = this.UnigramFreq.FirstOrDefault(x => x.Key.Equals(bi.Key.Item1)).Value;
-                float pti = (float)bi.Value / cti; // Transition probability: p(ti|ti-1) = C(ti-1, ti) / C(ti-1)
+                double pti = (double)bi.Value / cti; // Transition probability: p(ti|ti-1) = C(ti-1, ti) / C(ti-1)
                 this.BigramTransitionProbabilities.Add(bi.Key, pti);
 
             }
 
+            // trigram
             if (model.Equals("trigram"))
             {
                 this.TrigramTransitionProbabilities = new Dictionary<Tuple<string, string, string>, double>();
@@ -135,10 +148,39 @@ namespace NLP
                 {
                     Tuple<string, string> tuple = new Tuple<string, string>(tri.Key.Item1, tri.Key.Item2);
                     var cti = this.BigramTransition.FirstOrDefault(x => x.Key.Equals(tuple)).Value;
-                    float pti = (float)tri.Value / cti; // Transition probability: p(ti|ti-1, ti-2) = C(ti-2, ti-1, ti) / C(ti-2, ti-1)
+                    double pti = (double)tri.Value / cti; // Transition probability: p(ti|ti-1, ti-2) = C(ti-2, ti-1, ti) / C(ti-2, ti-1)
                     this.TrigramTransitionProbabilities.Add(tri.Key, pti);
                 }
             }            
+        }
+
+        public Tuple<double, double, double> DeletedInterpolation()
+        {
+            int lambda1 = 0, lambda2 = 0, lambda3 = 0;
+            foreach (var tri in this.TrigramTransition)
+            {
+                string unituple = tri.Key.Item3;
+                Tuple<string, string> bituple = new Tuple<string, string>(tri.Key.Item2, tri.Key.Item3);
+
+                double univalue = this.UnigramProbabilities.FirstOrDefault(x => x.Key.Equals(unituple)).Value;
+                double bivalue = this.BigramTransitionProbabilities.FirstOrDefault(x => x.Key.Equals(bituple)).Value;
+                double trivalue = this.TrigramTransitionProbabilities.FirstOrDefault(x => x.Key.Equals(tri.Key)).Value;
+
+                if(bivalue < univalue && univalue > trivalue)
+                {
+                    lambda1 += tri.Value;
+                }
+                else if(univalue < bivalue && bivalue > trivalue)
+                {
+                    lambda2 += tri.Value;
+                }
+                else
+                {
+                    lambda3 += tri.Value;
+                }
+            }
+            int sum = lambda1 + lambda2 + lambda3;
+            return new Tuple<double, double, double>((double)lambda1 / sum, (double)lambda2 / sum, (double)lambda3 / sum);
         }
 
 

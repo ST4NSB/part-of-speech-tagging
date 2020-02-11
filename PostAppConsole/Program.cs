@@ -75,10 +75,9 @@ namespace PostAppConsole
 
             wordsTest = tagger.EliminateDuplicateSequenceOfEndOfSentenceTags(wordsTest);
             tagger.CalculateProbabilitiesForTestFiles(wordsTest, model: "trigram");
-            Decoder decoder = new Decoder(tagger.EmissionProbabilities, tagger.BigramTransitionProbabilities, tagger.TrigramTransitionProbabilities);
+            Decoder decoder = new Decoder(tagger.EmissionProbabilities, tagger.UnigramProbabilities, tagger.BigramTransitionProbabilities, tagger.TrigramTransitionProbabilities);
             //decoder.ViterbiDecoding(wordsTest, model: "bigram", mode: "f+b");
             tagger.EliminateAllEndOfSentenceTags(wordsTest);
-
 
             // Decoder decoder = new Decoder();
             //const string deftag = "NN";
@@ -102,10 +101,15 @@ namespace PostAppConsole
                 foreach (var item2 in item.TagFreq)
                     Console.WriteLine("\t" + item2.Key + " -> " + item2.Value);
             }
+            foreach (var item in decoder.UnigramProbabilities)
+                Console.WriteLine("UNI: " + item.Key + "->" + item.Value);
             foreach (var item in decoder.BigramTransitionProbabilities)
-                Console.WriteLine(item.Key + " -> " + item.Value);
+                Console.WriteLine("BI: " + item.Key + " -> " + item.Value);
             foreach (var item in decoder.TrigramTransitionProbabilities)
-                Console.WriteLine(item.Key + " -> " + item.Value);
+                Console.WriteLine("TRI: " + item.Key + " -> " + item.Value);
+
+            Console.WriteLine("\nInterp: " + tagger.DeletedInterpolation());
+
             //foreach (var item in decoder.PredictedTags)
             //    Console.Write(item + " ");
 
