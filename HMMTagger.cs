@@ -14,6 +14,7 @@ namespace NLP
 
         public List<EmissionProbabilisticModel> EmissionProbabilities;
         public Dictionary<Tuple<string, string>, double> BigramTransitionProbabilities;
+        public Dictionary<Tuple<string, string, string>, double> TrigramTransitionProbabilities;
 
         private Stopwatch TrainingTime;
 
@@ -119,20 +120,25 @@ namespace NLP
             }
 
             // transition stage
-            foreach (var tuple in this.BigramTransition)
+            foreach (var bi in this.BigramTransition)
             {
-                var cti = this.UnigramFreq.FirstOrDefault(x => x.Key.Equals(tuple.Key.Item1)).Value;
-                float pti = (float)tuple.Value / cti; // Transition probability: p(ti|ti-1) = C(ti-1, ti) / C(ti-1)
-                this.BigramTransitionProbabilities.Add(tuple.Key, pti);
+                var cti = this.UnigramFreq.FirstOrDefault(x => x.Key.Equals(bi.Key.Item1)).Value;
+                float pti = (float)bi.Value / cti; // Transition probability: p(ti|ti-1) = C(ti-1, ti) / C(ti-1)
+                this.BigramTransitionProbabilities.Add(bi.Key, pti);
 
             }
 
             if (model.Equals("trigram"))
             {
-                // TODO: add condition later for tri-gram
-            }
-
-            
+                this.TrigramTransitionProbabilities = new Dictionary<Tuple<string, string, string>, double>();
+                foreach (var tri in this.TrigramTransition)
+                {
+                    Tuple<string, string> tuple = new Tuple<string, string>(tri.Key.Item1, tri.Key.Item2);
+                    var cti = this.BigramTransition.FirstOrDefault(x => x.Key.Equals(tuple)).Value;
+                    float pti = (float)tri.Value / cti; // Transition probability: p(ti|ti-1, ti-2) = C(ti-2, ti-1, ti) / C(ti-2, ti-1)
+                    this.TrigramTransitionProbabilities.Add(tri.Key, pti);
+                }
+            }            
         }
 
 
