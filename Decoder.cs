@@ -18,7 +18,9 @@ namespace NLP
 
         private Stopwatch ViterbiDecodeTime;
 
-        private List<ViterbiNode> ForwardHistory, BackwardHistory; 
+        private List<ViterbiNode> ForwardHistory, BackwardHistory;
+
+        public Decoder() { }
 
         public Decoder(
             List<HMMTagger.EmissionProbabilisticModel> EmissionProbabilities,
