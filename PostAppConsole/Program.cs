@@ -37,7 +37,7 @@ namespace PostAppConsole
             const string BrownfolderTrain = "Brown Corpus\\1_Train", BrownfolderTest = "Brown Corpus\\2_Test", 
                 demoFileTrain = "demo files\\train", demoFileTest = "demo files\\test";
 
-            var text = LoadAndReadFolderFiles(demoFileTrain);
+            var text = LoadAndReadFolderFiles(BrownfolderTrain);
             var oldWords = Tokenizer.SeparateTagFromWord(Tokenizer.WordTokenizeCorpus(text));
 
             var words = SpeechPart.GetNewHierarchicTags(oldWords);
@@ -66,7 +66,7 @@ namespace PostAppConsole
             // WriteToTxtFile("Trained Files", "SVM_trained_file.json", JsonConvert.SerializeObject(tagger.EmissionFreq));
 
             Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-            var textTest = LoadAndReadFolderFiles(demoFileTest);
+            var textTest = LoadAndReadFolderFiles(BrownfolderTest);
             var oldWordsTest = Tokenizer.SeparateTagFromWord(Tokenizer.WordTokenizeCorpus(textTest));
             var wordsTest = SpeechPart.GetNewHierarchicTags(oldWordsTest);
             wordsTest = TextNormalization.Pipeline(wordsTest);
@@ -74,17 +74,19 @@ namespace PostAppConsole
             tagger.CalculateProbabilitiesForTestFiles(wordsTest, model: "bigram");
 
             Decoder decoder = new Decoder(tagger.EmissionProbabilities, tagger.BigramTransitionProbabilities);
-            foreach (var item in decoder.EmissionProbabilities)
-            {
-                Console.WriteLine(item.Word);
-                foreach (var item2 in item.TagFreq)
-                    Console.WriteLine("\t" + item2.Key + " -> " + item2.Value);
-            }
-            foreach (var item in decoder.BigramTransitionProbabilities)
-                Console.WriteLine(item.Key + " -> " + item.Value);
 
 
-            decoder.ViterbiDecoding(wordsTest, model: "bigram", mode: "f+b");
+            //foreach (var item in decoder.EmissionProbabilities)
+            //{
+            //    Console.WriteLine(item.Word);
+            //    foreach (var item2 in item.TagFreq)
+            //        Console.WriteLine("\t" + item2.Key + " -> " + item2.Value);
+            //}
+            //foreach (var item in decoder.BigramTransitionProbabilities)
+            //    Console.WriteLine(item.Key + " -> " + item.Value);
+
+
+            decoder.ViterbiDecoding(wordsTest, model: "bigram", mode: "forward");
             //foreach (var line in decoder.ViterbiGraph)
             //{
             //    foreach (var col in line)
@@ -92,10 +94,8 @@ namespace PostAppConsole
             //    Console.WriteLine();
             //}
 
-           
-
-            foreach (var item in decoder.PredictedTags)
-               Console.Write(item + " ");
+            //foreach (var item in decoder.PredictedTags)
+            //   Console.Write(item + " ");
 
             Console.WriteLine("\nDuration of Viterbi Decoding: " + decoder.GetViterbiDecodingTime() + " ms!\n");
 
@@ -120,15 +120,14 @@ namespace PostAppConsole
 
             Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 
-
-            ////using (System.IO.StreamWriter file = new System.IO.StreamWriter("cuvinte_nepredictionate.csv"))
-            ////{
-            ////    file.WriteLine("Word,My Prediction Tag,Actual Tag");
-            ////    for (int i = 0; i < wordsTest.Count; i++)
-            ////    {
-            ////        file.WriteLine("\"" + wordsTest[i].word + "\"," + algPredictions[i] + "," + wordsTest[i].tag);
-            ////    }
-            ////}
+            using (System.IO.StreamWriter file = new System.IO.StreamWriter("cuvinte_nepredictionate_bigram.csv"))
+            {
+                file.WriteLine("Word,Real Tag,Prediction Tag");
+                for (int i = 0; i < wordsTest.Count; i++)
+                {
+                    file.WriteLine("\"" + wordsTest[i].word + "\"," + wordsTest[i].tag + "," + decoder.PredictedTags[i]);
+                }
+            }
         }
     }
 }
