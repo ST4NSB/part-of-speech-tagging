@@ -7,7 +7,7 @@ namespace NLP
 {
     public class HMMTagger
     {
-        private const int N = 10; // tokens - all individual tags number , const = 10
+        private int N;// nr of tokens
 
         public List<EmissionModel> EmissionFreq;
         public Dictionary<string, int> UnigramFreq = new Dictionary<string, int>();
@@ -66,6 +66,8 @@ namespace NLP
         {
             this.TrainingTime = new Stopwatch();
             this.TrainingTime.Start();
+
+            this.N = wordsInput.Count; // nr of tokens
 
             this.CalculateEmissionAndTransitionOccurrences(wordsInput);
             this.CalculateBigramOccurences(wordsInput); // calculated automatically
@@ -127,7 +129,7 @@ namespace NLP
             // unigram
             foreach(var uni in this.UnigramFreq)
             {
-                double pi = (double)uni.Value / N;
+                double pi = (double)uni.Value / this.N;
                 this.UnigramProbabilities.Add(uni.Key, pi);
             }
 
