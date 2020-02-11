@@ -55,8 +55,7 @@ namespace NLP
                 float fmeasure = (float) ((fbeta * fbeta + 1) * precision * recall) / ((fbeta * fbeta) * precision + recall);
                 if (float.IsNaN(fmeasure) || float.IsInfinity(fmeasure))
                     fmeasure = 0.0f;
-                if(fmeasure != 0.0f)
-                    finalMatrix.Add(new List<float>() { accuracy, precision, recall, fmeasure });
+                finalMatrix.Add(new List<float>() { accuracy, precision, recall, fmeasure });
             }
 
         }

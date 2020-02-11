@@ -71,15 +71,34 @@ namespace NLP
             this.TrainingTime.Stop();
         }
 
+        public List<Tokenizer.WordTag> EliminateDuplicateSequenceOfEndOfSentenceTags(List<Tokenizer.WordTag> testWords)
+        {
+            var results = new List<Tokenizer.WordTag>();
+            foreach (var tw in testWords)
+            {
+                if (results.Count == 0)
+                    results.Add(tw);
+                else
+                {
+                    if (results.Last().tag == "." && tw.tag == ".")
+                        continue;
+                    results.Add(tw);
+                }
+            }
+            return results;
+        }
+
+        public void EliminateAllEndOfSentenceTags(List<Tokenizer.WordTag> testWords)
+        {
+            testWords.RemoveAll(x => x.tag == ".");
+        }
+
         public void CalculateProbabilitiesForTestFiles(List<Tokenizer.WordTag> testWords, string model = "bigram")
         {
             this.EmissionProbabilities = new List<EmissionProbabilisticModel>();
             this.BigramTransitionProbabilities = new Dictionary<Tuple<string, string>, double>();
 
-            for (int i = 0; i < testWords.Count - 1; i++)
-                if (testWords[i].tag == "." && testWords[i].tag == testWords[i + 1].tag)
-                    testWords.RemoveAt(i);
-
+         
             // emission stage
             foreach (var tw in testWords)
             {
@@ -112,6 +131,8 @@ namespace NLP
             {
                 // TODO: add condition later for tri-gram
             }
+
+            
         }
 
 

@@ -34,7 +34,7 @@ namespace PostAppConsole
 
         static void Main(string[] args)
         {
-            const string BrownfolderTrain = "Brown Corpus\\1_Train", BrownfolderTest = "Brown Corpus\\2_Test", 
+            const string BrownfolderTrain = "Brown Corpus\\1_Train", BrownfolderTest = "Brown Corpus\\2_Test",
                 demoFileTrain = "demo files\\train", demoFileTest = "demo files\\test";
 
             var text = LoadAndReadFolderFiles(BrownfolderTrain);
@@ -43,10 +43,15 @@ namespace PostAppConsole
             var words = SpeechPart.GetNewHierarchicTags(oldWords);
             words = TextNormalization.Pipeline(words);
 
+            var nwords = new List<Tokenizer.WordTag>();
+
+            PorterStemmer stem = new PorterStemmer();
+            foreach(var item in words)
+                nwords.Add(new Tokenizer.WordTag(stem.StemWord(item.word), item.tag));
 
             Console.WriteLine("Done with loading and creating tokens!");
             HMMTagger tagger = new HMMTagger();
-            tagger.TrainModel(words, model: "bigram");
+            tagger.TrainModel(nwords, model: "bigram");
             Console.WriteLine("Done with training MODEL!");
             //foreach (var model in tagger.EmissionFreq)
             //{
@@ -71,7 +76,17 @@ namespace PostAppConsole
             var wordsTest = SpeechPart.GetNewHierarchicTags(oldWordsTest);
             wordsTest = TextNormalization.Pipeline(wordsTest);
 
-            tagger.CalculateProbabilitiesForTestFiles(wordsTest, model: "bigram");
+            var tnwords = new List<Tokenizer.WordTag>();
+            wordsTest = tagger.EliminateDuplicateSequenceOfEndOfSentenceTags(wordsTest);
+            foreach (var item in wordsTest)
+                tnwords.Add(new Tokenizer.WordTag(stem.StemWord(item.word), item.tag));
+
+            tagger.CalculateProbabilitiesForTestFiles(tnwords, model: "bigram");
+
+            //foreach (var item in wordsTest)
+            //    Console.WriteLine(item.word + "  " + item.tag);
+
+           
 
             Decoder decoder = new Decoder(tagger.EmissionProbabilities, tagger.BigramTransitionProbabilities);
 
@@ -86,7 +101,8 @@ namespace PostAppConsole
             //    Console.WriteLine(item.Key + " -> " + item.Value);
 
 
-            decoder.ViterbiDecoding(wordsTest, model: "bigram", mode: "forward");
+            decoder.ViterbiDecoding(tnwords, model: "bigram", mode: "f+b");
+            tagger.EliminateAllEndOfSentenceTags(tnwords);
             //foreach (var line in decoder.ViterbiGraph)
             //{
             //    foreach (var col in line)
@@ -95,20 +111,17 @@ namespace PostAppConsole
             //}
 
             //foreach (var item in decoder.PredictedTags)
-            //   Console.Write(item + " ");
+            //  Console.Write(item + " ");
 
             Console.WriteLine("\nDuration of Viterbi Decoding: " + decoder.GetViterbiDecodingTime() + " ms!\n");
 
-            Console.WriteLine("testwords: " + wordsTest.Count + " , predwords: " + decoder.PredictedTags.Count);
+            Console.WriteLine("testwords: " + tnwords.Count + " , predwords: " + decoder.PredictedTags.Count);
             Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-
-           //foreach (var item in wordsTest)
-             //  Console.WriteLine(item.word + "  ");
 
 
             Evaluation eval = new Evaluation();
-            eval.CreateSupervizedEvaluationsMatrix(wordsTest, decoder.PredictedTags, fbeta: 1);
-            Console.WriteLine("Simple Accuracy: " + eval.GetSimpleAccuracy(wordsTest, decoder.PredictedTags));
+            eval.CreateSupervizedEvaluationsMatrix(tnwords, decoder.PredictedTags, fbeta: 1);
+            Console.WriteLine("Simple Accuracy: " + eval.GetSimpleAccuracy(tnwords, decoder.PredictedTags));
             Console.WriteLine("TAG\t\tACCURACY\t\tPRECISION\t\tRECALL\t\t\tF-MEASURE");
             var fullMatrix = eval.GetFullClassificationMatrix();
             for (int i = 0; i < eval.GetFullMatrixLineLength(); i++)
@@ -120,14 +133,15 @@ namespace PostAppConsole
 
             Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 
-            using (System.IO.StreamWriter file = new System.IO.StreamWriter("cuvinte_nepredictionate_bigram.csv"))
-            {
-                file.WriteLine("Word,Real Tag,Prediction Tag");
-                for (int i = 0; i < wordsTest.Count; i++)
-                {
-                    file.WriteLine("\"" + wordsTest[i].word + "\"," + wordsTest[i].tag + "," + decoder.PredictedTags[i]);
-                }
-            }
+            //using (System.IO.StreamWriter file = new System.IO.StreamWriter("bigram_for_back.csv"))
+            //{
+            //    file.WriteLine("Word,Real Tag,Prediction Tag");
+            //    for (int i = 0; i < wordsTest.Count; i++) 
+            //    {
+            //        file.WriteLine("\"" + wordsTest[i].word + "\"," + wordsTest[i].tag + "," + decoder.PredictedTags[i]);
+            //    }
+            //}
+
         }
     }
 }

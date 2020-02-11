@@ -14,12 +14,12 @@ namespace NLP
             foreach (var word in words)
             {
                 var splittedWords = word.word.Split(new Char[] { '-', '/' }).ToList();
-                foreach(var sw in splittedWords)
+                foreach (var sw in splittedWords)
                 {
                     if (!IsStopWord(sw))
                     {
                         string tsw = EliminateDigitsFromWord(sw);
-                        if (!tsw.Equals(""))
+                        if (!string.IsNullOrEmpty(tsw))
                         {
                             tsw = ToLowerCaseNormalization(tsw);
                             tsw = EliminateApostrophe(tsw);
@@ -40,6 +40,12 @@ namespace NLP
             return false;
         }
 
+        private static string EliminateDotFromWord(string word)
+        {
+            string newstring = word.Replace(".", string.Empty);
+            return newstring;
+        }
+
         private static string EliminateDigitsFromWord(string word)
         {
             if (!word.Any(char.IsDigit))
@@ -51,7 +57,7 @@ namespace NLP
                 var count = output.Count(char.IsLetter);
                 if (count >= 3) // verifies if has at least 3 letters left
                     return output;
-                return "";
+                return string.Empty;
             }
         }
 
