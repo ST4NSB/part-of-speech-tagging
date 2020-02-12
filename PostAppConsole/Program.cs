@@ -46,7 +46,7 @@ namespace PostAppConsole
 
             Console.WriteLine("Done with loading and creating tokens!");
             HMMTagger tagger = new HMMTagger();
-            tagger.TrainModel(words, model: "trigram");
+            tagger.TrainModel(words);
             Console.WriteLine("Done with training MODEL!");
 
             //foreach (var model in tagger.EmissionFreq)
@@ -76,7 +76,11 @@ namespace PostAppConsole
             wordsTest = tagger.EliminateDuplicateSequenceOfEndOfSentenceTags(wordsTest);
             tagger.CalculateProbabilitiesForTestFiles(wordsTest, model: "trigram");
             Decoder decoder = new Decoder(tagger.EmissionProbabilities, tagger.UnigramProbabilities, tagger.BigramTransitionProbabilities, tagger.TrigramTransitionProbabilities);
-            decoder.ViterbiDecoding(wordsTest, model: "bigram", mode: "f+b");
+            Console.WriteLine("\nInterpolation: " + tagger.DeletedInterpolation());
+
+            decoder.SetLambdaValues(tagger.DeletedInterpolation());
+
+            decoder.ViterbiDecoding(wordsTest, model: "trigram", mode: "forward");
             tagger.EliminateAllEndOfSentenceTags(wordsTest);
 
             // Decoder decoder = new Decoder();
@@ -108,12 +112,10 @@ namespace PostAppConsole
             //foreach (var item in decoder.TrigramTransitionProbabilities)
             //    Console.WriteLine("TRI: " + item.Key + " -> " + item.Value);
 
-            Console.WriteLine("\nInterpolation: " + tagger.DeletedInterpolation());
+            
 
-            decoder.SetLambdaValues(tagger.DeletedInterpolation());
-
-           // foreach (var item in decoder.PredictedTags)
-           //     Console.Write(item + " ");
+            //foreach (var item in decoder.PredictedTags)
+            //    Console.Write(item + " ");
 
              Console.WriteLine("\nDuration of Viterbi Decoding: " + decoder.GetViterbiDecodingTime() + " ms!\n");
 

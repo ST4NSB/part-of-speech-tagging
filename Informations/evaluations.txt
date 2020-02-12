@@ -1,9 +1,12 @@
 70% training + 30% testing:
 
+Duration of training model: 113295 ms! (usually, trained on unigram,bigram,trigram + emission counts)
+Duration of Viterbi Decoding: 166502 ms! (forward+trigram)
+
 1) Inainte de Text Normalization(PreProcessing):
 
 default tagger NN:
-TAG             ACCURACY                PRECISION               RECALL                  F-MEASURE
+TAG             ACCURACY                PRECISION               RECALL                  F1-SCORE
 NN              0.247105                0.247105                1               	0.3962859
 OT              0.899334                0               	0               	0
 CC              0.943951                0               	0               	0
@@ -18,7 +21,7 @@ TOTAL           0.83269         	0.02745612              0.1111111              
 Accuracy: 0.247105
 
 Cazul NULL: 
-TAG             ACCURACY                PRECISION               RECALL                  F-MEASURE
+TAG             ACCURACY                PRECISION               RECALL                  F1-SCORE
 NN              0.949842                0.9600045               0.8316662               0.8912389
 OT              0.9973623               0.9911395               0.9825819               0.9868421
 CC              0.9916886               0.8886868               0.9736701               0.9292395
@@ -34,7 +37,7 @@ TOTAL           0.982828                0.857026                0.8300474       
 Accuracy: 0.9141399
 
 Cazul default-tagger NN:
-TAG             ACCURACY                PRECISION               RECALL                  F-MEASURE
+TAG             ACCURACY                PRECISION               RECALL                  F1-SCORE
 NN              0.9672917               0.9090763               0.9640567               0.9357597
 OT              0.9973623               0.9911395               0.9825819               0.9868421
 CC              0.9916886               0.8886868               0.9736701               0.9292395
@@ -51,7 +54,7 @@ Accuracy: 0.9468542
 2) Dupa Text Normalization(PreProcessing):
 
 Cazul NULL: 
-TAG             ACCURACY                PRECISION               RECALL                  F-MEASURE
+TAG             ACCURACY                PRECISION               RECALL                  F1-SCORE
 NN              0.9497955               0.9484133               0.8501928               0.8966212
 OT              0.9978545               0.9794577               0.9906546               0.9850243
 CC              0.9909721               0.8818253               0.9735199               0.9254068
@@ -67,7 +70,7 @@ TOTAL           0.9830364               0.8484592               0.8303644       
 Accuracy: 0.9151824
 
 Cazul default-tagger NN:
-TAG             ACCURACY                PRECISION               RECALL                  F-MEASURE
+TAG             ACCURACY                PRECISION               RECALL                  F1-SCORE
 NN              0.9660897               0.9175978               0.9531754               0.9350483
 OT              0.9978545               0.9794577               0.9906546               0.9850243
 CC              0.9909721               0.8818253               0.9735199               0.9254068
@@ -84,7 +87,7 @@ Accuracy: 0.941554
 3) BIGRAM (text normalizat):
 
 Bigram + forward:
-TAG             ACCURACY                PRECISION               RECALL                  F-MEASURE
+TAG             ACCURACY                PRECISION               RECALL                  F1-SCORE
 NN              0.9603807               0.9451547               0.8973559               0.9206353
 OT              0.9968328               0.9843991               0.9709206               0.9776134
 CC              0.9919195               0.9092773               0.9547901               0.9314781
@@ -99,7 +102,7 @@ TOTAL           0.9845098               0.9273348               0.9308305       
 Accuracy: 0.9302939
 
 Bigram + backward:
-TAG             ACCURACY                PRECISION               RECALL                  F-MEASURE
+TAG             ACCURACY                PRECISION               RECALL                  F1-SCORE
 NN              0.962198                0.94694         	0.9029778               0.9244365
 OT              0.9936037               0.939916                0.972355                0.9558603
 CC              0.9906532               0.8895119               0.9562971               0.9216962
@@ -114,7 +117,7 @@ TOTAL           0.9851268               0.917948                0.9352025       
 Accuracy: 0.933071
 
 Bigram + f+b: 
-TAG             ACCURACY                PRECISION               RECALL                  F-MEASURE
+TAG             ACCURACY                PRECISION               RECALL                  F1-SCORE
 NN              0.9631918               0.9452659               0.9088898               0.926721
 OT              0.9951857               0.9597891               0.9731809               0.9664386
 CC              0.9915727               0.9032242               0.9559203               0.9288254
@@ -127,3 +130,23 @@ RB              0.985842                0.8727944               0.8647661       
 TOTAL           0.9853842               0.925771                0.9338715               0.9295947
 
 Accuracy: 0.9342289
+
+3) TRIGRAM:
+
+Trigram + forward:
+TAG             ACCURACY                PRECISION               RECALL                  F1-SCORE
+NN              0.9636655               0.9462222               0.9098207               0.9276645
+OT              0.9967988               0.973657                0.9816135               0.977619
+CC              0.990257                0.880067                0.9616792               0.9190649
+JJ              0.9824613               0.8934093               0.8566599               0.8746487
+PP              0.9893994               0.9413821               0.9785345               0.9595988
+AT/DT           0.9854767               0.9228465               0.9708359               0.9462332
+VB              0.9822972               0.9540408               0.9361978               0.9450351
+PN              0.9957616               0.9689069               0.9675129               0.9682094
+RB              0.9871579               0.8954694               0.8638519               0.8793765
+TOTAL           0.9859194               0.9306668               0.9363007               0.93305
+
+Accuracy: 0.9366376
+
+
+

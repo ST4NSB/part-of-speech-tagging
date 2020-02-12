@@ -62,7 +62,7 @@ namespace NLP
         /// Function that creates the Emission & Transition Matrix
         /// </summary>
         /// <param name="wordsInput">List of words - tag, eg. The - at)</param>
-        public void TrainModel(List<Tokenizer.WordTag> wordsInput, string model = "bigram")
+        public void TrainModel(List<Tokenizer.WordTag> wordsInput)
         {
             this.TrainingTime = new Stopwatch();
             this.TrainingTime.Start();
@@ -70,9 +70,8 @@ namespace NLP
             this.N = wordsInput.Count; // nr of tokens
 
             this.CalculateEmissionAndTransitionOccurrences(wordsInput);
-            this.CalculateBigramOccurences(wordsInput); // calculated automatically
-            if (model.Equals("trigram"))
-                this.CalculateTrigramOccurences(wordsInput);
+            this.CalculateBigramOccurences(wordsInput);
+            this.CalculateTrigramOccurences(wordsInput);
 
             this.TrainingTime.Stop();
         }
@@ -158,6 +157,9 @@ namespace NLP
 
         public Tuple<double, double, double> DeletedInterpolation()
         {
+            if (this.TrigramTransitionProbabilities == null)
+                this.TrigramTransitionProbabilities = new Dictionary<Tuple<string, string, string>, double>();
+
             int lambda1 = 0, lambda2 = 0, lambda3 = 0;
             foreach (var tri in this.TrigramTransition)
             {
