@@ -128,14 +128,13 @@ namespace NLP
                         foreach (var item in orderedTransitions)
                             if (item.Key.Item1.Equals(".") && item.Key.Item2 != ".")
                             {
-                                product = item.Value;
+                                double uniVal = this.UnigramProbabilities.FirstOrDefault(x => x.Key.Equals(item.Key.Item2)).Value;
+                                double biTrans = (double)(uniVal * lambda1) + (item.Value * lambda2);
+                                product = biTrans;
                                 nodeTag = item.Key.Item2;
                                 ViterbiNode node = new ViterbiNode(product, nodeTag);
                                 vList.Add(node);
-                                //break;
                             }
-                        //ViterbiNode node = new ViterbiNode(product, nodeTag);
-                        //vList.Add(node);
                     }
                     else
                     {
@@ -154,7 +153,7 @@ namespace NLP
                                 ViterbiNode node = new ViterbiNode(product, wt.Key); 
                                 vList.Add(node);
                             } 
-                            else // case where we don't find a bi transition (start point)
+                            else // WE NEVER ENTER HERE TOTO DELELTE LATER .. case where we don't find a bi transition (start point)
                             {
                                 foreach (var item in this.UnigramProbabilities)
                                 {
@@ -242,7 +241,9 @@ namespace NLP
                                 foreach (var item in orderedTransitions)
                                     if (item.Key.Item1.Equals(elem.CurrentTag) && item.Key.Item2 != ".")
                                     {
-                                        product = (double)elem.value * item.Value;
+                                        double uniVal = this.UnigramProbabilities.FirstOrDefault(x => x.Key.Equals(item.Key.Item2)).Value;
+                                        double biTrans = (double)(uniVal * lambda1) + (item.Value * lambda2);
+                                        product = (double)elem.value * biTrans;
                                         nodeTag = item.Key.Item2;
                                         if (product >= vGoodNode.value)
                                         {
@@ -255,7 +256,6 @@ namespace NLP
                                         }
                                     }
                             }
-
                             vList.Add(vGoodNode);
                         }
                     }
@@ -310,7 +310,7 @@ namespace NLP
                                             vGoodNode.PrevNode = prevNodesGoodNode;
                                         }
                                     }
-                                    else // case where we don't find a bi transition
+                                    else // WE NEVER ENTER HERE TODO DELETE LATER.. case where we don't find a bi transition
                                     {
                                         Console.WriteLine("shouldnt entered here lol\n");
                                         var maxUnigramList = this.UnigramProbabilities.OrderByDescending(x => x.Value).ToList();

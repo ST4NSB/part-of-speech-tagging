@@ -13,9 +13,10 @@ namespace NLP
             List<Tokenizer.WordTag> newWords = new List<Tokenizer.WordTag>();
             foreach (var word in words)
             {
-                var splittedWords = word.word.Split(new Char[] { '-', '/' }).ToList();
-                foreach (var sw in splittedWords)
-                {
+                var sw = word.word;
+               // var splittedWords = word.word.Split(new Char[] { '-', '/' }).ToList();
+                //foreach (var sw in splittedWords)
+                //{
                     if (!IsStopWord(sw))
                     {
                         string tsw = EliminateDigitsFromWord(sw);
@@ -26,7 +27,7 @@ namespace NLP
                             newWords.Add(new Tokenizer.WordTag(tsw, word.tag));
                         }
                     }
-                }
+                //}
             }
             return newWords;
         }
