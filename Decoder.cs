@@ -153,7 +153,7 @@ namespace NLP
                                 ViterbiNode node = new ViterbiNode(product, wt.Key); 
                                 vList.Add(node);
                             } 
-                            else // WE NEVER ENTER HERE TOTO DELELTE LATER .. case where we don't find a bi transition (start point)
+                            else // WE NEVER ENTER HERE TODO DELELTE LATER .. case where we don't find a bi transition (start point)
                             {
                                 foreach (var item in this.UnigramProbabilities)
                                 {
@@ -192,7 +192,7 @@ namespace NLP
                                 elem.PrevNode = elem.PrevNode.OrderByDescending(x => x.value).ToList();
                                 ViterbiNode elem2 = elem.PrevNode[0];
                                 var orderedTransitionsTri = TrigramTransitionProbabilities.OrderByDescending(x => x.Value).ToList();
-
+                                
                                 double product = 0.0d;
                                 string nodeTag = "NULL_TRI";
 
@@ -200,7 +200,14 @@ namespace NLP
                                 foreach (var item in orderedTransitionsTri)
                                     if (item.Key.Item1.Equals(elem2.CurrentTag) && item.Key.Item2.Equals(elem.CurrentTag) && item.Key.Item3 != ".")
                                     {
-                                        product = (double)elem.value * item.Value;
+                                        Tuple<string, string> biTuple = new Tuple<string, string>(elem.CurrentTag, item.Key.Item3);
+                                        double biVal = this.BigramTransitionProbabilities.FirstOrDefault(x => x.Key.Equals(biTuple)).Value;
+
+                                        double uniVal = this.UnigramProbabilities.FirstOrDefault(x => x.Key.Equals(item.Key.Item3)).Value;
+
+                                        double triTransition = (double)(lambda3 * item.Value) + (lambda2 * biVal) + (lambda1 * uniVal);
+
+                                        product = (double)elem.value * triTransition;
                                         nodeTag = item.Key.Item3;
                                         if (product >= vGoodNode.value)
                                         {

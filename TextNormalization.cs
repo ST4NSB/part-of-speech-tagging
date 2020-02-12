@@ -14,19 +14,19 @@ namespace NLP
             foreach (var word in words)
             {
                 var sw = word.word;
-               // var splittedWords = word.word.Split(new Char[] { '-', '/' }).ToList();
+                // var splittedWords = word.word.Split(new Char[] { '-', '/' }).ToList();
                 //foreach (var sw in splittedWords)
                 //{
-                    if (!IsStopWord(sw))
+                if (!IsStopWord(sw))
+                {
+                    string tsw = EliminateDigitsFromWord(sw);
+                    if (!string.IsNullOrEmpty(tsw))
                     {
-                        string tsw = EliminateDigitsFromWord(sw);
-                        if (!string.IsNullOrEmpty(tsw))
-                        {
-                            tsw = ToLowerCaseNormalization(tsw);
-                            tsw = EliminateApostrophe(tsw);
-                            newWords.Add(new Tokenizer.WordTag(tsw, word.tag));
-                        }
+                        tsw = ToLowerCaseNormalization(tsw);
+                        tsw = EliminateApostrophe(tsw);
+                        newWords.Add(new Tokenizer.WordTag(tsw, word.tag));
                     }
+                }
                 //}
             }
             return newWords;

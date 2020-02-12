@@ -74,19 +74,19 @@ namespace PostAppConsole
             wordsTest = TextNormalization.Pipeline(wordsTest);
 
             wordsTest = tagger.EliminateDuplicateSequenceOfEndOfSentenceTags(wordsTest);
-            tagger.CalculateProbabilitiesForTestFiles(wordsTest, model: "bigram");
+            tagger.CalculateProbabilitiesForTestFiles(wordsTest, model: "trigram");
             Decoder decoder = new Decoder(tagger.EmissionProbabilities, tagger.UnigramProbabilities, tagger.BigramTransitionProbabilities, tagger.TrigramTransitionProbabilities);
             Console.WriteLine("\nInterpolation: " + tagger.DeletedInterpolation());
 
             decoder.SetLambdaValues(tagger.DeletedInterpolation());
 
-            decoder.ViterbiDecoding(wordsTest, model: "bigram", mode: "forward");
+            decoder.ViterbiDecoding(wordsTest, model: "trigram", mode: "forward");
             tagger.EliminateAllEndOfSentenceTags(wordsTest);
 
-            // Decoder decoder = new Decoder();
-            //const string deftag = "NN";
+            //decoder = new Decoder();
+            //const string deftag = "NULL";
             //decoder.PredictedTags = new List<string>();
-            //foreach(var tw in wordsTest)
+            //foreach (var tw in wordsTest)
             //{
             //    var modelMax = tagger.EmissionFreq.Find(x => x.Word == tw.word);
             //    if (modelMax != null)
@@ -112,12 +112,10 @@ namespace PostAppConsole
             //foreach (var item in decoder.TrigramTransitionProbabilities)
             //    Console.WriteLine("TRI: " + item.Key + " -> " + item.Value);
 
-            
-
             //foreach (var item in decoder.PredictedTags)
             //    Console.Write(item + " ");
 
-             Console.WriteLine("\nDuration of Viterbi Decoding: " + decoder.GetViterbiDecodingTime() + " ms!\n");
+            Console.WriteLine("\nDuration of Viterbi Decoding: " + decoder.GetViterbiDecodingTime() + " ms!\n");
 
             Console.WriteLine("testwords: " + wordsTest.Count + " , predwords: " + decoder.PredictedTags.Count);
             Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
