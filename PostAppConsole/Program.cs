@@ -74,13 +74,13 @@ namespace PostAppConsole
             wordsTest = TextNormalization.Pipeline(wordsTest);
 
             wordsTest = tagger.EliminateDuplicateSequenceOfEndOfSentenceTags(wordsTest);
-            tagger.CalculateProbabilitiesForTestFiles(wordsTest, model: "trigram");
+            tagger.CalculateProbabilitiesForTestFiles(wordsTest, model: "bigram");
             Decoder decoder = new Decoder(tagger.EmissionProbabilities, tagger.UnigramProbabilities, tagger.BigramTransitionProbabilities, tagger.TrigramTransitionProbabilities);
             Console.WriteLine("\nInterpolation: " + tagger.DeletedInterpolation());
 
             decoder.SetLambdaValues(tagger.DeletedInterpolation());
 
-            decoder.ViterbiDecoding(wordsTest, model: "trigram", mode: "forward");
+            decoder.ViterbiDecoding(wordsTest, model: "bigram", mode: "forward");
             tagger.EliminateAllEndOfSentenceTags(wordsTest);
 
             // Decoder decoder = new Decoder();

@@ -148,7 +148,9 @@ namespace NLP
                             var biTransition = BigramTransitionProbabilities.FirstOrDefault(x => x.Key.Equals(tuple)); // eg. NN->VB - 0.25
                             if (!biTransition.Equals(null))
                             {
-                                double product = (double)emissionFreqValue * biTransition.Value;
+                                double uniVal = this.UnigramProbabilities.FirstOrDefault(x => x.Key.Equals(wt.Key)).Value;
+                                double biTrans = (double)(uniVal * lambda1) + (biTransition.Value * lambda2);
+                                double product = (double)emissionFreqValue * biTrans;
                                 ViterbiNode node = new ViterbiNode(product, wt.Key); 
                                 vList.Add(node);
                             } 
@@ -234,8 +236,6 @@ namespace NLP
                             }
                             else
                             {
-                                
-
                                 double product = 0.0d;
                                 string nodeTag = "NULL_BI";
 
@@ -298,7 +298,9 @@ namespace NLP
                                     var biTransition = BigramTransitionProbabilities.FirstOrDefault(x => x.Key.Equals(tuple)); // eg. NN->VB - 0.25
                                     if (!biTransition.Equals(null))
                                     {
-                                        double product = (double)vn.value * biTransition.Value * tf.Value;
+                                        double uniVal = this.UnigramProbabilities.FirstOrDefault(x => x.Key.Equals(tf.Key)).Value;
+                                        double biTrans = (double)(uniVal * lambda1) + (biTransition.Value * lambda2);
+                                        double product = (double)vn.value * biTrans * tf.Value;
                                         if (product >= vGoodNode.value)
                                         {
                                             vGoodNode.value = product;
