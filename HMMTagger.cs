@@ -155,7 +155,34 @@ namespace NLP
             }            
         }
 
-        public Tuple<double, double, double> DeletedInterpolation()
+        public Tuple<double, double> DeletedInterpolationBigram()
+        {
+            if (this.TrigramTransitionProbabilities == null)
+                this.TrigramTransitionProbabilities = new Dictionary<Tuple<string, string, string>, double>();
+
+            int lambda1 = 0, lambda2 = 0;
+            foreach (var tri in this.TrigramTransition)
+            {
+                string unituple = tri.Key.Item3;
+                Tuple<string, string> bituple = new Tuple<string, string>(tri.Key.Item2, tri.Key.Item3);
+
+                double univalue = this.UnigramProbabilities.FirstOrDefault(x => x.Key.Equals(unituple)).Value;
+                double bivalue = this.BigramTransitionProbabilities.FirstOrDefault(x => x.Key.Equals(bituple)).Value;
+
+                if (bivalue < univalue)
+                {
+                    lambda1 += tri.Value;
+                }
+                else
+                {
+                    lambda2 += tri.Value;
+                }
+            }
+            int sum = lambda1 + lambda2;
+            return new Tuple<double, double>((double)lambda1 / sum, (double)lambda2 / sum);
+        }
+
+        public Tuple<double, double, double> DeletedInterpolationTrigram()
         {
             if (this.TrigramTransitionProbabilities == null)
                 this.TrigramTransitionProbabilities = new Dictionary<Tuple<string, string, string>, double>();
