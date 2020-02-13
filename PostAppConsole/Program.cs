@@ -105,7 +105,7 @@ namespace PostAppConsole
             tagger.EliminateAllEndOfSentenceTags(wordsTest);
 
             decoder = new Decoder();
-            const string deftag = ".";
+            const string deftag = "RB";
             decoder.PredictedTags = new List<string>();
             foreach (var tw in wordsTest)
             {
