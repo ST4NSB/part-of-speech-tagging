@@ -74,13 +74,13 @@ namespace PostAppConsole
             wordsTest = TextNormalization.Pipeline(wordsTest);
 
             wordsTest = tagger.EliminateDuplicateSequenceOfEndOfSentenceTags(wordsTest);
-            tagger.CalculateProbabilitiesForTestFiles(wordsTest, model: "trigram");
+            tagger.CalculateProbabilitiesForTestFiles(wordsTest, model: "bigram");
             Decoder decoder = new Decoder(tagger.EmissionProbabilities, tagger.UnigramProbabilities, tagger.BigramTransitionProbabilities, tagger.TrigramTransitionProbabilities);
             Console.WriteLine("\nInterpolation: " + tagger.DeletedInterpolation());
 
             decoder.SetLambdaValues(tagger.DeletedInterpolation());
 
-            decoder.ViterbiDecoding(wordsTest, model: "trigram", mode: "backward");
+            decoder.ViterbiDecoding(wordsTest, model: "bigram", mode: "forward");
             tagger.EliminateAllEndOfSentenceTags(wordsTest);
 
             //decoder = new Decoder();
@@ -137,14 +137,14 @@ namespace PostAppConsole
 
 
 
-            ////using (System.IO.StreamWriter file = new System.IO.StreamWriter("bigram_for_back.csv"))
-            ////{
-            ////    file.WriteLine("Word,Real Tag,Prediction Tag");
-            ////    for (int i = 0; i < wordsTest.Count; i++) 
-            ////    {
-            ////        file.WriteLine("\"" + wordsTest[i].word + "\"," + wordsTest[i].tag + "," + decoder.PredictedTags[i]);
-            ////    }
-            ////}
+            //using (System.IO.StreamWriter file = new System.IO.StreamWriter("trigram_forw_back.csv"))
+            //{
+            //    file.WriteLine("Word,Real Tag,Prediction Tag");
+            //    for (int i = 0; i < wordsTest.Count; i++)
+            //    {
+            //        file.WriteLine("\"" + wordsTest[i].word + "\"," + wordsTest[i].tag + "," + decoder.PredictedTags[i]);
+            //    }
+            //}
 
         }
     }

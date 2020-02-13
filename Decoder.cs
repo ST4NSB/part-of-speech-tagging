@@ -129,7 +129,13 @@ namespace NLP
                             if (item.Key.Item1.Equals(".") && item.Key.Item2 != ".")
                             {
                                 double uniVal = this.UnigramProbabilities.FirstOrDefault(x => x.Key.Equals(item.Key.Item2)).Value;
-                                double biTrans = (double)(uniVal * lambda1) + (item.Value * lambda2);
+
+                                double biTrans = 0.0d;
+                                if (lambda3 == 0.0d)
+                                    biTrans = (double)(uniVal * lambda1) + (item.Value * lambda2);
+                                else
+                                    biTrans = (double)(uniVal * lambda1) + (item.Value * lambda3);
+
                                 product = biTrans;
                                 nodeTag = item.Key.Item2;
                                 ViterbiNode node = new ViterbiNode(product, nodeTag);
@@ -147,7 +153,13 @@ namespace NLP
                             double biTransition = BigramTransitionProbabilities.FirstOrDefault(x => x.Key.Equals(tuple)).Value; // eg. NN->VB - 0.25
 
                             double uniVal = this.UnigramProbabilities.FirstOrDefault(x => x.Key.Equals(wt.Key)).Value;
-                            double biTrans = (double)(uniVal * lambda1) + (biTransition * lambda2);
+
+                            double biTrans = 0.0d;
+                            if (lambda3 == 0.0d)
+                                biTrans = (double)(uniVal * lambda1) + (biTransition * lambda2);
+                            else
+                                biTrans = (double)(uniVal * lambda1) + (biTransition * lambda3);
+
                             double product = (double)emissionFreqValue * biTrans;
                             ViterbiNode node = new ViterbiNode(product, wt.Key);
                             vList.Add(node);
@@ -218,7 +230,13 @@ namespace NLP
                                     if (item.Key.Item1.Equals(elem.CurrentTag) && item.Key.Item2 != ".")
                                     {
                                         double uniVal = this.UnigramProbabilities.FirstOrDefault(x => x.Key.Equals(item.Key.Item2)).Value;
-                                        double biTrans = (double)(uniVal * lambda1) + (item.Value * lambda2);
+
+                                        double biTrans = 0.0d;
+                                        if (lambda3 == 0.0d)
+                                            biTrans = (double)(uniVal * lambda1) + (item.Value * lambda2);
+                                        else
+                                            biTrans = (double)(uniVal * lambda1) + (item.Value * lambda3);
+
                                         product = (double)elem.value * biTrans;
                                         nodeTag = item.Key.Item2;
                                         if (product >= vGoodNode.value)
@@ -274,7 +292,14 @@ namespace NLP
                                     double biTransition = BigramTransitionProbabilities.FirstOrDefault(x => x.Key.Equals(tuple)).Value; // eg. NN->VB - 0.25
 
                                     double uniVal = this.UnigramProbabilities.FirstOrDefault(x => x.Key.Equals(tf.Key)).Value;
-                                    double biTrans = (double)(uniVal * lambda1) + (biTransition * lambda2);
+
+                                    //double biTrans = (double)(uniVal * lambda1) + (biTransition * lambda2);
+                                    double biTrans = 0.0d;
+                                    if (lambda3 == 0.0d)
+                                        biTrans = (double)(uniVal * lambda1) + (biTransition * lambda2);
+                                    else
+                                        biTrans = (double)(uniVal * lambda1) + (biTransition * lambda3);
+
                                     double product = (double)vn.value * biTrans * tf.Value;
                                     if (product >= vGoodNode.value)
                                     {
@@ -578,7 +603,7 @@ namespace NLP
             {
                 if(BackwardHistory[i].value > ForwardHistory[i].value)
                 {
-                    Console.WriteLine("backward!!!");
+                    //Console.WriteLine("backward!!!");
                     List<string> tagsViterbi = new List<string>();
                     while (true)
                     {
