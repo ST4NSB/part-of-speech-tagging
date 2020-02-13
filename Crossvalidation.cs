@@ -6,42 +6,57 @@ namespace NLP
 {
     public class CrossValidation
     {
-        private List<string> TrainFiles, TestFiles;
-        public string TestFile, TrainFile;
+        public string[] TestFile, TrainFile;
 
         public CrossValidation() { }
 
-        public void SetFilesForCrossValidation(string filePath, int fold = 10)
+        public void SetFilesForCrossValidation(string filePath, int fold = 10, bool shuffle = false) // TODO later add shuffle function
         {
             List<string> files = FileReader.GetAllTextFromDirectoryAsList(filePath);
             int filesPerFold = files.Count / fold;
 
-            int crossIndex = 0;
+            TestFile = new string[fold];
+            TrainFile = new string[fold];
 
+            if (shuffle) 
+                files = this.Shuffle(files);
 
-            TrainFiles = new List<string>();
-            TestFiles = new List<string>();
-
-            for (int i = 0; i < files.Count; i++)
+            for (int crossIndex = 0; crossIndex < fold; crossIndex++)
             {
-                if (i >= filesPerFold)
+                var IndividualTrainFiles = new List<string>();
+                var IndividualTestFiles = new List<string>();
+                for (int i = 0; i < files.Count; i++)
                 {
-                    TrainFiles.Add(files[i]);
+                    if (i >= (filesPerFold * crossIndex) && i < (filesPerFold * (crossIndex + 1)))
+                    {
+                        IndividualTestFiles.Add(files[i]);
+                    }
+                    else
+                    {
+                        IndividualTrainFiles.Add(files[i]);
+                    }
                 }
-                else
-                {
-                    TestFiles.Add(files[i]);
-                }
+                string trainf = String.Join("  ", IndividualTrainFiles);
+                string testf = String.Join("  ", IndividualTestFiles);
+                this.TrainFile[crossIndex] = trainf;
+                this.TestFile[crossIndex] = testf;
             }
-
-            TestFile = String.Join(" ", TestFiles);
-            TrainFile = String.Join(" ", TrainFiles);
-
-
-            //Console.WriteLine("cross: " + files.Count);
-
-
-
         }
+
+        private List<string> Shuffle(List<string> list)
+        {
+            Random rng = new Random();
+            int n = list.Count;
+            while (n > 1) 
+            {
+                n--;
+                int k = rng.Next(n + 1);
+                string value = list[k];
+                list[k] = list[n];
+                list[n] = value;
+            }
+            return list; 
+        }
+
     }
 }

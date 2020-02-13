@@ -36,18 +36,25 @@ namespace PostAppConsole
         {
             string path = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.Parent.FullName + "\\";
             string BrownFolderPath = path + "Brown Corpus\\brown";
-            const string BrownfolderTrain = "Brown Corpus\\1_Train", BrownfolderTest = "Brown Corpus\\2_Test",
-                demoFileTrain = "demo files\\train", demoFileTest = "demo files\\test";
+            const int fold = 10;
 
+            //const string BrownfolderTrain = "Brown Corpus\\1_Train", BrownfolderTest = "Brown Corpus\\2_Test";
+            //const string demoFileTrain = "demo files\\train", demoFileTest = "demo files\\test";
             // var text = LoadAndReadFolderFiles(BrownfolderTrain);
 
             CrossValidation cv = new CrossValidation();
-            cv.SetFilesForCrossValidation(BrownFolderPath, fold: 10);
+            cv.SetFilesForCrossValidation(BrownFolderPath, fold: fold, shuffle: false);
 
-            var oldWords = Tokenizer.SeparateTagFromWord(Tokenizer.WordTokenizeCorpus(cv.TrainFile));
+            for (int bfile = 0; bfile < fold; bfile++) 
+            {
+                // TOTO: ADD logic in here
+                return;
+            }
+
+            var oldWords = Tokenizer.SeparateTagFromWord(Tokenizer.WordTokenizeCorpus(""));
             var words = SpeechPart.GetNewHierarchicTags(oldWords);
             words = TextNormalization.Pipeline(words);
-
+            
             Console.WriteLine("Done with loading and creating tokens!");
             HMMTagger tagger = new HMMTagger();
             tagger.TrainModel(words);
@@ -78,7 +85,7 @@ namespace PostAppConsole
             Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
             //var textTest = LoadAndReadFolderFiles();
 
-            var oldWordsTest = Tokenizer.SeparateTagFromWord(Tokenizer.WordTokenizeCorpus(cv.TestFile));
+            var oldWordsTest = Tokenizer.SeparateTagFromWord(Tokenizer.WordTokenizeCorpus(""));
             var wordsTest = SpeechPart.GetNewHierarchicTags(oldWordsTest);
             wordsTest = TextNormalization.Pipeline(wordsTest);
 

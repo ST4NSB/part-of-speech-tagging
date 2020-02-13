@@ -9,6 +9,8 @@ namespace NLP
         HashSet<string> ClassTags;
         List<List<float>> finalMatrix;
 
+        public List<List<List<string>>> CrossValEval; // TOTO ADD LOGIC HERE
+
         public float GetSimpleAccuracy(List<Tokenizer.WordTag> realTags, List<string> predictedTags)
         {
             int wordsHit = 0;
