@@ -34,15 +34,19 @@ namespace PostAppConsole
 
         static void Main(string[] args)
         {
+            string path = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.Parent.FullName + "\\";
+            string BrownFolderPath = path + "Brown Corpus\\brown";
             const string BrownfolderTrain = "Brown Corpus\\1_Train", BrownfolderTest = "Brown Corpus\\2_Test",
                 demoFileTrain = "demo files\\train", demoFileTest = "demo files\\test";
 
-            var text = LoadAndReadFolderFiles(BrownfolderTrain);
-            var oldWords = Tokenizer.SeparateTagFromWord(Tokenizer.WordTokenizeCorpus(text));
+            // var text = LoadAndReadFolderFiles(BrownfolderTrain);
 
+            CrossValidation cv = new CrossValidation();
+            cv.SetFilesForCrossValidation(BrownFolderPath, fold: 10);
+
+            var oldWords = Tokenizer.SeparateTagFromWord(Tokenizer.WordTokenizeCorpus(cv.TrainFile));
             var words = SpeechPart.GetNewHierarchicTags(oldWords);
             words = TextNormalization.Pipeline(words);
-
 
             Console.WriteLine("Done with loading and creating tokens!");
             HMMTagger tagger = new HMMTagger();
@@ -64,25 +68,30 @@ namespace PostAppConsole
             //foreach (var item in tagger.TrigramTransition)
             //    Console.WriteLine(item.Key + " -> " + item.Value);
 
+            //WriteToTxtFile("Trained Files", "emission.json", JsonConvert.SerializeObject(tagger.EmissionFreq));
+            // WriteToTxtFile("Trained Files", "unigram.json", JsonConvert.SerializeObject(tagger.UnigramFreq));
+            //WriteToTxtFile("Trained Files", "bigram.json", JsonConvert.SerializeObject(tagger.BigramTransition));
+            //WriteToTxtFile("Trained Files", "trigram.json", JsonConvert.SerializeObject(tagger.TrigramTransition));
+
             Console.WriteLine("Duration of training model: " + tagger.GetTrainingTimeMs() + " ms!");
-            //// WriteToTxtFile("Trained Files", "SVM_trained_file.json", JsonConvert.SerializeObject(tagger.EmissionFreq));
 
             Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-            var textTest = LoadAndReadFolderFiles(BrownfolderTest);
-            var oldWordsTest = Tokenizer.SeparateTagFromWord(Tokenizer.WordTokenizeCorpus(textTest));
+            //var textTest = LoadAndReadFolderFiles();
+
+            var oldWordsTest = Tokenizer.SeparateTagFromWord(Tokenizer.WordTokenizeCorpus(cv.TestFile));
             var wordsTest = SpeechPart.GetNewHierarchicTags(oldWordsTest);
             wordsTest = TextNormalization.Pipeline(wordsTest);
 
             wordsTest = tagger.EliminateDuplicateSequenceOfEndOfSentenceTags(wordsTest);
-            tagger.CalculateProbabilitiesForTestFiles(wordsTest, model: "trigram");
+            tagger.CalculateProbabilitiesForTestFiles(wordsTest, model: "bigram");
             Decoder decoder = new Decoder(tagger.EmissionProbabilities, tagger.UnigramProbabilities, tagger.BigramTransitionProbabilities, tagger.TrigramTransitionProbabilities);
 
             Console.WriteLine("\nInterpolation: " + tagger.DeletedInterpolationTrigram() + " , " + tagger.DeletedInterpolationBigram());
             decoder.SetLambdaValues(tagger.DeletedInterpolationTrigram(), tagger.DeletedInterpolationBigram());
 
-            decoder.ViterbiDecoding(wordsTest, model: "trigram", mode: "backward");
-            tagger.EliminateAllEndOfSentenceTags(wordsTest);
-
+            decoder.ViterbiDecoding(wordsTest, modelForward: "bigram", modelBackward: "bigram", mode: "forward");
+            tagger.EliminateAllEndOfSentenceTags(wordsTest);  
+            
             //decoder = new Decoder();
             //const string deftag = "NULL";
             //decoder.PredictedTags = new List<string>();

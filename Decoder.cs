@@ -72,7 +72,7 @@ namespace NLP
             lambda2Bi = lambdaBiTuple.Item2;
         }
 
-        public void ViterbiDecoding(List<Tokenizer.WordTag> testWords, string model = "bigram", string mode = "forward")
+        public void ViterbiDecoding(List<Tokenizer.WordTag> testWords, string modelForward = "bigram",string modelBackward = "bigram", string mode = "forward")
         {
             this.ViterbiDecodeTime = new Stopwatch();
             this.ViterbiDecodeTime.Start();
@@ -84,9 +84,9 @@ namespace NLP
             this.ViterbiGraph = new List<List<ViterbiNode>>();
 
             if(mode.Equals("forward") || mode.Equals("f+b"))
-                this.ForwardAlgorithm(testWords, model, mode);
+                this.ForwardAlgorithm(testWords, modelForward, mode);
             if (mode.Equals("backward") || mode.Equals("f+b"))
-                this.BackwardAlgorithm(testWords, model, mode);
+                this.BackwardAlgorithm(testWords, modelBackward, mode);
 
             if(mode.Equals("f+b"))
                 BiDirectionalModelTrace();
