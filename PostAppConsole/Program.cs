@@ -44,17 +44,15 @@ namespace PostAppConsole
             
 
             CrossValidation cv = new CrossValidation();
-            cv.SetFilesForCrossValidation(demoBrown, fold: fold, shuffle: true);
+            cv.SetFilesForCrossValidation(BrownFolderPath, fold: fold, shuffle: false);
 
             for (int bfile = 0; bfile < fold; bfile++) 
             {
                 // TOTO: ADD logic in here
 
-                Console.WriteLine("test: " + cv.TestFile[bfile]);
-                Console.WriteLine("train: " + cv.TrainFile[bfile]);
+               // Console.WriteLine("test: " + cv.TestFile[bfile]);
+               // Console.WriteLine("train: " + cv.TrainFile[bfile]);
             }
-
-            return;
 
             var text = LoadAndReadFolderFiles(BrownfolderTrain);
             var oldWords = Tokenizer.SeparateTagFromWord(Tokenizer.WordTokenizeCorpus(text));
@@ -107,7 +105,7 @@ namespace PostAppConsole
             tagger.EliminateAllEndOfSentenceTags(wordsTest);
 
             decoder = new Decoder();
-            const string deftag = "JJ";
+            const string deftag = ".";
             decoder.PredictedTags = new List<string>();
             foreach (var tw in wordsTest)
             {
