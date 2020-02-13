@@ -36,22 +36,28 @@ namespace PostAppConsole
         {
             string path = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.Parent.FullName + "\\";
             string BrownFolderPath = path + "Brown Corpus\\brown";
-            const int fold = 10;
+            const int fold = 4;
 
-            //const string BrownfolderTrain = "Brown Corpus\\1_Train", BrownfolderTest = "Brown Corpus\\2_Test";
-            //const string demoFileTrain = "demo files\\train", demoFileTest = "demo files\\test";
-            // var text = LoadAndReadFolderFiles(BrownfolderTrain);
+            const string BrownfolderTrain = "Brown Corpus\\Rule 70-30\\1_Train", BrownfolderTest = "Brown Corpus\\Rule 70-30\\2_Test";
+            const string demoFileTrain = "demo files\\train", demoFileTest = "demo files\\test";
+            string demoBrown = path + "demo files\\cross";
+            
 
             CrossValidation cv = new CrossValidation();
-            cv.SetFilesForCrossValidation(BrownFolderPath, fold: fold, shuffle: false);
+            cv.SetFilesForCrossValidation(demoBrown, fold: fold, shuffle: true);
 
             for (int bfile = 0; bfile < fold; bfile++) 
             {
                 // TOTO: ADD logic in here
-                return;
+
+                Console.WriteLine("test: " + cv.TestFile[bfile]);
+                Console.WriteLine("train: " + cv.TrainFile[bfile]);
             }
 
-            var oldWords = Tokenizer.SeparateTagFromWord(Tokenizer.WordTokenizeCorpus(""));
+            return;
+
+            var text = LoadAndReadFolderFiles(BrownfolderTrain);
+            var oldWords = Tokenizer.SeparateTagFromWord(Tokenizer.WordTokenizeCorpus(text));
             var words = SpeechPart.GetNewHierarchicTags(oldWords);
             words = TextNormalization.Pipeline(words);
             
@@ -83,37 +89,38 @@ namespace PostAppConsole
             Console.WriteLine("Duration of training model: " + tagger.GetTrainingTimeMs() + " ms!");
 
             Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-            //var textTest = LoadAndReadFolderFiles();
 
-            var oldWordsTest = Tokenizer.SeparateTagFromWord(Tokenizer.WordTokenizeCorpus(""));
+            var textTest = LoadAndReadFolderFiles(BrownfolderTest);
+
+            var oldWordsTest = Tokenizer.SeparateTagFromWord(Tokenizer.WordTokenizeCorpus(textTest));
             var wordsTest = SpeechPart.GetNewHierarchicTags(oldWordsTest);
             wordsTest = TextNormalization.Pipeline(wordsTest);
 
             wordsTest = tagger.EliminateDuplicateSequenceOfEndOfSentenceTags(wordsTest);
-            tagger.CalculateProbabilitiesForTestFiles(wordsTest, model: "bigram");
+            //tagger.CalculateProbabilitiesForTestFiles(wordsTest, model: "bigram");
             Decoder decoder = new Decoder(tagger.EmissionProbabilities, tagger.UnigramProbabilities, tagger.BigramTransitionProbabilities, tagger.TrigramTransitionProbabilities);
 
-            Console.WriteLine("\nInterpolation: " + tagger.DeletedInterpolationTrigram() + " , " + tagger.DeletedInterpolationBigram());
-            decoder.SetLambdaValues(tagger.DeletedInterpolationTrigram(), tagger.DeletedInterpolationBigram());
+            //Console.WriteLine("\nInterpolation: " + tagger.DeletedInterpolationTrigram() + " , " + tagger.DeletedInterpolationBigram());
+            //decoder.SetLambdaValues(tagger.DeletedInterpolationTrigram(), tagger.DeletedInterpolationBigram());
 
-            decoder.ViterbiDecoding(wordsTest, modelForward: "bigram", modelBackward: "bigram", mode: "forward");
-            tagger.EliminateAllEndOfSentenceTags(wordsTest);  
-            
-            //decoder = new Decoder();
-            //const string deftag = "NULL";
-            //decoder.PredictedTags = new List<string>();
-            //foreach (var tw in wordsTest)
-            //{
-            //    var modelMax = tagger.EmissionFreq.Find(x => x.Word == tw.word);
-            //    if (modelMax != null)
-            //    {
-            //        string maxTag = modelMax.TagFreq.OrderByDescending(x => x.Value).FirstOrDefault().Key;
-            //        if (maxTag != ".")
-            //            decoder.PredictedTags.Add(maxTag);
-            //        else decoder.PredictedTags.Add(deftag);
-            //    }
-            //    else decoder.PredictedTags.Add(deftag); // NULL / NN
-            //}
+            //decoder.ViterbiDecoding(wordsTest, modelForward: "bigram", modelBackward: "bigram", mode: "forward");
+            tagger.EliminateAllEndOfSentenceTags(wordsTest);
+
+            decoder = new Decoder();
+            const string deftag = "JJ";
+            decoder.PredictedTags = new List<string>();
+            foreach (var tw in wordsTest)
+            {
+                var modelMax = tagger.EmissionFreq.Find(x => x.Word == tw.word);
+                if (modelMax != null)
+                {
+                    string maxTag = modelMax.TagFreq.OrderByDescending(x => x.Value).FirstOrDefault().Key;
+                    if (maxTag != ".")
+                        decoder.PredictedTags.Add(maxTag);
+                    else decoder.PredictedTags.Add(deftag);
+                }
+                else decoder.PredictedTags.Add(deftag); // NULL / NN
+            }
 
             //foreach (var item in decoder.EmissionProbabilities)
             //{
@@ -131,7 +138,7 @@ namespace PostAppConsole
             //foreach (var item in decoder.PredictedTags)
             //    Console.Write(item + " ");
 
-            Console.WriteLine("\nDuration of Viterbi Decoding: " + decoder.GetViterbiDecodingTime() + " ms!\n");
+           // Console.WriteLine("\nDuration of Viterbi Decoding: " + decoder.GetViterbiDecodingTime() + " ms!\n");
 
             Console.WriteLine("testwords: " + wordsTest.Count + " , predwords: " + decoder.PredictedTags.Count);
             Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
