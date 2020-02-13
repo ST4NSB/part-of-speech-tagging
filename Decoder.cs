@@ -144,23 +144,13 @@ namespace NLP
                                 continue;
                             double emissionFreqValue = wt.Value; // eg. Jane -> 0.1111 (NN)
                             Tuple<string, string> tuple = new Tuple<string, string>(".", wt.Key);
-                            var biTransition = BigramTransitionProbabilities.FirstOrDefault(x => x.Key.Equals(tuple)); // eg. NN->VB - 0.25
-                            if (!biTransition.Equals(null))
-                            {
-                                double uniVal = this.UnigramProbabilities.FirstOrDefault(x => x.Key.Equals(wt.Key)).Value;
-                                double biTrans = (double)(uniVal * lambda1) + (biTransition.Value * lambda2);
-                                double product = (double)emissionFreqValue * biTrans;
-                                ViterbiNode node = new ViterbiNode(product, wt.Key); 
-                                vList.Add(node);
-                            } 
-                            else // WE NEVER ENTER HERE TODO DELELTE LATER .. case where we don't find a bi transition (start point)
-                            {
-                                foreach (var item in this.UnigramProbabilities)
-                                {
-                                    ViterbiNode node = new ViterbiNode((double)emissionFreqValue * (item.Value * lambda1), item.Key);
-                                    vList.Add(node);
-                                }
-                            }
+                            double biTransition = BigramTransitionProbabilities.FirstOrDefault(x => x.Key.Equals(tuple)).Value; // eg. NN->VB - 0.25
+
+                            double uniVal = this.UnigramProbabilities.FirstOrDefault(x => x.Key.Equals(wt.Key)).Value;
+                            double biTrans = (double)(uniVal * lambda1) + (biTransition * lambda2);
+                            double product = (double)emissionFreqValue * biTrans;
+                            ViterbiNode node = new ViterbiNode(product, wt.Key);
+                            vList.Add(node);
                         }
                     }
                     this.ViterbiGraph.Add(vList);
@@ -196,7 +186,6 @@ namespace NLP
                                 double product = 0.0d;
                                 string nodeTag = "NULL_TRI";
 
-                                bool foundTri = false;
                                 foreach (var item in orderedTransitionsTri)
                                     if (item.Key.Item1.Equals(elem2.CurrentTag) && item.Key.Item2.Equals(elem.CurrentTag) && item.Key.Item3 != ".")
                                     {
@@ -216,29 +205,9 @@ namespace NLP
                                             List<ViterbiNode> prevNodesGoodNode = new List<ViterbiNode>();
                                             prevNodesGoodNode.Add(elem);
                                             vGoodNode.PrevNode = prevNodesGoodNode;
-                                            foundTri = true;
                                             break;
                                         }
                                     }
-
-                                if(!foundTri)
-                                {
-                                    foreach (var item in orderedTransitions)
-                                        if (item.Key.Item1.Equals(elem.CurrentTag) && item.Key.Item2 != ".")
-                                        {
-                                            product = (double)elem.value * item.Value;
-                                            nodeTag = item.Key.Item2;
-                                            if (product >= vGoodNode.value)
-                                            {
-                                                vGoodNode.value = product;
-                                                vGoodNode.CurrentTag = nodeTag;
-                                                List<ViterbiNode> prevNodesGoodNode = new List<ViterbiNode>();
-                                                prevNodesGoodNode.Add(elem);
-                                                vGoodNode.PrevNode = prevNodesGoodNode;
-                                                break;
-                                            }
-                                        }
-                                }
                             }
                             else
                             {
@@ -302,27 +271,15 @@ namespace NLP
                                 else
                                 {
                                     Tuple<string, string> tuple = new Tuple<string, string>(vn.CurrentTag, tf.Key);
-                                    var biTransition = BigramTransitionProbabilities.FirstOrDefault(x => x.Key.Equals(tuple)); // eg. NN->VB - 0.25
-                                    if (!biTransition.Equals(null))
+                                    double biTransition = BigramTransitionProbabilities.FirstOrDefault(x => x.Key.Equals(tuple)).Value; // eg. NN->VB - 0.25
+
+                                    double uniVal = this.UnigramProbabilities.FirstOrDefault(x => x.Key.Equals(tf.Key)).Value;
+                                    double biTrans = (double)(uniVal * lambda1) + (biTransition * lambda2);
+                                    double product = (double)vn.value * biTrans * tf.Value;
+                                    if (product >= vGoodNode.value)
                                     {
-                                        double uniVal = this.UnigramProbabilities.FirstOrDefault(x => x.Key.Equals(tf.Key)).Value;
-                                        double biTrans = (double)(uniVal * lambda1) + (biTransition.Value * lambda2);
-                                        double product = (double)vn.value * biTrans * tf.Value;
-                                        if (product >= vGoodNode.value)
-                                        {
-                                            vGoodNode.value = product;
-                                            vGoodNode.CurrentTag = tf.Key;
-                                            List<ViterbiNode> prevNodesGoodNode = new List<ViterbiNode>();
-                                            prevNodesGoodNode.Add(vn);
-                                            vGoodNode.PrevNode = prevNodesGoodNode;
-                                        }
-                                    }
-                                    else // WE NEVER ENTER HERE TODO DELETE LATER.. case where we don't find a bi transition
-                                    {
-                                        Console.WriteLine("shouldnt entered here lol\n");
-                                        var maxUnigramList = this.UnigramProbabilities.OrderByDescending(x => x.Value).ToList();
-                                        vGoodNode.value = (double)vn.value * tf.Value * (lambda1 * maxUnigramList.ElementAt(0).Value);
-                                        vGoodNode.CurrentTag = maxUnigramList.ElementAt(0).Key;
+                                        vGoodNode.value = product;
+                                        vGoodNode.CurrentTag = tf.Key;
                                         List<ViterbiNode> prevNodesGoodNode = new List<ViterbiNode>();
                                         prevNodesGoodNode.Add(vn);
                                         vGoodNode.PrevNode = prevNodesGoodNode;
@@ -342,8 +299,10 @@ namespace NLP
         {
             // right to left encoding - backward approach
             bool startPoint = true;
+            int triPoz = -1;
             for (int i = testWords.Count - 2; i >= -1; i--)
             {
+                triPoz++;
                 if (i == -1) // we first check to see if we got to index -1
                 {
                     Backtrace(method: "backward");
@@ -358,6 +317,7 @@ namespace NLP
                 }
                 if (startPoint)
                 {
+                    triPoz = 0;
                     HMMTagger.EmissionProbabilisticModel foundWord = this.EmissionProbabilities.Find(x => x.Word.Equals(testWords[i].word));
                     List<ViterbiNode> vList = new List<ViterbiNode>();
 
@@ -375,14 +335,14 @@ namespace NLP
                         foreach (var item in orderedTransitions)
                             if (item.Key.Item2.Equals(".") && item.Key.Item1 != ".")
                             {
-                                product = item.Value;
+                                double uniVal = this.UnigramProbabilities.FirstOrDefault(x => x.Key.Equals(item.Key.Item1)).Value;
+                                double biTrans = (double)(uniVal * lambda1) + (item.Value * lambda2);
+
+                                product = biTrans;
                                 nodeTag = item.Key.Item1;
                                 ViterbiNode node = new ViterbiNode(product, nodeTag);
                                 vList.Add(node);
-                                //break;
                             }
-                        //ViterbiNode node = new ViterbiNode(product, nodeTag);
-                        //vList.Add(node);
                     }
                     else
                     {
@@ -392,21 +352,14 @@ namespace NLP
                                 continue;
                             double emissionFreqValue = wt.Value; // eg. Jane -> 0.1111 (NN)
                             Tuple<string, string> tuple = new Tuple<string, string>(wt.Key, ".");
-                            var biTransition = BigramTransitionProbabilities.FirstOrDefault(x => x.Key.Equals(tuple)); // eg. NN->VB - 0.25
-                            if (!biTransition.Equals(null))
-                            {
-                                double product = (double)emissionFreqValue * biTransition.Value;
-                                ViterbiNode node = new ViterbiNode(product, wt.Key); 
-                                vList.Add(node);
-                            }
-                            else // case 1
-                            {
-                                foreach (var item in this.UnigramProbabilities)
-                                {
-                                    ViterbiNode node = new ViterbiNode((double)emissionFreqValue * (item.Value * lambda1), item.Key);
-                                    vList.Add(node);
-                                }
-                            }
+                            double biTransition = BigramTransitionProbabilities.FirstOrDefault(x => x.Key.Equals(tuple)).Value; // eg. NN->VB - 0.25
+
+                            double uniVal = this.UnigramProbabilities.FirstOrDefault(x => x.Key.Equals(wt.Key)).Value;
+                            double biTrans = (double)(uniVal * lambda1) + (biTransition * lambda2);
+
+                            double product = (double)emissionFreqValue * biTrans;
+                            ViterbiNode node = new ViterbiNode(product, wt.Key);
+                            vList.Add(node);
                         }
                     }
                     this.ViterbiGraph.Add(vList);
@@ -426,30 +379,68 @@ namespace NLP
                         for (int j = 0; j < this.ViterbiGraph[this.ViterbiGraph.Count - 1].Count; j++)
                         {
                             ViterbiNode elem = this.ViterbiGraph[this.ViterbiGraph.Count - 1][j];
+                            ViterbiNode vGoodNode = new ViterbiNode(0.0d, "NULL");
                             // we take the best transition case where first item is "."
                             var orderedTransitions = BigramTransitionProbabilities.OrderByDescending(x => x.Value).ToList();
-                            // trigram cond.
 
+                            if (model == "trigram" && triPoz >= 2)
+                            {
+                                if (elem.NextNode == null)
+                                    continue;
+                                elem.NextNode = elem.NextNode.OrderByDescending(x => x.value).ToList();
+                                ViterbiNode elem2 = elem.NextNode[0];
+                                var orderedTransitionsTri = TrigramTransitionProbabilities.OrderByDescending(x => x.Value).ToList();
 
-                            ViterbiNode vGoodNode = new ViterbiNode(0.0d, "NULL_BI");
-                            double product = 0.0d;
-                            string nodeTag = "NULL_BI";
+                                double product = 0.0d;
+                                string nodeTag = "NULL_TRI";
 
-                            foreach (var item in orderedTransitions)
-                                if (item.Key.Item2.Equals(elem.CurrentTag) && item.Key.Item1 != ".")
-                                {
-                                    product = (double)elem.value * item.Value;
-                                    nodeTag = item.Key.Item1;
-                                    if (product >= vGoodNode.value)
+                                foreach (var item in orderedTransitionsTri)
+                                    if (item.Key.Item3.Equals(elem2.CurrentTag) && item.Key.Item2.Equals(elem.CurrentTag) && item.Key.Item1 != ".")
                                     {
-                                        vGoodNode.value = product;
-                                        vGoodNode.CurrentTag = nodeTag;
-                                        List<ViterbiNode> nextGoodNodes = new List<ViterbiNode>();
-                                        nextGoodNodes.Add(elem);
-                                        vGoodNode.NextNode = nextGoodNodes;
-                                        break;
+                                        Tuple<string, string> biTuple = new Tuple<string, string>(item.Key.Item1, elem.CurrentTag);
+                                        double biVal = this.BigramTransitionProbabilities.FirstOrDefault(x => x.Key.Equals(biTuple)).Value;
+
+                                        double uniVal = this.UnigramProbabilities.FirstOrDefault(x => x.Key.Equals(item.Key.Item1)).Value;
+
+                                        double triTransition = (double)(lambda3 * item.Value) + (lambda2 * biVal) + (lambda1 * uniVal);
+
+                                        product = (double)elem.value * triTransition;
+                                        nodeTag = item.Key.Item1;
+                                        if (product >= vGoodNode.value)
+                                        {
+                                            vGoodNode.value = product;
+                                            vGoodNode.CurrentTag = nodeTag;
+                                            List<ViterbiNode> nextNodeTags = new List<ViterbiNode>();
+                                            nextNodeTags.Add(elem);
+                                            vGoodNode.NextNode = nextNodeTags;
+                                            break;
+                                        }
                                     }
-                                }
+                            }
+                            else
+                            {
+                                double product = 0.0d;
+                                string nodeTag = "NULL_BI";
+
+                                foreach (var item in orderedTransitions)
+                                    if (item.Key.Item2.Equals(elem.CurrentTag) && item.Key.Item1 != ".")
+                                    {
+                                        double uniVal = this.UnigramProbabilities.FirstOrDefault(x => x.Key.Equals(item.Key.Item1)).Value;
+                                        double biTrans = (double)(uniVal * lambda1) + (item.Value * lambda2);
+
+                                        product = (double)elem.value * biTrans;
+                                        nodeTag = item.Key.Item1;
+                                        if (product >= vGoodNode.value)
+                                        {
+                                            vGoodNode.value = product;
+                                            vGoodNode.CurrentTag = nodeTag;
+                                            List<ViterbiNode> nextGoodNodes = new List<ViterbiNode>();
+                                            nextGoodNodes.Add(elem);
+                                            vGoodNode.NextNode = nextGoodNodes;
+                                            break;
+                                        }
+                                    }
+                            }
                             vList.Add(vGoodNode);
                         }
                     }
@@ -462,11 +453,40 @@ namespace NLP
                             ViterbiNode vGoodNode = new ViterbiNode(0.0d, "NULL");
                             foreach (ViterbiNode vn in this.ViterbiGraph[this.ViterbiGraph.Count - 1])
                             {
-                                Tuple<string, string> tuple = new Tuple<string, string>(tf.Key, vn.CurrentTag);
-                                var biTransition = BigramTransitionProbabilities.FirstOrDefault(x => x.Key.Equals(tuple)); // eg. NN->VB - 0.25
-                                if (!biTransition.Equals(null))
+                                if (model == "trigram" && triPoz >= 2)
                                 {
-                                    double product = (double)vn.value * biTransition.Value * tf.Value;
+                                    if (vn.NextNode == null)
+                                        continue;
+                                    vn.NextNode = vn.NextNode.OrderByDescending(x => x.value).ToList();
+                                    Tuple<string, string, string> triTuple = new Tuple<string, string, string>(tf.Key, vn.CurrentTag, vn.NextNode[0].CurrentTag);
+                                    double triVal = this.TrigramTransitionProbabilities.FirstOrDefault(x => x.Key.Equals(triTuple)).Value;
+
+                                    Tuple<string, string> biTuple = new Tuple<string, string>(tf.Key, vn.CurrentTag);
+                                    double biVal = this.BigramTransitionProbabilities.FirstOrDefault(x => x.Key.Equals(biTuple)).Value;
+
+                                    double uniVal = this.UnigramProbabilities.FirstOrDefault(x => x.Key.Equals(tf.Key)).Value;
+
+                                    double triTransition = (double)(lambda3 * triVal) + (lambda2 * biVal) + (lambda1 * uniVal);
+                                    double product = (double)vn.value * triTransition * tf.Value;
+
+                                    if (product >= vGoodNode.value)
+                                    {
+                                        vGoodNode.value = product;
+                                        vGoodNode.CurrentTag = tf.Key;
+                                        List<ViterbiNode> nextGoodNodes = new List<ViterbiNode>();
+                                        nextGoodNodes.Add(vn);
+                                        vGoodNode.NextNode = nextGoodNodes;
+                                    }
+                                }
+                                else
+                                {
+                                    Tuple<string, string> tuple = new Tuple<string, string>(tf.Key, vn.CurrentTag);
+                                    double biTransition = BigramTransitionProbabilities.FirstOrDefault(x => x.Key.Equals(tuple)).Value; // eg. NN->VB - 0.25
+
+                                    double uniVal = this.UnigramProbabilities.FirstOrDefault(x => x.Key.Equals(tf.Key)).Value;
+                                    double biTrans = (double)(uniVal * lambda1) + (biTransition * lambda2);
+
+                                    double product = (double)vn.value * biTrans * tf.Value;
                                     if (product >= vGoodNode.value)
                                     {
                                         vGoodNode.value = product;
@@ -475,15 +495,6 @@ namespace NLP
                                         nextGoodNode.Add(vn);
                                         vGoodNode.NextNode = nextGoodNode;
                                     }
-                                }
-                                else // case 2
-                                {
-                                    var maxUnigramList = this.UnigramProbabilities.OrderByDescending(x => x.Value).ToList();
-                                    vGoodNode.value = (double)vn.value * tf.Value * (lambda1 * maxUnigramList.ElementAt(0).Value);
-                                    vGoodNode.CurrentTag = maxUnigramList.ElementAt(0).Key;
-                                    List<ViterbiNode> nextGoodNodes = new List<ViterbiNode>();
-                                    nextGoodNodes.Add(vn);
-                                    vGoodNode.NextNode = nextGoodNodes;
                                 }
                             }
                             vList.Add(vGoodNode);

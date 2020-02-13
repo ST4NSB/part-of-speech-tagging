@@ -80,7 +80,7 @@ namespace PostAppConsole
 
             decoder.SetLambdaValues(tagger.DeletedInterpolation());
 
-            decoder.ViterbiDecoding(wordsTest, model: "trigram", mode: "forward");
+            decoder.ViterbiDecoding(wordsTest, model: "trigram", mode: "backward");
             tagger.EliminateAllEndOfSentenceTags(wordsTest);
 
             //decoder = new Decoder();
