@@ -43,7 +43,7 @@ namespace PostAppConsole
             string demoBrown = path + "demo files\\cross";
            
 
-            var text = LoadAndReadFolderFiles(demoFileTrain);
+            var text = LoadAndReadFolderFiles(BrownfolderTrain);
             var oldWords = Tokenizer.SeparateTagFromWord(Tokenizer.WordTokenizeCorpus(text));
             var words = SpeechPart.GetNewHierarchicTags(oldWords);
             words = TextNormalization.Pipeline(words, toLowerTxt: true);
@@ -80,7 +80,7 @@ namespace PostAppConsole
 
             Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 
-            var textTest = LoadAndReadFolderFiles(demoFileTest);
+            var textTest = LoadAndReadFolderFiles(BrownfolderTest);
 
             var oldWordsTest = Tokenizer.SeparateTagFromWord(Tokenizer.WordTokenizeCorpus(textTest));
             var wordsTest = SpeechPart.GetNewHierarchicTags(oldWordsTest);
@@ -88,13 +88,13 @@ namespace PostAppConsole
 
 
             wordsTest = tagger.EliminateDuplicateSequenceOfEndOfSentenceTags(wordsTest);
-            tagger.CalculateProbabilitiesForTestFiles(wordsTest, model: "bigram");
+            tagger.CalculateProbabilitiesForTestFiles(wordsTest, model: "trigram");
             Decoder decoder = new Decoder(tagger.EmissionProbabilities, tagger.UnigramProbabilities, tagger.BigramTransitionProbabilities, tagger.TrigramTransitionProbabilities);
 
             Console.WriteLine("\nInterpolation: " + tagger.DeletedInterpolationTrigram() + " , " + tagger.DeletedInterpolationBigram());
             decoder.SetLambdaValues(tagger.DeletedInterpolationTrigram(), tagger.DeletedInterpolationBigram());
 
-            decoder.ViterbiDecoding(wordsTest, modelForward: "bigram", modelBackward: "bigram", mode: "forward");
+            decoder.ViterbiDecoding(wordsTest, modelForward: "trigram", modelBackward: "trigram", mode: "backward");
             tagger.EliminateAllEndOfSentenceTags(wordsTest);
 
             
@@ -156,14 +156,14 @@ namespace PostAppConsole
 
 
 
-            //using (System.IO.StreamWriter file = new System.IO.StreamWriter("trigram_forw_back.csv"))
-            //{
-            //    file.WriteLine("Word,Real Tag,Prediction Tag");
-            //    for (int i = 0; i < wordsTest.Count; i++)
-            //    {
-            //        file.WriteLine("\"" + wordsTest[i].word + "\"," + wordsTest[i].tag + "," + decoder.PredictedTags[i]);
-            //    }
-            //}
+            using (System.IO.StreamWriter file = new System.IO.StreamWriter("trigram__back.csv"))
+            {
+                file.WriteLine("Word,Real Tag,Prediction Tag");
+                for (int i = 0; i < wordsTest.Count; i++)
+                {
+                    file.WriteLine("\"" + wordsTest[i].word + "\"," + wordsTest[i].tag + "," + decoder.PredictedTags[i]);
+                }
+            }
 
         }
     }

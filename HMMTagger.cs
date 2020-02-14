@@ -162,21 +162,21 @@ namespace NLP
                 this.TrigramTransitionProbabilities = new Dictionary<Tuple<string, string, string>, double>();
 
             int lambda1 = 0, lambda2 = 0;
-            foreach (var tri in this.TrigramTransition)
+            foreach (var bi in this.BigramTransition)
             {
-                string unituple = tri.Key.Item3;
-                Tuple<string, string> bituple = new Tuple<string, string>(tri.Key.Item2, tri.Key.Item3);
+                string unituple = bi.Key.Item2;
+                Tuple<string, string> bituple = new Tuple<string, string>(bi.Key.Item2, bi.Key.Item2);
 
                 double univalue = this.UnigramProbabilities.FirstOrDefault(x => x.Key.Equals(unituple)).Value;
                 double bivalue = this.BigramTransitionProbabilities.FirstOrDefault(x => x.Key.Equals(bituple)).Value;
 
                 if (bivalue < univalue)
                 {
-                    lambda1 += tri.Value;
+                    lambda1 += bi.Value;
                 }
                 else
                 {
-                    lambda2 += tri.Value;
+                    lambda2 += bi.Value;
                 }
             }
             int sum = lambda1 + lambda2;
