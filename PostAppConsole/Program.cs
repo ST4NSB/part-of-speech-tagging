@@ -145,9 +145,9 @@ namespace PostAppConsole
                 Console.WriteLine();
             }
 
-            Console.WriteLine("\nAccuracy known: " + eval.GetSimpleAccuracy(wordsTest, decoder.PredictedTags, decoder.UnknownWords, evalMode: "k"));
-            Console.WriteLine("Accuracy unknown: " + eval.GetSimpleAccuracy(wordsTest, decoder.PredictedTags, decoder.UnknownWords, evalMode: "u"));
-            Console.WriteLine("Accuracy both: " + eval.GetSimpleAccuracy(wordsTest, decoder.PredictedTags, decoder.UnknownWords, evalMode: "k+u"));
+            Console.WriteLine("\nAccuracy for known words: " + eval.GetSimpleAccuracy(wordsTest, decoder.PredictedTags, decoder.UnknownWords, evalMode: "k"));
+            Console.WriteLine("Accuracy for unknown words: " + eval.GetSimpleAccuracy(wordsTest, decoder.PredictedTags, decoder.UnknownWords, evalMode: "u"));
+            Console.WriteLine("Accuracy on both: " + eval.GetSimpleAccuracy(wordsTest, decoder.PredictedTags, decoder.UnknownWords, evalMode: "k+u"));
 
             Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 

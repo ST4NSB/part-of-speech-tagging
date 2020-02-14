@@ -242,9 +242,13 @@ Accuracy: 0.9439945
 II:
 Exemplu pe Bigram forward:
 1) Fara functie pt. unknown words:
-
+Accuracy for known words: 0.9631028
+Accuracy for unknown words: 0.369357
+Accuracy both: 0.9388232
 2) Cu functie dar weights setate manual:
-
+Accuracy for known words: 0.9631611
+Accuracy for unknown words: 0.5671834
+Accuracy on both: 0.9469687
 3) Cu functie dar weights calculate statistic:
 TBA
 

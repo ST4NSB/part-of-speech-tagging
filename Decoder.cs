@@ -107,8 +107,6 @@ namespace NLP
 
             string lowerWord = testWord.ToLower();
 
-            return proc;
-
             // NN
             if (testWordIsCapitalized && currentTag == "NN")
                 return 1.90d; // 90% chance to be a NN
