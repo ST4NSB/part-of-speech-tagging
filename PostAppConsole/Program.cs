@@ -156,14 +156,14 @@ namespace PostAppConsole
 
 
 
-            using (System.IO.StreamWriter file = new System.IO.StreamWriter("trigram__back.csv"))
-            {
-                file.WriteLine("Word,Real Tag,Prediction Tag");
-                for (int i = 0; i < wordsTest.Count; i++)
-                {
-                    file.WriteLine("\"" + wordsTest[i].word + "\"," + wordsTest[i].tag + "," + decoder.PredictedTags[i]);
-                }
-            }
+            //using (System.IO.StreamWriter file = new System.IO.StreamWriter("trigram__back.csv"))
+            //{
+            //    file.WriteLine("Word,Real Tag,Prediction Tag");
+            //    for (int i = 0; i < wordsTest.Count; i++)
+            //    {
+            //        file.WriteLine("\"" + wordsTest[i].word + "\"," + wordsTest[i].tag + "," + decoder.PredictedTags[i]);
+            //    }
+            //}
 
         }
     }

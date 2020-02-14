@@ -76,6 +76,19 @@ namespace NLP
             this.TrainingTime.Stop();
         }
 
+        public void TrainSuffixPreffixEmission(List<Tokenizer.WordTag> words)
+        {
+            List<string> sffx = new List<string>() { "able", "ible", "ade", "al", "an", "ance",
+                                                    "ary", "ate", "cian", "cule", "cy", "dom",
+                                                    "ee", "en","ence", "ency", "er", "ese", "ess",
+                                                    "esis", "osis", "et", "ful", "fy", "ine", "ion",
+                                                    "ish", "ism", "ist", "ity", "less", "ly", "ness",
+                                                    "ous", "ent", "ize", "ing", "ive" }; // ends with
+            List<string> prffx = new List<string>() { "mis", "dis", "re", "anti", "in", "over" }; // starts with
+
+            //TODO:ADD LOGIC HERE
+        }
+
         public List<Tokenizer.WordTag> EliminateDuplicateSequenceOfEndOfSentenceTags(List<Tokenizer.WordTag> testWords)
         {
             var results = new List<Tokenizer.WordTag>();

@@ -101,46 +101,57 @@ namespace NLP
         private double GetProcentForUnknownWord(string testWord, string currentTag, string prevTag = "NULL")
         {
             double proc = 1.0d;
+
+            const double maxVal = 2.5d, minVal = 1.5d;
+
             bool testWordIsCapitalized = false;
             if (char.IsUpper(testWord[0]))
                 testWordIsCapitalized = true;
 
             string lowerWord = testWord.ToLower();
 
-            // NN
             if (testWordIsCapitalized && currentTag == "NN")
-                return 1.90d; // 90% chance to be a NN
-            if ((lowerWord.Contains("-") || lowerWord.Contains("/") && currentTag == "NN"))
-                return 1.75d; // NN
-            if ((lowerWord.EndsWith("ion") || lowerWord.EndsWith("sion") || lowerWord.EndsWith("tion") || lowerWord.EndsWith("hood")) && currentTag == "NN")
-                return 1.70d; // NN
-            if ((lowerWord.EndsWith("cian") || lowerWord.EndsWith("dom")) && currentTag == "NN")
-                return 1.60d; // NN
-            if ((lowerWord.EndsWith("ee") || lowerWord.EndsWith("ment") || lowerWord.EndsWith("ist") || lowerWord.EndsWith("ism")) && currentTag == "NN")
-                return 1.40d; // NN
-            if (lowerWord.EndsWith("ade") && (prevTag == "NN" || prevTag == "VB") && currentTag == "NN")
-                return 1.25d; // NN         
+                return maxVal; // max value to be a NN
+            if ((lowerWord.Contains("-") || lowerWord.Contains("/")) && currentTag == "NN")
+                return (minVal + 0.50d); // NN
+            if ((lowerWord.Contains("-") || lowerWord.Contains("/")) && currentTag == "JJ")
+                return (minVal + 0.25d); // JJ
+            if ((lowerWord.Contains("-") || lowerWord.Contains("/")) && currentTag == "OT")
+                return (minVal); // OT
 
-            // VB
-            if ((lowerWord.EndsWith("ate") || lowerWord.EndsWith("ize") || lowerWord.EndsWith("ise") || lowerWord.StartsWith("mis") || lowerWord.StartsWith("dis")) && currentTag == "VB")
-                return 1.50d; // VB
-            if ((lowerWord.EndsWith("ify") || lowerWord.EndsWith("en") || lowerWord.StartsWith("re")) && currentTag == "VB")
-                return 1.30d; // VB
 
-            // JJ
-            if ((lowerWord.EndsWith("able") || lowerWord.EndsWith("ible") || lowerWord.EndsWith("ish") || lowerWord.EndsWith("like")) && prevTag == "VB" && currentTag == "JJ")
-                return 1.70d; // JJ
-            if ((lowerWord.EndsWith("ly") || lowerWord.EndsWith("ate") || lowerWord.StartsWith("anti")) && currentTag == "JJ")
-                return 1.50d; // JJ
-            if ((lowerWord.EndsWith("ful") || lowerWord.EndsWith("ous") || lowerWord.StartsWith("im") || lowerWord.StartsWith("in")) && currentTag == "JJ")
-                return 1.40d; // JJ
+
+            //if ((lowerWord.EndsWith("ion") || lowerWord.EndsWith("sion") || lowerWord.EndsWith("tion") || lowerWord.EndsWith("hood")) && currentTag == "NN")
+            //    return 1.70d; // NN
+            //if ((lowerWord.EndsWith("cian") || lowerWord.EndsWith("dom")) && currentTag == "NN")
+            //    return 1.60d; // NN
+            //if ((lowerWord.EndsWith("ee") || lowerWord.EndsWith("ment") || lowerWord.EndsWith("ist") || lowerWord.EndsWith("ism")) && currentTag == "NN")
+            //    return 1.40d; // NN
+            //if (lowerWord.EndsWith("ade") && (prevTag == "NN" || prevTag == "VB") && currentTag == "NN")
+            //    return 1.25d; // NN         
+
+            //// VB
+            //if ((lowerWord.EndsWith("ate") || lowerWord.EndsWith("ize") || lowerWord.EndsWith("ise") || lowerWord.StartsWith("mis") || lowerWord.StartsWith("dis")) && currentTag == "VB")
+            //    return 1.50d; // VB
+            //if ((lowerWord.EndsWith("ify") || lowerWord.EndsWith("en") || lowerWord.StartsWith("re")) && currentTag == "VB")
+            //    return 1.30d; // VB
+
+            //// JJ
+            //if ((lowerWord.EndsWith("able") || lowerWord.EndsWith("ible") || lowerWord.EndsWith("ish") || lowerWord.EndsWith("like")) && prevTag == "VB" && currentTag == "JJ")
+            //    return 1.70d; // JJ
+            //if ((lowerWord.EndsWith("ly") || lowerWord.EndsWith("ate") || lowerWord.StartsWith("anti")) && currentTag == "JJ")
+            //    return 1.50d; // JJ
+            //if ((lowerWord.EndsWith("ful") || lowerWord.EndsWith("ous") || lowerWord.StartsWith("im") || lowerWord.StartsWith("in")) && currentTag == "JJ")
+            //    return 1.40d; // JJ
             
-            // RB
-            if (lowerWord.EndsWith("ly") && currentTag == "RB")
-                return 1.50d; // RB
-            if (lowerWord.EndsWith("less") && currentTag == "RB")
-                return 1.40d; // RB
+            //// RB
+            //if (lowerWord.EndsWith("ly") && currentTag == "RB")
+            //    return 1.50d; // RB
+            //if (lowerWord.EndsWith("less") && currentTag == "RB")
+            //    return 1.40d; // RB
            
+
+
             return proc;
         }
 
