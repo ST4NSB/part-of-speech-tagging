@@ -5,6 +5,7 @@ Duration of Viterbi Decoding: 126091 ms! (backward+trigram)
 
 Interpolation: (0.312720483651062, 0.687279516348938, 0) , (0.312720483651062, 0.687279516348938)
 
+!!! Evaluari pt. o functie cu unknown words slaba:
 1) Inainte de Text Normalization(PreProcessing):
 
 default tagger NN:
@@ -238,3 +239,25 @@ TOTAL           0.9875543               0.9363874               0.9442368       
 
 Accuracy: 0.9439945
 ~~~~~~~~~~~~~~~~~~~~
+
+!!! cazuri cu functie mai buna pt unknown words:
+Duration of Viterbi Decoding: 414450 ms! (f+b, trigram)
+~ 20% increase sau mai mult pt capitalization (cazul NN)
+
+trigram, f+b
+~~~~~~~~~~~~~~~~~~~~
+TAG             ACCURACY                PRECISION               RECALL                  F1-SCORE
+NN              0.9721635               0.9584558               0.9306188               0.9443322
+OT              0.9983218               0.9889703               0.9885588               0.9887645
+CC              0.992936                0.9103268               0.9735085               0.9408582
+JJ              0.9848433               0.8646475               0.92187         	0.8923423
+PP              0.9926998               0.9675736               0.9762495               0.9718922
+AT/DT           0.9888927               0.9500324               0.9667906               0.9583382
+VB              0.9832987               0.9615747               0.9349243               0.9480622
+PN              0.9965472               0.9633997               0.9858906               0.9745154
+RB              0.98769         	0.8988022               0.8714956               0.8849383
+TOTAL           0.9885992               0.9404203               0.9499896               0.9448938
+
+Accuracy: 0.9486966
+~~~~~~~~~~~~~~~~~~~~
+

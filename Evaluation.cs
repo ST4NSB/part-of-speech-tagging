@@ -16,16 +16,34 @@ namespace NLP
             this.CrossValEval = new List<List<List<float>>>();
         }
 
-        public float GetSimpleAccuracy(List<Tokenizer.WordTag> realTags, List<string> predictedTags)
+        public float GetSimpleAccuracy(List<Tokenizer.WordTag> realTags, List<string> predictedTags, HashSet<string> unknownWords, string evalMode = "k+u")
         {
             int wordsHit = 0;
+            int nrOfWords = 0;
             for (int i = 0; i < realTags.Count; i++)
+            {
+                if (evalMode != "k+u")
+                {
+                    if (unknownWords.Contains(realTags[i].word))
+                    {
+                        if (evalMode == "k")
+                            continue;
+                    }
+                    else
+                    {
+                        if (evalMode == "u")
+                            continue;
+                    }
+                    
+                }
                 if (realTags[i].tag == predictedTags[i])
                     wordsHit++;
-            return (float)wordsHit / realTags.Count;
+                nrOfWords++;
+            }
+            return (float)wordsHit / nrOfWords;
         }
 
-        public void CreateSupervizedEvaluationsMatrix(List<Tokenizer.WordTag> realTags, List<string> predictedTags, int fbeta = 1)
+        public void CreateSupervizedEvaluationsMatrix(List<Tokenizer.WordTag> realTags, List<string> predictedTags, HashSet<string> unknownWords, string evalMode = "k+u", int fbeta = 1)
         {
             ClassTags = new HashSet<string>();
             finalMatrix = new List<List<float>>();
@@ -41,6 +59,21 @@ namespace NLP
                 int tp = 0, fp = 0, fn = 0, tn = 0; 
                 for (int i = 0; i < realTags.Count; i++)
                 {
+                    if (evalMode != "k+u")
+                    {
+                        if (unknownWords.Contains(realTags[i].word))
+                        {
+                            if (evalMode == "k")
+                                continue;
+                        }
+                        else
+                        {
+                            if (evalMode == "u")
+                                continue;
+                        }
+                    }
+                    
+
                     if (realTags[i].tag != tag && predictedTags[i] != tag)
                         tn++;
                     else if (realTags[i].tag == tag && predictedTags[i] == tag)

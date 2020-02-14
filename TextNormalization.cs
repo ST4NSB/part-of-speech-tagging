@@ -8,26 +8,27 @@ namespace NLP
 {
     public class TextNormalization
     {
-        public static List<Tokenizer.WordTag> Pipeline(List<Tokenizer.WordTag> words)
+        public static List<Tokenizer.WordTag> Pipeline(List<Tokenizer.WordTag> words, bool toLowerTxt = true)
         {
             List<Tokenizer.WordTag> newWords = new List<Tokenizer.WordTag>();
             foreach (var word in words)
             {
                 var sw = word.word;
-                // var splittedWords = word.word.Split(new Char[] { '-', '/' }).ToList();
-                //foreach (var sw in splittedWords)
+               // var splittedWords = word.word.Split(new Char[] { '-', '/' }).ToList();
+               // foreach (var sw in splittedWords)
                 //{
-                if (!IsStopWord(sw))
-                {
-                    string tsw = EliminateDigitsFromWord(sw);
-                    if (!string.IsNullOrEmpty(tsw))
+                    if (!IsStopWord(sw))
                     {
-                        tsw = ToLowerCaseNormalization(tsw);
-                        tsw = EliminateApostrophe(tsw);
-                        newWords.Add(new Tokenizer.WordTag(tsw, word.tag));
+                        string tsw = EliminateDigitsFromWord(sw);
+                        if (!string.IsNullOrEmpty(tsw))
+                        {
+                            if (toLowerTxt)
+                                tsw = ToLowerCaseNormalization(tsw);
+                            tsw = EliminateApostrophe(tsw);
+                            newWords.Add(new Tokenizer.WordTag(tsw, word.tag));
+                        }
                     }
-                }
-                //}
+               // }
             }
             return newWords;
         }

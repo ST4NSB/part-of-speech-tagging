@@ -24,6 +24,8 @@ namespace NLP
         private double lambda1, lambda2, lambda3;
         private double lambda1Bi, lambda2Bi;
 
+        public HashSet<string> UnknownWords;
+
         public Decoder() { }
 
         public Decoder(
@@ -77,6 +79,8 @@ namespace NLP
             this.ViterbiDecodeTime = new Stopwatch();
             this.ViterbiDecodeTime.Start();
 
+            this.UnknownWords = new HashSet<string>();
+
             this.ForwardHistory = new List<ViterbiNode>();
             this.BackwardHistory = new List<ViterbiNode>();
 
@@ -94,6 +98,20 @@ namespace NLP
             this.ViterbiDecodeTime.Stop();
         }
 
+        private double GetProcentForUnknownWord(string testWord, string currentTag)
+        {
+            double proc = 1.0d;
+            bool testWordIsCapitalized = false;
+            if (char.IsUpper(testWord[0]))
+                testWordIsCapitalized = true;
+
+            string lowerWord = testWord.ToLower();
+
+            if (testWordIsCapitalized && currentTag == "NN")
+                return 1.80d; // 80% chance to be a NN
+
+            return proc;
+        }
 
 
         private void ForwardAlgorithm(List<Tokenizer.WordTag> testWords, string model, string mode)
@@ -103,8 +121,8 @@ namespace NLP
             int triPoz = -1;
             for (int i = 0; i < testWords.Count; i++) // starting from left (0 index)
             {
-                triPoz++;
-                if (testWords[i].tag == ".") // we can verify word instead of tag here
+               triPoz++;
+               if (testWords[i].tag == ".") // we can verify word instead of tag here
                 {
                     Backtrace(method: "forward"); // decompress method, going from right to left using prev nodes, applied only when '.' is met
                     startPoint = true;
@@ -113,8 +131,8 @@ namespace NLP
                 if (startPoint) // first node (start)
                 {
                     triPoz = 0;
-                    HMMTagger.EmissionProbabilisticModel foundWord = this.EmissionProbabilities.Find(x => x.Word.Equals(testWords[i].word));
-                    List<ViterbiNode> vList = new List<ViterbiNode>();
+                    HMMTagger.EmissionProbabilisticModel foundWord = this.EmissionProbabilities.Find(x => x.Word == testWords[i].word.ToLower()); // .Equals(testWords[i].word.ToLower()));
+                    List <ViterbiNode> vList = new List<ViterbiNode>();
 
                     if(foundWord != null)
                         if (foundWord.TagFreq.Count == 1 && foundWord.TagFreq.ContainsKey(".")) // case where the only tag is '.'
@@ -122,6 +140,7 @@ namespace NLP
 
                     if (foundWord == null)
                     {
+                        UnknownWords.Add(testWords[i].word);
                         // we take the best transition case where first item is "."
                         // case 2: all the transitions
                         var orderedTransitions = BigramTransitionProbabilities.OrderByDescending(x => x.Value).ToList();
@@ -135,7 +154,9 @@ namespace NLP
 
                                 double biTrans = (double)(uniVal * lambda1Bi) + (item.Value * lambda2Bi);
 
-                                product = biTrans;
+                                double unknownProcent = GetProcentForUnknownWord(testWords[i].word, item.Key.Item2);
+
+                                product = biTrans * unknownProcent;
                                 nodeTag = item.Key.Item2;
                                 ViterbiNode node = new ViterbiNode(product, nodeTag);
                                 vList.Add(node);
@@ -165,8 +186,8 @@ namespace NLP
                 }
                 else
                 {
-                    HMMTagger.EmissionProbabilisticModel foundWord = this.EmissionProbabilities.Find(x => x.Word.Equals(testWords[i].word));
-                    List<ViterbiNode> vList = new List<ViterbiNode>();
+                    HMMTagger.EmissionProbabilisticModel foundWord = this.EmissionProbabilities.Find(x => x.Word == testWords[i].word.ToLower()); //.Equals(testWords[i].word.ToLower()));
+                    List <ViterbiNode> vList = new List<ViterbiNode>();
 
                     if (foundWord != null)
                         if (foundWord.TagFreq.Count == 1 && foundWord.TagFreq.ContainsKey("."))
@@ -174,6 +195,7 @@ namespace NLP
 
                     if (foundWord == null)
                     {
+                        UnknownWords.Add(testWords[i].word);
                         for (int j = 0; j < this.ViterbiGraph[this.ViterbiGraph.Count - 1].Count; j++)
                         {
                             ViterbiNode vGoodNode = new ViterbiNode(0.0d, "NULL");
@@ -203,7 +225,9 @@ namespace NLP
 
                                         double triTransition = (double)(lambda3 * item.Value) + (lambda2 * biVal) + (lambda1 * uniVal);
 
-                                        product = (double)elem.value * triTransition;
+                                        double unknownProcent = GetProcentForUnknownWord(testWords[i].word, item.Key.Item3);
+
+                                        product = (double)elem.value * triTransition * unknownProcent;
                                         nodeTag = item.Key.Item3;
                                         if (product >= vGoodNode.value)
                                         {
@@ -228,7 +252,9 @@ namespace NLP
 
                                         double biTrans = (double)(uniVal * lambda1Bi) + (item.Value * lambda2Bi);
 
-                                        product = (double)elem.value * biTrans;
+                                        double unknownProcent = GetProcentForUnknownWord(testWords[i].word, item.Key.Item2);
+
+                                        product = (double)elem.value * biTrans * unknownProcent;
                                         nodeTag = item.Key.Item2;
                                         if (product >= vGoodNode.value)
                                         {
@@ -329,7 +355,7 @@ namespace NLP
                 if (startPoint)
                 {
                     triPoz = 0;
-                    HMMTagger.EmissionProbabilisticModel foundWord = this.EmissionProbabilities.Find(x => x.Word.Equals(testWords[i].word));
+                    HMMTagger.EmissionProbabilisticModel foundWord = this.EmissionProbabilities.Find(x => x.Word.Equals(testWords[i].word.ToLower()));
                     List<ViterbiNode> vList = new List<ViterbiNode>();
 
                     if (foundWord != null)
@@ -338,6 +364,7 @@ namespace NLP
 
                     if (foundWord == null)
                     {
+                        UnknownWords.Add(testWords[i].word);
                         // we take the best transition case where first item is "."
                         var orderedTransitions = BigramTransitionProbabilities.OrderByDescending(x => x.Value).ToList();
                         double product = 0.0d;
@@ -350,7 +377,9 @@ namespace NLP
 
                                 double biTrans = (double)(uniVal * lambda1Bi) + (item.Value * lambda2Bi);
 
-                                product = biTrans;
+                                double unknownProcent = GetProcentForUnknownWord(testWords[i].word, item.Key.Item1);
+
+                                product = biTrans * unknownProcent;
                                 nodeTag = item.Key.Item1;
                                 ViterbiNode node = new ViterbiNode(product, nodeTag);
                                 vList.Add(node);
@@ -380,7 +409,7 @@ namespace NLP
                 }
                 else
                 {
-                    HMMTagger.EmissionProbabilisticModel foundWord = this.EmissionProbabilities.Find(x => x.Word.Equals(testWords[i].word));
+                    HMMTagger.EmissionProbabilisticModel foundWord = this.EmissionProbabilities.Find(x => x.Word.Equals(testWords[i].word.ToLower()));
                     List<ViterbiNode> vList = new List<ViterbiNode>();
 
                     if (foundWord != null)
@@ -389,6 +418,7 @@ namespace NLP
 
                     if (foundWord == null)
                     {
+                        UnknownWords.Add(testWords[i].word);
                         for (int j = 0; j < this.ViterbiGraph[this.ViterbiGraph.Count - 1].Count; j++)
                         {
                             ViterbiNode elem = this.ViterbiGraph[this.ViterbiGraph.Count - 1][j];
@@ -417,7 +447,9 @@ namespace NLP
 
                                         double triTransition = (double)(lambda3 * item.Value) + (lambda2 * biVal) + (lambda1 * uniVal);
 
-                                        product = (double)elem.value * triTransition;
+                                        double unknownProcent = GetProcentForUnknownWord(testWords[i].word, item.Key.Item1);
+
+                                        product = (double)elem.value * triTransition * unknownProcent;
                                         nodeTag = item.Key.Item1;
                                         if (product >= vGoodNode.value)
                                         {
@@ -442,7 +474,9 @@ namespace NLP
 
                                         double biTrans = (double)(uniVal * lambda1Bi) + (item.Value * lambda2Bi);
 
-                                        product = (double)elem.value * biTrans;
+                                        double unknownProcent = GetProcentForUnknownWord(testWords[i].word, item.Key.Item1);
+
+                                        product = (double)elem.value * biTrans * unknownProcent;
                                         nodeTag = item.Key.Item1;
                                         if (product >= vGoodNode.value)
                                         {
