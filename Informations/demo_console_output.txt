@@ -1,0 +1,95 @@
+Read File Path: [D:\Projects\github\Nlp-PosTagger\demo files\train]
+Done with loading and creating tokens!
+Done with training MODEL!
+mary
+     NN -> 4
+jane
+     NN -> 2
+can
+     CC -> 1
+see
+     VB -> 2
+will
+     NN -> 1
+     CC -> 3
+.
+     . -> 3
+spot
+     NN -> 2
+     VB -> 1
+?
+     . -> 1
+pat
+     VB -> 1
+NN -> 9
+CC -> 4
+VB -> 4
+. -> 4
+(., NN) -> 3
+(NN, NN) -> 1
+(NN, CC) -> 3
+(CC, VB) -> 3
+(VB, NN) -> 4
+(NN, .) -> 4
+(., CC) -> 1
+(CC, NN) -> 1
+(NN, VB) -> 1
+(., NN, NN) -> 1
+(NN, NN, CC) -> 1
+(NN, CC, VB) -> 3
+(CC, VB, NN) -> 3
+(VB, NN, .) -> 4
+(., NN, CC) -> 2
+(., CC, NN) -> 1
+(CC, NN, VB) -> 1
+(NN, VB, NN) -> 1
+Duration of training model: 15 ms!
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Read File Path: [D:\Projects\github\Nlp-PosTagger\demo files\test]
+Test phrase: Jane will spot Will .
+
+Interpolation: (0.176470588235294, 0.823529411764706, 0) , (0.176470588235294, 0.823529411764706)
+
+Probability emission:
+jane
+        NN -> 0.222222223877907
+will
+        NN -> 0.111111111938953
+        CC -> 0.75
+spot
+        NN -> 0.222222223877907
+        VB -> 0.25
+.
+        . -> 0.75
+Probabilities transitions:
+UNI: NN -> 0.428571428571429
+UNI: CC -> 0.19047619047619
+UNI: VB ->0 .19047619047619
+UNI: . -> 0.19047619047619
+BI: (., NN) -> 0.75
+BI: (NN, NN) -> 0.111111111111111
+BI: (NN, CC) -> 0.333333333333333
+BI: (CC, VB) -> 0.75
+BI: (VB, NN) -> 1
+BI: (NN, .) -> 0.444444444444444
+BI: (., CC) -> 0.25
+BI: (CC, NN) -> 0.25
+BI: (NN, VB) -> 0.111111111111111
+
+Duration of Viterbi Decoding: 22 ms!
+
+Predicted tags: NN CC VB NN
+
+testwords: 4 , predwords: 4
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+TAG             ACCURACY                PRECISION               RECALL                  F1-SCORE
+NN              1               	1               	1               	1
+CC              1               	1               	1               	1
+VB              1               	1               	1       	        1
+TOTAL           1               	1               	1               	1
+
+Accuracy for known words: 1
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+C:\Program Files\dotnet\dotnet.exe (process 5648) exited with code 0.
+Press any key to close this window . . .

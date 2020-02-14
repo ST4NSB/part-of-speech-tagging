@@ -43,7 +43,7 @@ namespace PostAppConsole
             string demoBrown = path + "demo files\\cross";
            
 
-            var text = LoadAndReadFolderFiles(BrownfolderTrain);
+            var text = LoadAndReadFolderFiles(demoFileTrain);
             var oldWords = Tokenizer.SeparateTagFromWord(Tokenizer.WordTokenizeCorpus(text));
             var words = SpeechPart.GetNewHierarchicTags(oldWords);
             words = TextNormalization.Pipeline(words, toLowerTxt: true);
@@ -80,7 +80,7 @@ namespace PostAppConsole
 
             Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 
-            var textTest = LoadAndReadFolderFiles(BrownfolderTest);
+            var textTest = LoadAndReadFolderFiles(demoFileTest);
 
             var oldWordsTest = Tokenizer.SeparateTagFromWord(Tokenizer.WordTokenizeCorpus(textTest));
             var wordsTest = SpeechPart.GetNewHierarchicTags(oldWordsTest);
@@ -96,6 +96,8 @@ namespace PostAppConsole
 
             decoder.ViterbiDecoding(wordsTest, modelForward: "bigram", modelBackward: "bigram", mode: "forward");
             tagger.EliminateAllEndOfSentenceTags(wordsTest);
+
+            
 
             //decoder = new Decoder();
             //const string deftag = "RB";
@@ -126,6 +128,7 @@ namespace PostAppConsole
             //foreach (var item in decoder.TrigramTransitionProbabilities)
             //    Console.WriteLine("TRI: " + item.Key + " -> " + item.Value);
 
+            //Console.WriteLine("Predicted tags: ");
             //foreach (var item in decoder.PredictedTags)
             //    Console.Write(item + " ");
 
