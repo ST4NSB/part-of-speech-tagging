@@ -107,9 +107,10 @@ namespace NLP
          
             // emission stage
             foreach (var tw in testWords)
-            { 
-                HMMTagger.EmissionModel wmFind = EmissionFreq.Find(x => x.Word == tw.word.ToLower());
-                EmissionProbabilisticModel wFind = EmissionProbabilities.Find(x => x.Word == tw.word.ToLower());
+            {
+                string sWord = tw.word.ToLower();
+                HMMTagger.EmissionModel wmFind = EmissionFreq.Find(x => x.Word == sWord);
+                EmissionProbabilisticModel wFind = EmissionProbabilities.Find(x => x.Word == sWord);
                 if (wmFind != null && wFind == null)
                 {
                     EmissionProbabilisticModel epModel = new EmissionProbabilisticModel();

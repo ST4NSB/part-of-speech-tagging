@@ -88,13 +88,13 @@ namespace PostAppConsole
 
 
             wordsTest = tagger.EliminateDuplicateSequenceOfEndOfSentenceTags(wordsTest);
-            tagger.CalculateProbabilitiesForTestFiles(wordsTest, model: "trigram");
+            tagger.CalculateProbabilitiesForTestFiles(wordsTest, model: "bigram");
             Decoder decoder = new Decoder(tagger.EmissionProbabilities, tagger.UnigramProbabilities, tagger.BigramTransitionProbabilities, tagger.TrigramTransitionProbabilities);
 
             Console.WriteLine("\nInterpolation: " + tagger.DeletedInterpolationTrigram() + " , " + tagger.DeletedInterpolationBigram());
             decoder.SetLambdaValues(tagger.DeletedInterpolationTrigram(), tagger.DeletedInterpolationBigram());
 
-            decoder.ViterbiDecoding(wordsTest, modelForward: "trigram", modelBackward: "trigram", mode: "forward");
+            decoder.ViterbiDecoding(wordsTest, modelForward: "bigram", modelBackward: "bigram", mode: "forward");
             tagger.EliminateAllEndOfSentenceTags(wordsTest);
 
             //decoder = new Decoder();
@@ -145,7 +145,9 @@ namespace PostAppConsole
                 Console.WriteLine();
             }
 
-            Console.WriteLine("\nAccuracy: " + eval.GetSimpleAccuracy(wordsTest, decoder.PredictedTags, decoder.UnknownWords, evalMode: "k"));
+            Console.WriteLine("\nAccuracy known: " + eval.GetSimpleAccuracy(wordsTest, decoder.PredictedTags, decoder.UnknownWords, evalMode: "k"));
+            Console.WriteLine("Accuracy unknown: " + eval.GetSimpleAccuracy(wordsTest, decoder.PredictedTags, decoder.UnknownWords, evalMode: "u"));
+            Console.WriteLine("Accuracy both: " + eval.GetSimpleAccuracy(wordsTest, decoder.PredictedTags, decoder.UnknownWords, evalMode: "k+u"));
 
             Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 
