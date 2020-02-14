@@ -165,10 +165,9 @@ namespace NLP
             foreach (var bi in this.BigramTransition)
             {
                 string unituple = bi.Key.Item2;
-                Tuple<string, string> bituple = new Tuple<string, string>(bi.Key.Item2, bi.Key.Item2);
 
                 double univalue = this.UnigramProbabilities.FirstOrDefault(x => x.Key.Equals(unituple)).Value;
-                double bivalue = this.BigramTransitionProbabilities.FirstOrDefault(x => x.Key.Equals(bituple)).Value;
+                double bivalue = this.BigramTransitionProbabilities.FirstOrDefault(x => x.Key.Equals(bi.Key)).Value;
 
                 if (bivalue < univalue)
                 {
