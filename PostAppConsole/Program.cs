@@ -46,7 +46,7 @@ namespace PostAppConsole
             var text = LoadAndReadFolderFiles(BrownfolderTrain);
             var oldWords = Tokenizer.SeparateTagFromWord(Tokenizer.WordTokenizeCorpus(text));
             var words = SpeechPart.GetNewHierarchicTags(oldWords);
-            words = TextNormalization.Pipeline(words, toLowerTxt: true);
+            words = TextNormalization.CleanDataPipeline(words, toLowerTxt: true);
 
             
             Console.WriteLine("Done with loading and creating tokens!");
@@ -84,18 +84,18 @@ namespace PostAppConsole
 
             var oldWordsTest = Tokenizer.SeparateTagFromWord(Tokenizer.WordTokenizeCorpus(textTest));
             var wordsTest = SpeechPart.GetNewHierarchicTags(oldWordsTest);
-            wordsTest = TextNormalization.Pipeline(wordsTest, toLowerTxt: false);
+            wordsTest = TextNormalization.CleanDataPipeline(wordsTest, toLowerTxt: false);
 
 
             wordsTest = tagger.EliminateDuplicateSequenceOfEndOfSentenceTags(wordsTest);
-            tagger.CalculateProbabilitiesForTestFiles(wordsTest, model: "trigram");
+            tagger.CalculateProbabilitiesForTestFiles(wordsTest, model: "bigram");
             Decoder decoder = new Decoder(tagger.EmissionProbabilities, tagger.UnigramProbabilities, tagger.BigramTransitionProbabilities, tagger.TrigramTransitionProbabilities);
             decoder.SetPreffixAndSuffixProbabilities(tagger.PreffixEmission, tagger.SuffixesEmission);
 
             Console.WriteLine("\nInterpolation: " + tagger.DeletedInterpolationTrigram() + " , " + tagger.DeletedInterpolationBigram());
             decoder.SetLambdaValues(tagger.DeletedInterpolationTrigram(), tagger.DeletedInterpolationBigram());
 
-            decoder.ViterbiDecoding(wordsTest, modelForward: "trigram", modelBackward: "bigram", mode: "f+b");
+            decoder.ViterbiDecoding(wordsTest, modelForward: "bigram", modelBackward: "bigram", mode: "forward");
             tagger.EliminateAllEndOfSentenceTags(wordsTest);
 
             
@@ -157,12 +157,15 @@ namespace PostAppConsole
 
 
 
-            //using (System.IO.StreamWriter file = new System.IO.StreamWriter("trigram__back.csv"))
+            //using (System.IO.StreamWriter file = new System.IO.StreamWriter("trigram_bidirectional.csv"))
             //{
-            //    file.WriteLine("Word,Real Tag,Prediction Tag");
+            //    file.WriteLine("Word,Real Tag,Prediction Tag,Is word in Train-file");
             //    for (int i = 0; i < wordsTest.Count; i++)
             //    {
-            //        file.WriteLine("\"" + wordsTest[i].word + "\"," + wordsTest[i].tag + "," + decoder.PredictedTags[i]);
+            //        bool isInTrain = true;
+            //        if (decoder.UnknownWords.Contains(wordsTest[i].word))
+            //            isInTrain = false;
+            //        file.WriteLine("\"" + wordsTest[i].word + "\"," + wordsTest[i].tag + "," + decoder.PredictedTags[i] + "," + isInTrain);
             //    }
             //}
 

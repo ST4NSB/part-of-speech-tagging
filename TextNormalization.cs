@@ -13,27 +13,19 @@ namespace NLP
             return (double)(((value - oldMin) * (newMax - newMin)) / (oldMax - oldMin)) + newMin;
         }
 
-        public static List<Tokenizer.WordTag> Pipeline(List<Tokenizer.WordTag> words, bool toLowerTxt = true)
+        public static List<Tokenizer.WordTag> CleanDataPipeline(List<Tokenizer.WordTag> words, bool toLowerTxt = true)
         {
             List<Tokenizer.WordTag> newWords = new List<Tokenizer.WordTag>();
-            foreach (var word in words)
+            foreach (var sw in words)
             {
-                var sw = word.word;
-                // var splittedWords = word.word.Split(new Char[] { '-', '/' }).ToList();
-                // foreach (var sw in splittedWords)
-                //{
-                if (!IsStopWord(sw))
+                string tsw = EliminateDigitsFromWord(sw.word);
+                if (!string.IsNullOrEmpty(tsw))
                 {
-                    string tsw = EliminateDigitsFromWord(sw);
-                    if (!string.IsNullOrEmpty(tsw))
-                    {
-                        if (toLowerTxt)
-                            tsw = ToLowerCaseNormalization(tsw);
-                        tsw = EliminateApostrophe(tsw);
-                        newWords.Add(new Tokenizer.WordTag(tsw, word.tag));
-                    }
+                    if (toLowerTxt)
+                        tsw = ToLowerCaseNormalization(tsw);
+                    //tsw = EliminateApostrophe(tsw);
+                    newWords.Add(new Tokenizer.WordTag(tsw, sw.tag));
                 }
-               // }
             }
             return newWords;
         }

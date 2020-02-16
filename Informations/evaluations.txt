@@ -250,6 +250,7 @@ Accuracy for known words: 0.9631611
 Accuracy for unknown words: 0.5671834
 Accuracy on both: 0.9469687
 3) Cu functie dar weights calculate statistic (max =2, min=1):
-Accuracy for known words: 0.9632162
-Accuracy for unknown words: 0.6334549
-Accuracy on both: 0.9497315
+Accuracy for known words: 0.9643413
+Accuracy for unknown words: 0.6686751
+Accuracy on both: 0.9522517
+

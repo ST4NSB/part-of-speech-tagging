@@ -112,8 +112,10 @@ namespace NLP
                 if (lowerWord.StartsWith(pfx.Word))
                 {
                     if (pfx.TagFreq.ContainsKey(currentTag))
+                    {
                         preffixVal = pfx.TagFreq[currentTag];
-                    break;
+                        break;
+                    }
                 }
             }
 
@@ -122,8 +124,10 @@ namespace NLP
                 if (lowerWord.EndsWith(sfx.Word))
                 {
                     if (sfx.TagFreq.ContainsKey(currentTag))
+                    {
                         suffixVal = sfx.TagFreq[currentTag];
-                    break;
+                        break;
+                    }
                 }
             }
 
@@ -131,7 +135,7 @@ namespace NLP
             if (sumOfPreSuf > 0.0d)
                 proc += (double)TextNormalization.MinMaxNormalization(sumOfPreSuf, maxVal, minVal);
 
-            if (testWordIsCapitalized && currentTag == "NN")
+            if ((testWordIsCapitalized || lowerWord.EndsWith("\'s")) && currentTag == "NN")
                 proc += (double)maxVal; // max value to be a NN
             if ((lowerWord.Contains("-") || lowerWord.Contains("/")) && currentTag == "NN")
                 proc += (double)(maxVal - 0.25d); // NN
@@ -140,7 +144,7 @@ namespace NLP
             if ((lowerWord.Contains("-") && lowerWord.Count(x => x == '-') > 2) && currentTag == "OT")
                 proc += (double)maxVal;
             if (lowerWord.Contains("/") && currentTag == "OT")
-                proc += (double)minVal; // OT
+                proc += (double)(maxVal - 0.25d); // OT
 
             return proc;
         }
@@ -153,7 +157,7 @@ namespace NLP
             int triPoz = -1;
             for (int i = 0; i < testWords.Count; i++) // starting from left (0 index)
             {
-               triPoz++;
+                triPoz++;
                if (testWords[i].tag == ".") // we can verify word instead of tag here
                 {
                     Backtrace(method: "forward"); // decompress method, going from right to left using prev nodes, applied only when '.' is met
@@ -163,7 +167,7 @@ namespace NLP
                 if (startPoint) // first node (start)
                 {
                     triPoz = 0;
-                    HMMTagger.EmissionProbabilisticModel foundWord = this.EmissionProbabilities.Find(x => x.Word == testWords[i].word.ToLower()); // .Equals(testWords[i].word.ToLower()));
+                    HMMTagger.EmissionProbabilisticModel foundWord = this.EmissionProbabilities.Find(x => x.Word == testWords[i].word.ToLower()); 
                     List <ViterbiNode> vList = new List<ViterbiNode>();
 
                     if(foundWord != null)
@@ -218,7 +222,8 @@ namespace NLP
                 }
                 else
                 {
-                    HMMTagger.EmissionProbabilisticModel foundWord = this.EmissionProbabilities.Find(x => x.Word == testWords[i].word.ToLower()); //.Equals(testWords[i].word.ToLower()));
+                    HMMTagger.EmissionProbabilisticModel foundWord = this.EmissionProbabilities.Find(x => x.Word == testWords[i].word.ToLower());
+
                     List <ViterbiNode> vList = new List<ViterbiNode>();
 
                     if (foundWord != null)

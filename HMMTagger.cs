@@ -82,13 +82,19 @@ namespace NLP
 
         private void TrainSuffixPreffixEmission(List<Tokenizer.WordTag> words)
         {
-            List<string> suff = new List<string>() { "able", "ible", "ade", "al", "an", "ance",
-                                                    "ary", "ate", "cian", "cule", "cy", "dom",
-                                                    "ee", "en","ence", "ency", "er", "ese", "ess",
-                                                    "esis", "osis", "et", "ful", "fy", "ine", "ion",
-                                                    "ish", "ism", "ist", "ity", "less", "ly", "ness",
-                                                    "ous", "ent", "ize", "ing", "ive" }; // ends with
-            List<string> preff = new List<string>() { "mis", "dis", "re", "anti", "in", "over" }; // starts with
+            List<string> suff = new List<string>() { "able", "ible", "ble", "ade", "al", "cian", "ance", "ite",
+                                                    "ary", "ate", "an", "cule", "ency", "dom", "eon",
+                                                    "ee", "en","ence", "cy", "er", "or", "ar", "ium",
+                                                    "ment", "ese", "ness", "ship", "ed", "ant", "ow", "land",
+                                                    "esis", "osis", "et", "ette", "ful", "ify", "fy", "ine", "ion",
+                                                    "ish", "ism", "ist", "ty", "less", "ly", "ess", "ward",
+                                                    "ous", "ent", "ise", "ize", "ing", "ive", "ic", "ways",
+                                                    "hood", "logy", "ice", "oid", "id", "ide", "age"}; // ends with
+
+            List<string> preff = new List<string>() { "inter", "mis", "dis", "re", "anti", "in", "over", "en",
+                                                    "il", "im", "ir", "non", "ob", "op", "pre", "un",
+                                                    "multi", "bi", "mono", "de", "super", "cyber", "for",
+                                                    "ex", "hy", "post", "sub", "co", "semi", "vice", "poly" }; // starts with
 
             var suffxem = new List<EmissionModel>();
             var preffxem = new List<EmissionModel>();
