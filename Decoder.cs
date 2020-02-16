@@ -142,9 +142,9 @@ namespace NLP
             if ((lowerWord.Contains("-") || lowerWord.Contains("/")) && currentTag == "JJ")
                 proc += (double)(maxVal - 0.25d); // JJ
             if ((lowerWord.Contains("-") && lowerWord.Count(x => x == '-') > 2) && currentTag == "OT")
-                proc += (double)maxVal;
+                proc += (double)maxVal; // OT (e.g.: At-the-central-library)
             if (lowerWord.Contains("/") && currentTag == "OT")
-                proc += (double)(maxVal - 0.25d); // OT
+                proc += (double)minVal; // OT
 
             return proc;
         }

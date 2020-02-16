@@ -254,3 +254,7 @@ Accuracy for known words: 0.9643413
 Accuracy for unknown words: 0.6686751
 Accuracy on both: 0.9522517
 
+tri+bidirectional:
+Accuracy for known words: 0.966057
+Accuracy for unknown words: 0.7242431
+Accuracy on both: 0.9561694
