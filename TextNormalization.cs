@@ -8,6 +8,11 @@ namespace NLP
 {
     public class TextNormalization
     {
+        public static double MinMaxNormalization(double value, double newMax, double newMin, double oldMax = 1.0d, double oldMin = 0.0d)
+        {
+            return (double)(((value - oldMin) * (newMax - newMin)) / (oldMax - oldMin)) + newMin;
+        }
+
         public static List<Tokenizer.WordTag> Pipeline(List<Tokenizer.WordTag> words, bool toLowerTxt = true)
         {
             List<Tokenizer.WordTag> newWords = new List<Tokenizer.WordTag>();

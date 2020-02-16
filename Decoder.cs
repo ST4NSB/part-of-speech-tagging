@@ -13,6 +13,8 @@ namespace NLP
         public Dictionary<Tuple<string, string>, double> BigramTransitionProbabilities;
         public Dictionary<Tuple<string, string, string>, double> TrigramTransitionProbabilities;
 
+        public List<HMMTagger.EmissionProbabilisticModel> SuffixProbs, PreffixProbs;
+
         public List<string> PredictedTags;
 
         public List<List<ViterbiNode>> ViterbiGraph;
@@ -31,18 +33,8 @@ namespace NLP
         public Decoder(
             List<HMMTagger.EmissionProbabilisticModel> EmissionProbabilities,
             Dictionary<string, double> UnigramProbabilities,
-            Dictionary<Tuple<string, string>, double> BigramTransitionProbabilities)
-        {
-            this.EmissionProbabilities = EmissionProbabilities;
-            this.UnigramProbabilities = UnigramProbabilities;
-            this.BigramTransitionProbabilities = BigramTransitionProbabilities;
-        }
-
-        public Decoder(
-            List<HMMTagger.EmissionProbabilisticModel> EmissionProbabilities,
-            Dictionary<string, double> UnigramProbabilities,
             Dictionary<Tuple<string, string>, double> BigramTransitionProbabilities,
-            Dictionary<Tuple<string, string, string>, double> TrigramTransitionProbabilities)
+            Dictionary<Tuple<string, string, string>, double> TrigramTransitionProbabilities = null)
         {
             this.EmissionProbabilities = EmissionProbabilities;
             this.UnigramProbabilities = UnigramProbabilities;
@@ -74,6 +66,12 @@ namespace NLP
             lambda2Bi = lambdaBiTuple.Item2;
         }
 
+        public void SetPreffixAndSuffixProbabilities(List<HMMTagger.EmissionProbabilisticModel> PreffixProbs, List<HMMTagger.EmissionProbabilisticModel> SuffixProbs)
+        { 
+            this.PreffixProbs = PreffixProbs;
+            this.SuffixProbs = SuffixProbs;
+        }
+
         public void ViterbiDecoding(List<Tokenizer.WordTag> testWords, string modelForward = "bigram",string modelBackward = "bigram", string mode = "forward")
         {
             this.ViterbiDecodeTime = new Stopwatch();
@@ -98,59 +96,51 @@ namespace NLP
             this.ViterbiDecodeTime.Stop();
         }
 
-        private double GetProcentForUnknownWord(string testWord, string currentTag, string prevTag = "NULL")
+        private double GetProcentForUnknownWord(string testWord, string currentTag)
         {
             double proc = 1.0d;
-
-            const double maxVal = 2.5d, minVal = 1.5d;
+            const double maxVal = 2.0d, minVal = 1.0d;
 
             bool testWordIsCapitalized = false;
             if (char.IsUpper(testWord[0]))
                 testWordIsCapitalized = true;
-
             string lowerWord = testWord.ToLower();
 
+            double suffixVal = 0.0d, preffixVal = 0.0d;
+            foreach (var pfx in this.PreffixProbs)
+            {
+                if (lowerWord.StartsWith(pfx.Word))
+                {
+                    if (pfx.TagFreq.ContainsKey(currentTag))
+                        preffixVal = pfx.TagFreq[currentTag];
+                    break;
+                }
+            }
+
+            foreach (var sfx in this.SuffixProbs)
+            {
+                if (lowerWord.EndsWith(sfx.Word))
+                {
+                    if (sfx.TagFreq.ContainsKey(currentTag))
+                        suffixVal = sfx.TagFreq[currentTag];
+                    break;
+                }
+            }
+
+            double sumOfPreSuf = (double)preffixVal + suffixVal;
+            if (sumOfPreSuf > 0.0d)
+                proc += (double)TextNormalization.MinMaxNormalization(sumOfPreSuf, maxVal, minVal);
+
             if (testWordIsCapitalized && currentTag == "NN")
-                return maxVal; // max value to be a NN
+                proc += (double)maxVal; // max value to be a NN
             if ((lowerWord.Contains("-") || lowerWord.Contains("/")) && currentTag == "NN")
-                return (minVal + 0.50d); // NN
+                proc += (double)(maxVal - 0.25d); // NN
             if ((lowerWord.Contains("-") || lowerWord.Contains("/")) && currentTag == "JJ")
-                return (minVal + 0.25d); // JJ
-            if ((lowerWord.Contains("-") || lowerWord.Contains("/")) && currentTag == "OT")
-                return (minVal); // OT
-
-
-
-            //if ((lowerWord.EndsWith("ion") || lowerWord.EndsWith("sion") || lowerWord.EndsWith("tion") || lowerWord.EndsWith("hood")) && currentTag == "NN")
-            //    return 1.70d; // NN
-            //if ((lowerWord.EndsWith("cian") || lowerWord.EndsWith("dom")) && currentTag == "NN")
-            //    return 1.60d; // NN
-            //if ((lowerWord.EndsWith("ee") || lowerWord.EndsWith("ment") || lowerWord.EndsWith("ist") || lowerWord.EndsWith("ism")) && currentTag == "NN")
-            //    return 1.40d; // NN
-            //if (lowerWord.EndsWith("ade") && (prevTag == "NN" || prevTag == "VB") && currentTag == "NN")
-            //    return 1.25d; // NN         
-
-            //// VB
-            //if ((lowerWord.EndsWith("ate") || lowerWord.EndsWith("ize") || lowerWord.EndsWith("ise") || lowerWord.StartsWith("mis") || lowerWord.StartsWith("dis")) && currentTag == "VB")
-            //    return 1.50d; // VB
-            //if ((lowerWord.EndsWith("ify") || lowerWord.EndsWith("en") || lowerWord.StartsWith("re")) && currentTag == "VB")
-            //    return 1.30d; // VB
-
-            //// JJ
-            //if ((lowerWord.EndsWith("able") || lowerWord.EndsWith("ible") || lowerWord.EndsWith("ish") || lowerWord.EndsWith("like")) && prevTag == "VB" && currentTag == "JJ")
-            //    return 1.70d; // JJ
-            //if ((lowerWord.EndsWith("ly") || lowerWord.EndsWith("ate") || lowerWord.StartsWith("anti")) && currentTag == "JJ")
-            //    return 1.50d; // JJ
-            //if ((lowerWord.EndsWith("ful") || lowerWord.EndsWith("ous") || lowerWord.StartsWith("im") || lowerWord.StartsWith("in")) && currentTag == "JJ")
-            //    return 1.40d; // JJ
-            
-            //// RB
-            //if (lowerWord.EndsWith("ly") && currentTag == "RB")
-            //    return 1.50d; // RB
-            //if (lowerWord.EndsWith("less") && currentTag == "RB")
-            //    return 1.40d; // RB
-           
-
+                proc += (double)(maxVal - 0.25d); // JJ
+            if ((lowerWord.Contains("-") && lowerWord.Count(x => x == '-') > 2) && currentTag == "OT")
+                proc += (double)maxVal;
+            if (lowerWord.Contains("/") && currentTag == "OT")
+                proc += (double)minVal; // OT
 
             return proc;
         }
@@ -196,7 +186,7 @@ namespace NLP
 
                                 double biTrans = (double)(uniVal * lambda1Bi) + (item.Value * lambda2Bi);
 
-                                double unknownProcent = GetProcentForUnknownWord(testWords[i].word, item.Key.Item2, item.Key.Item1);
+                                double unknownProcent = GetProcentForUnknownWord(testWords[i].word, item.Key.Item2);
 
                                 product = biTrans * unknownProcent;
                                 nodeTag = item.Key.Item2;
@@ -267,7 +257,7 @@ namespace NLP
 
                                         double triTransition = (double)(lambda3 * item.Value) + (lambda2 * biVal) + (lambda1 * uniVal);
 
-                                        double unknownProcent = GetProcentForUnknownWord(testWords[i].word, item.Key.Item3, item.Key.Item2);
+                                        double unknownProcent = GetProcentForUnknownWord(testWords[i].word, item.Key.Item3);
 
                                         product = (double)elem.value * triTransition * unknownProcent;
                                         nodeTag = item.Key.Item3;
@@ -294,7 +284,7 @@ namespace NLP
 
                                         double biTrans = (double)(uniVal * lambda1Bi) + (item.Value * lambda2Bi);
 
-                                        double unknownProcent = GetProcentForUnknownWord(testWords[i].word, item.Key.Item2, item.Key.Item1);
+                                        double unknownProcent = GetProcentForUnknownWord(testWords[i].word, item.Key.Item2);
 
                                         product = (double)elem.value * biTrans * unknownProcent;
                                         nodeTag = item.Key.Item2;

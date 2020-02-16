@@ -19,6 +19,8 @@ namespace NLP
         public Dictionary<Tuple<string, string>, double> BigramTransitionProbabilities;
         public Dictionary<Tuple<string, string, string>, double> TrigramTransitionProbabilities;
 
+        public List<EmissionProbabilisticModel> SuffixesEmission, PreffixEmission;
+
         private Stopwatch TrainingTime;
 
         public HMMTagger() { }
@@ -69,6 +71,8 @@ namespace NLP
 
             this.N = wordsInput.Count; // nr of tokens
 
+            this.TrainSuffixPreffixEmission(wordsInput);
+
             this.CalculateEmissionAndTransitionOccurrences(wordsInput);
             this.CalculateBigramOccurences(wordsInput);
             this.CalculateTrigramOccurences(wordsInput);
@@ -76,17 +80,102 @@ namespace NLP
             this.TrainingTime.Stop();
         }
 
-        public void TrainSuffixPreffixEmission(List<Tokenizer.WordTag> words)
+        private void TrainSuffixPreffixEmission(List<Tokenizer.WordTag> words)
         {
-            List<string> sffx = new List<string>() { "able", "ible", "ade", "al", "an", "ance",
+            List<string> suff = new List<string>() { "able", "ible", "ade", "al", "an", "ance",
                                                     "ary", "ate", "cian", "cule", "cy", "dom",
                                                     "ee", "en","ence", "ency", "er", "ese", "ess",
                                                     "esis", "osis", "et", "ful", "fy", "ine", "ion",
                                                     "ish", "ism", "ist", "ity", "less", "ly", "ness",
                                                     "ous", "ent", "ize", "ing", "ive" }; // ends with
-            List<string> prffx = new List<string>() { "mis", "dis", "re", "anti", "in", "over" }; // starts with
+            List<string> preff = new List<string>() { "mis", "dis", "re", "anti", "in", "over" }; // starts with
 
-            //TODO:ADD LOGIC HERE
+            var suffxem = new List<EmissionModel>();
+            var preffxem = new List<EmissionModel>();
+
+            foreach (var item in suff)
+            {
+                var em = new EmissionModel();
+                em.Word = item;
+                suffxem.Add(em);
+            }
+
+            foreach (var item in preff)
+            {
+                var em = new EmissionModel();
+                em.Word = item;
+                preffxem.Add(em);
+            }
+        
+
+            foreach (var w in words)
+            {
+                foreach(var sfx in suffxem)
+                {
+                    if (w.word.EndsWith(sfx.Word))
+                    {
+                        var tag = sfx.TagFreq.FirstOrDefault(x => x.Key == w.tag);
+                        if (tag.Key == null)
+                        {
+                            sfx.TagFreq.Add(w.tag, 1);
+                        }
+                        else
+                        {
+                            sfx.TagFreq[tag.Key] += 1;
+                        }
+                    }
+                }
+
+                foreach(var pfx in preffxem)
+                {
+                    if (w.word.StartsWith(pfx.Word))
+                    {
+                        var tag = pfx.TagFreq.FirstOrDefault(x => x.Key == w.tag);
+                        if (tag.Key == null)
+                        {
+                            pfx.TagFreq.Add(w.tag, 1);
+                        }
+                        else
+                        {
+                            pfx.TagFreq[tag.Key] += 1;
+                        }
+                    }
+                }
+            }
+
+            this.SuffixesEmission = new List<EmissionProbabilisticModel>();
+            this.PreffixEmission = new List<EmissionProbabilisticModel>();
+
+            foreach(var sfx in suffxem)
+            {
+                var tagSum = sfx.TagFreq.Sum(x => x.Value);
+                Dictionary<string, double> tgfreq = new Dictionary<string, double>();
+                foreach (var tg in sfx.TagFreq)
+                {
+                    tgfreq.Add(tg.Key, (double)tg.Value / tagSum);
+                }
+
+                var em = new EmissionProbabilisticModel();
+                em.Word = sfx.Word;
+                em.TagFreq = tgfreq;
+                this.SuffixesEmission.Add(em);
+            }
+
+            foreach (var pfx in preffxem)
+            {
+                var tagSum = pfx.TagFreq.Sum(x => x.Value);
+                Dictionary<string, double> tgfreq = new Dictionary<string, double>();
+                foreach (var tg in pfx.TagFreq)
+                {
+                    tgfreq.Add(tg.Key, (double)tg.Value / tagSum);
+                }
+
+                var em = new EmissionProbabilisticModel();
+                em.Word = pfx.Word;
+                em.TagFreq = tgfreq;
+                this.PreffixEmission.Add(em);
+            }
+
         }
 
         public List<Tokenizer.WordTag> EliminateDuplicateSequenceOfEndOfSentenceTags(List<Tokenizer.WordTag> testWords)
