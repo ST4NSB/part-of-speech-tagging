@@ -159,13 +159,15 @@ namespace PostAppConsole
 
             using (System.IO.StreamWriter file = new System.IO.StreamWriter("trigram_bidirectional.csv"))
             {
-                file.WriteLine("Word,Real Tag,Prediction Tag,Is word in Train-file");
+                file.WriteLine("Word,Real Tag,Prediction Tag,Is in Train T/F,Predicted T/F");
                 for (int i = 0; i < wordsTest.Count; i++)
                 {
-                    bool isInTrain = true;
+                    bool isInTrain = true, predictedB = false;
                     if (decoder.UnknownWords.Contains(wordsTest[i].word))
                         isInTrain = false;
-                    file.WriteLine("\"" + wordsTest[i].word + "\"," + wordsTest[i].tag + "," + decoder.PredictedTags[i] + "," + isInTrain);
+                    if (wordsTest[i].tag == decoder.PredictedTags[i])
+                        predictedB = true;
+                    file.WriteLine("\"" + wordsTest[i].word + "\"," + wordsTest[i].tag + "," + decoder.PredictedTags[i] + "," + isInTrain + "," + predictedB);
                 }
             }
 
