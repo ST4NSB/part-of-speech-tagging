@@ -94,7 +94,7 @@ namespace NLP
                                                     "ment", "ese", "ness", "ship", "ed", "ant", "ow", "land", "ure",
                                                     "esis", "osis", "et", "ette", "ful", "ify", "fy", "ine", "ion",
                                                     "ish", "ism", "ist", "ty", "less", "ly", "ess", "ward", "em",
-                                                    "ous", "ent", "ise", "ize", "ing", "ive", "ic", "ways", "in",
+                                                    "ous", "ent", "ise", "ize", "ling", "ing", "ive", "ic", "ways", "in",
                                                     "hood", "logy", "ice", "oid", "id", "ide", "age", "worthy", "ae"}; // ends with
 
 
