@@ -260,6 +260,6 @@ Accuracy for unknown words: 0.6805773
 Accuracy on both: 0.952781
 
 tri+bidirectional:
-Accuracy for known words: 0.9660507
-Accuracy for unknown words: 0.7308636
-Accuracy on both: 0.9564341
+Accuracy for known words: 0.9660444
+Accuracy for unknown words: 0.7330953
+Accuracy on both: 0.9565192

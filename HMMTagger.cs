@@ -83,15 +83,6 @@ namespace NLP
 
         private void TrainSuffixPreffixEmission(List<Tokenizer.WordTag> words)
         {
-            //List<string> suff = new List<string>() { "able", "ible", "ble", "ade", "al", "cian", "ance", "ite", "genic", "phile",
-            //                                        "ary", "ate", "man", "an", "cule", "ency", "dom", "eon", "lily", "ix", "eer",
-            //                                        "ee", "en","ence", "cy", "ier", "ler", "er", "or", "ular", "ar", "ium", "um", "ure",
-            //                                        "ment", "ese", "ness", "ship", "ed", "ant", "ow", "land", "in", "iana", "ex",
-            //                                        "esis", "osis", "is", "et", "ette", "ful", "ify", "fy", "ine", "ion", "est",
-            //                                        "ish", "ism", "ist", "ty", "less", "ly", "ess", "ward", "ard", "ey", "em",
-            //                                        "ous", "us", "valent", "ent", "ise", "ize", "ing", "ive", "ic", "ways", "th",
-            //                                        "hood", "logy", "ice", "oid", "id", "ide", "age", "worthy", "ae"}; // ends with
-
             List<string> preff = new List<string>() { "inter", "mis", "dis", "re", "anti", "in", "over", "en",
                                                     "il", "im", "ir", "non", "ob", "op", "pre", "un", "epi",
                                                     "multi", "bi", "mono", "de", "super", "cyber", "for",
