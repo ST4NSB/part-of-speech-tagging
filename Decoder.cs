@@ -131,12 +131,44 @@ namespace NLP
                 }
             }
 
+            if(suffixVal == 0.0d) // plural case: "violonists" -> "violonIST"
+            {
+                string singularWord = "";
+                bool isPlural = false;
+                if (lowerWord.EndsWith("s"))
+                {
+                    singularWord = lowerWord.Remove(lowerWord.Length - 1);
+                    isPlural = true;
+                }
+                else if(lowerWord.EndsWith("\'s") || lowerWord.EndsWith("s\'"))
+                {
+                    singularWord = lowerWord.Remove(lowerWord.Length - 2);
+                    isPlural = true;
+                }
+                if (isPlural)
+                {
+                    foreach (var sfx in this.SuffixProbs)
+                    {
+                        if (singularWord.EndsWith(sfx.Word))
+                        {
+                            if (sfx.TagFreq.ContainsKey(currentTag))
+                            {
+                                suffixVal = sfx.TagFreq[currentTag];
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
             double sumOfPreSuf = (double)preffixVal + suffixVal;
             if (sumOfPreSuf > 0.0d)
                 proc += (double)TextNormalization.MinMaxNormalization(sumOfPreSuf, maxVal, minVal);
 
-            if ((testWordIsCapitalized || lowerWord.EndsWith("\'s")) && currentTag == "NN")
+            if (testWordIsCapitalized && currentTag == "NN")
                 proc += (double)maxVal; // max value to be a NN
+            if ((lowerWord.EndsWith("\'s") || lowerWord.EndsWith("s\'")) && currentTag == "NN")
+                proc += (double)maxVal;
             if ((lowerWord.Contains("-") || lowerWord.Contains("/")) && currentTag == "NN")
                 proc += (double)(maxVal - 0.25d); // NN
             if ((lowerWord.Contains("-") || lowerWord.Contains("/")) && currentTag == "JJ")
@@ -212,7 +244,7 @@ namespace NLP
 
                             double biTrans = (double)(uniVal * lambda1Bi) + (biTransition * lambda2Bi);
 
-                            double product = (double)emissionFreqValue * biTrans;
+                            double product = (double)emissionFreqValue * biTrans; 
                             ViterbiNode node = new ViterbiNode(product, wt.Key);
                             vList.Add(node);
                         }
@@ -330,6 +362,7 @@ namespace NLP
                                     double uniVal = this.UnigramProbabilities.FirstOrDefault(x => x.Key.Equals(tf.Key)).Value;
 
                                     double triTransition = (double)(lambda3 * triVal) + (lambda2 * biVal) + (lambda1 * uniVal);
+
                                     double product = (double)vn.value * triTransition * tf.Value;
                                     if(product >= vGoodNode.value)
                                     {

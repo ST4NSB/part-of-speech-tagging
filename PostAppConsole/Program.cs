@@ -88,14 +88,14 @@ namespace PostAppConsole
 
 
             wordsTest = tagger.EliminateDuplicateSequenceOfEndOfSentenceTags(wordsTest);
-            tagger.CalculateProbabilitiesForTestFiles(wordsTest, model: "trigram");
+            tagger.CalculateProbabilitiesForTestFiles(wordsTest, model: "bigram");
             Decoder decoder = new Decoder(tagger.EmissionProbabilities, tagger.UnigramProbabilities, tagger.BigramTransitionProbabilities, tagger.TrigramTransitionProbabilities);
             decoder.SetPreffixAndSuffixProbabilities(tagger.PreffixEmission, tagger.SuffixesEmission);
 
             Console.WriteLine("\nInterpolation: " + tagger.DeletedInterpolationTrigram() + " , " + tagger.DeletedInterpolationBigram());
             decoder.SetLambdaValues(tagger.DeletedInterpolationTrigram(), tagger.DeletedInterpolationBigram());
 
-            decoder.ViterbiDecoding(wordsTest, modelForward: "trigram", modelBackward: "trigram", mode: "f+b");
+            decoder.ViterbiDecoding(wordsTest, modelForward: "bigram", modelBackward: "bigram", mode: "forward");
             tagger.EliminateAllEndOfSentenceTags(wordsTest);
 
             
@@ -157,19 +157,19 @@ namespace PostAppConsole
 
 
 
-            using (System.IO.StreamWriter file = new System.IO.StreamWriter("trigram_bidirectional.csv"))
-            {
-                file.WriteLine("Word,Real Tag,Prediction Tag,Is in Train T/F,Predicted T/F");
-                for (int i = 0; i < wordsTest.Count; i++)
-                {
-                    bool isInTrain = true, predictedB = false;
-                    if (decoder.UnknownWords.Contains(wordsTest[i].word))
-                        isInTrain = false;
-                    if (wordsTest[i].tag == decoder.PredictedTags[i])
-                        predictedB = true;
-                    file.WriteLine("\"" + wordsTest[i].word + "\"," + wordsTest[i].tag + "," + decoder.PredictedTags[i] + "," + isInTrain + "," + predictedB);
-                }
-            }
+            //using (System.IO.StreamWriter file = new System.IO.StreamWriter("trigram_bidirectional.csv"))
+            //{
+            //    file.WriteLine("Word,Real Tag,Prediction Tag,Is in Train T/F,Predicted T/F");
+            //    for (int i = 0; i < wordsTest.Count; i++)
+            //    {
+            //        bool isInTrain = true, predictedB = false;
+            //        if (decoder.UnknownWords.Contains(wordsTest[i].word))
+            //            isInTrain = false;
+            //        if (wordsTest[i].tag == decoder.PredictedTags[i])
+            //            predictedB = true;
+            //        file.WriteLine("\"" + wordsTest[i].word + "\"," + wordsTest[i].tag + "," + decoder.PredictedTags[i] + "," + isInTrain + "," + predictedB);
+            //    }
+            //}
 
         }
     }

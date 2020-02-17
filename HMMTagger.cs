@@ -73,6 +73,7 @@ namespace NLP
 
             this.TrainSuffixPreffixEmission(wordsInput);
 
+
             this.CalculateEmissionAndTransitionOccurrences(wordsInput);
             this.CalculateBigramOccurences(wordsInput);
             this.CalculateTrigramOccurences(wordsInput);
@@ -82,19 +83,29 @@ namespace NLP
 
         private void TrainSuffixPreffixEmission(List<Tokenizer.WordTag> words)
         {
-            List<string> suff = new List<string>() { "able", "ible", "ble", "ade", "al", "cian", "ance", "ite",
-                                                    "ary", "ate", "an", "cule", "ency", "dom", "eon",
-                                                    "ee", "en","ence", "cy", "er", "or", "ar", "ium",
-                                                    "ment", "ese", "ness", "ship", "ed", "ant", "ow", "land",
-                                                    "esis", "osis", "et", "ette", "ful", "ify", "fy", "ine", "ion",
-                                                    "ish", "ism", "ist", "ty", "less", "ly", "ess", "ward",
-                                                    "ous", "ent", "ise", "ize", "ing", "ive", "ic", "ways",
-                                                    "hood", "logy", "ice", "oid", "id", "ide", "age"}; // ends with
+            //List<string> suff = new List<string>() { "able", "ible", "ble", "ade", "al", "cian", "ance", "ite", "genic", "phile",
+            //                                        "ary", "ate", "man", "an", "cule", "ency", "dom", "eon", "lily", "ix", "eer",
+            //                                        "ee", "en","ence", "cy", "ier", "ler", "er", "or", "ular", "ar", "ium", "um", "ure",
+            //                                        "ment", "ese", "ness", "ship", "ed", "ant", "ow", "land", "in", "iana", "ex",
+            //                                        "esis", "osis", "is", "et", "ette", "ful", "ify", "fy", "ine", "ion", "est",
+            //                                        "ish", "ism", "ist", "ty", "less", "ly", "ess", "ward", "ard", "ey", "em",
+            //                                        "ous", "us", "valent", "ent", "ise", "ize", "ing", "ive", "ic", "ways", "th",
+            //                                        "hood", "logy", "ice", "oid", "id", "ide", "age", "worthy", "ae"}; // ends with
 
             List<string> preff = new List<string>() { "inter", "mis", "dis", "re", "anti", "in", "over", "en",
-                                                    "il", "im", "ir", "non", "ob", "op", "pre", "un",
+                                                    "il", "im", "ir", "non", "ob", "op", "pre", "un", "epi",
                                                     "multi", "bi", "mono", "de", "super", "cyber", "for",
                                                     "ex", "hy", "post", "sub", "co", "semi", "vice", "poly" }; // starts with
+
+            List<string> suff = new List<string>() { "able", "ible", "ble", "ade", "al", "cian", "ance", "ite", "genic", "phile",
+                                                    "ary", "ate", "man", "an", "cule", "ency", "dom", "eon", "ex", "ix",
+                                                    "ee", "en","ence", "cy", "eer", "ier", "er", "or", "ar", "ium",
+                                                    "ment", "ese", "ness", "ship", "ed", "ant", "ow", "land", "ure",
+                                                    "esis", "osis", "et", "ette", "ful", "ify", "fy", "ine", "ion",
+                                                    "ish", "ism", "ist", "ty", "less", "ly", "ess", "ward", "em",
+                                                    "ous", "ent", "ise", "ize", "ing", "ive", "ic", "ways", "in",
+                                                    "hood", "logy", "ice", "oid", "id", "ide", "age", "worthy", "ae"}; // ends with
+
 
             var suffxem = new List<EmissionModel>();
             var preffxem = new List<EmissionModel>();
