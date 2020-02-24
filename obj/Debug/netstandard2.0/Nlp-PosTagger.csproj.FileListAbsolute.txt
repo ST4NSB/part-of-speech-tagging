@@ -6,3 +6,4 @@ D:\Projects\github\Nlp-PosTagger\obj\Debug\netstandard2.0\Nlp-PosTagger.Assembly
 D:\Projects\github\Nlp-PosTagger\obj\Debug\netstandard2.0\Nlp-PosTagger.AssemblyInfo.cs
 D:\Projects\github\Nlp-PosTagger\obj\Debug\netstandard2.0\Nlp-PosTagger.dll
 D:\Projects\github\Nlp-PosTagger\obj\Debug\netstandard2.0\Nlp-PosTagger.pdb
+D:\Projects\github\Nlp-PosTagger\obj\Debug\netstandard2.0\Nlp-PosTagger.csprojAssemblyReference.cache

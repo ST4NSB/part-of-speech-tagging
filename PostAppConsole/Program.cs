@@ -46,7 +46,7 @@ namespace PostAppConsole
             var text = LoadAndReadFolderFiles(BrownfolderTrain);
             var oldWords = Tokenizer.SeparateTagFromWord(Tokenizer.WordTokenizeCorpus(text));
             var words = SpeechPart.GetNewHierarchicTags(oldWords);
-            words = TextNormalization.CleanDataPipeline(words, toLowerTxt: true);
+            words = TextNormalization.PreProcessingPipeline(words, toLowerTxt: true);
 
             
             Console.WriteLine("Done with loading and creating tokens!");
@@ -84,18 +84,18 @@ namespace PostAppConsole
 
             var oldWordsTest = Tokenizer.SeparateTagFromWord(Tokenizer.WordTokenizeCorpus(textTest));
             var wordsTest = SpeechPart.GetNewHierarchicTags(oldWordsTest);
-            wordsTest = TextNormalization.CleanDataPipeline(wordsTest, toLowerTxt: false);
+            wordsTest = TextNormalization.PreProcessingPipeline(wordsTest, toLowerTxt: false);
 
 
             wordsTest = tagger.EliminateDuplicateSequenceOfEndOfSentenceTags(wordsTest);
-            tagger.CalculateProbabilitiesForTestFiles(wordsTest, model: "trigram");
+            tagger.CalculateProbabilitiesForTestFiles(wordsTest, model: "bigram");
             Decoder decoder = new Decoder(tagger.EmissionProbabilities, tagger.UnigramProbabilities, tagger.BigramTransitionProbabilities, tagger.TrigramTransitionProbabilities);
             decoder.SetPreffixAndSuffixProbabilities(tagger.PreffixEmission, tagger.SuffixesEmission);
 
             Console.WriteLine("\nInterpolation: " + tagger.DeletedInterpolationTrigram() + " , " + tagger.DeletedInterpolationBigram());
             decoder.SetLambdaValues(tagger.DeletedInterpolationTrigram(), tagger.DeletedInterpolationBigram());
 
-            decoder.ViterbiDecoding(wordsTest, modelForward: "trigram", modelBackward: "trigram", mode: "f+b");
+            decoder.ViterbiDecoding(wordsTest, modelForward: "bigram", modelBackward: "bigram", mode: "forward");
             tagger.EliminateAllEndOfSentenceTags(wordsTest);
 
             

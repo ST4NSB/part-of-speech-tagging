@@ -13,26 +13,25 @@ namespace NLP
             return (double)(((value - oldMin) * (newMax - newMin)) / (oldMax - oldMin)) + newMin;
         }
 
-        public static List<Tokenizer.WordTag> CleanDataPipeline(List<Tokenizer.WordTag> words, bool toLowerTxt = true)
+        public static List<Tokenizer.WordTag> PreProcessingPipeline(List<Tokenizer.WordTag> words, bool toLowerTxt = true)
         {
             List<Tokenizer.WordTag> newWords = new List<Tokenizer.WordTag>();
             foreach (var sw in words)
             {
+                if (IsStopWord(sw.word)) continue;
                 string tsw = EliminateDigitsFromWord(sw.word);
-                if (!string.IsNullOrEmpty(tsw))
-                {
-                    if (toLowerTxt)
-                        tsw = ToLowerCaseNormalization(tsw);
-                    //tsw = EliminateApostrophe(tsw);
-                    newWords.Add(new Tokenizer.WordTag(tsw, sw.tag));
-                }
+                if (string.IsNullOrEmpty(tsw)) continue;
+                if (toLowerTxt)
+                    tsw = ToLowerCaseNormalization(tsw);
+                newWords.Add(new Tokenizer.WordTag(tsw, sw.tag));
             }
             return newWords;
         }
 
         private static bool IsStopWord(string word)
         {
-            string[] stopWords = { "``", "\"", "\'", "''", "(", ")", "[", "]", "{", "}" };
+            //string[] stopWords = { "``", "\"", "\'", "''", "(", ")", "[", "]", "{", "}" };
+            string[] stopWords = { "(", ")", "[", "]", "{", "}" };
             foreach (var sword in stopWords)
                 if (word.Equals(sword))
                     return true;
