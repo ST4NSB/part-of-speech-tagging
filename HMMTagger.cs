@@ -88,13 +88,13 @@ namespace NLP
                                                     "multi", "bi", "mono", "de", "super", "cyber", "for",
                                                     "ex", "hy", "post", "sub", "co", "semi", "vice", "poly" }; // starts with
 
-            List<string> suff = new List<string>() { "able", "ible", "ble", "ade", "al", "cian", "ance", "ite", "genic", "phile",
-                                                    "ary", "ate", "man", "an", "cule", "ency", "dom", "eon", "ex", "ix",
+            List<string> suff = new List<string>() { "able", "ible", "ble", "ade", "al", "cian", "ance", "ite", "genic", "phile", "ian", "ery", "ory",
+                                                    "ary", "ate", "man", "an", "cule", "ency", "dom", "eon", "ex", "ix","acy", "escent",
                                                     "ee", "en","ence", "cy", "eer", "ier", "er", "or", "ar", "ium",
                                                     "ment", "ese", "ness", "ship", "ed", "ant", "ow", "land", "ure",
-                                                    "esis", "osis", "et", "ette", "ful", "ify", "fy", "ine", "ion",
-                                                    "ish", "ism", "ist", "ty", "less", "ly", "ess", "ward", "em",
-                                                    "ous", "ent", "ise", "ize", "ling", "ing", "ive", "ic", "ways", "in",
+                                                    "esis", "osis", "et", "ette", "ful", "ify", "fy", "ine", "sion", "tion", "ion", "ity",
+                                                    "ish", "ism", "ist", "ty", "less", "ly", "ess", "ward", "em", "fic",
+                                                    "ous", "ent", "ise", "ize", "ling", "ing", "ive", "ic", "ways", "in", "ology",
                                                     "hood", "logy", "ice", "oid", "id", "ide", "age", "worthy", "ae"}; // ends with
 
 

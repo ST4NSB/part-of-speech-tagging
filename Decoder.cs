@@ -169,6 +169,8 @@ namespace NLP
                 proc += (double)maxVal; // max value to be a NN
             if ((lowerWord.EndsWith("\'s") || lowerWord.EndsWith("s\'")) && currentTag == "NN")
                 proc += (double)maxVal;
+            if (lowerWord.Contains(".") && currentTag == "NN")
+                proc += (double)(maxVal - 0.25d);
             if ((lowerWord.Contains("-") || lowerWord.Contains("/")) && currentTag == "NN")
                 proc += (double)(maxVal - 0.25d); // NN
             if ((lowerWord.Contains("-") || lowerWord.Contains("/")) && currentTag == "JJ")
@@ -177,6 +179,10 @@ namespace NLP
                 proc += (double)maxVal; // OT (e.g.: At-the-central-library)
             if (lowerWord.Contains("/") && currentTag == "OT")
                 proc += (double)minVal; // OT
+            if (lowerWord.EndsWith("\'t") && currentTag == "VB")
+                proc += (double)maxVal;
+            if (lowerWord.EndsWith("\'ve") && currentTag == "PN")
+                proc += (double)maxVal;
 
             return proc;
         }
