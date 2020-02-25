@@ -89,19 +89,20 @@ namespace PostAppConsole
 
             wordsTest = tagger.EliminateDuplicateSequenceOfEndOfSentenceTags(wordsTest);
             tagger.CalculateProbabilitiesForTestFiles(wordsTest, model: "bigram");
+
             Decoder decoder = new Decoder(tagger.EmissionProbabilities, tagger.UnigramProbabilities, tagger.BigramTransitionProbabilities, tagger.TrigramTransitionProbabilities);
             decoder.SetPreffixAndSuffixProbabilities(tagger.PreffixEmission, tagger.SuffixesEmission);
-
             Console.WriteLine("\nInterpolation: " + tagger.DeletedInterpolationTrigram() + " , " + tagger.DeletedInterpolationBigram());
             decoder.SetLambdaValues(tagger.DeletedInterpolationTrigram(), tagger.DeletedInterpolationBigram());
-
             decoder.ViterbiDecoding(wordsTest, modelForward: "bigram", modelBackward: "bigram", mode: "forward");
+
             tagger.EliminateAllEndOfSentenceTags(wordsTest);
 
-            
 
-            //decoder = new Decoder();
-            //const string deftag = "RB";
+
+            //Decoder decoder = new Decoder();
+            //decoder.UnknownWords = new HashSet<string>();
+            //const string deftag = "NN";
             //decoder.PredictedTags = new List<string>();
             //foreach (var tw in wordsTest)
             //{
@@ -109,11 +110,13 @@ namespace PostAppConsole
             //    if (modelMax != null)
             //    {
             //        string maxTag = modelMax.TagFreq.OrderByDescending(x => x.Value).FirstOrDefault().Key;
-            //        if (maxTag != ".")
-            //            decoder.PredictedTags.Add(maxTag);
-            //        else decoder.PredictedTags.Add(deftag);
+            //        decoder.PredictedTags.Add(deftag);
             //    }
-            //    else decoder.PredictedTags.Add(deftag); // NULL / NN
+            //    else
+            //    {
+            //        decoder.PredictedTags.Add(deftag); // NULL / NN
+            //        decoder.UnknownWords.Add(tw.word);
+            //    }
             //}
 
             //foreach (var item in decoder.EmissionProbabilities)
@@ -128,6 +131,13 @@ namespace PostAppConsole
             //    Console.WriteLine("BI: " + item.Key + " -> " + item.Value);
             //foreach (var item in decoder.TrigramTransitionProbabilities)
             //    Console.WriteLine("TRI: " + item.Key + " -> " + item.Value);
+
+            //foreach (var item in decoder.ViterbiGraph)
+            //{
+            //    foreach (var item2 in item)
+            //        Console.Write(item2.CurrentTag + ":" + item2.value + "    ");
+            //    Console.WriteLine();
+            //}
 
             //Console.WriteLine("Predicted tags: ");
             //foreach (var item in decoder.PredictedTags)
@@ -157,19 +167,19 @@ namespace PostAppConsole
 
 
 
-            using (System.IO.StreamWriter file = new System.IO.StreamWriter("trigram_bidirectional.csv"))
-            {
-                file.WriteLine("Word,Real Tag,Prediction Tag,Is in Train T/F,Predicted T/F");
-                for (int i = 0; i < wordsTest.Count; i++)
-                {
-                    bool isInTrain = true, predictedB = false;
-                    if (decoder.UnknownWords.Contains(wordsTest[i].word))
-                        isInTrain = false;
-                    if (wordsTest[i].tag == decoder.PredictedTags[i])
-                        predictedB = true;
-                    file.WriteLine("\"" + wordsTest[i].word + "\"," + wordsTest[i].tag + "," + decoder.PredictedTags[i] + "," + isInTrain + "," + predictedB);
-                }
-            }
+            //using (System.IO.StreamWriter file = new System.IO.StreamWriter("trigram_bidirectional.csv"))
+            //{
+            //    file.WriteLine("Word,Real Tag,Prediction Tag,Is in Train T/F,Predicted T/F");
+            //    for (int i = 0; i < wordsTest.Count; i++)
+            //    {
+            //        bool isInTrain = true, predictedB = false;
+            //        if (decoder.UnknownWords.Contains(wordsTest[i].word))
+            //            isInTrain = false;
+            //        if (wordsTest[i].tag == decoder.PredictedTags[i])
+            //            predictedB = true;
+            //        file.WriteLine("\"" + wordsTest[i].word + "\"," + wordsTest[i].tag + "," + decoder.PredictedTags[i] + "," + isInTrain + "," + predictedB);
+            //    }
+            //}
 
         }
     }
