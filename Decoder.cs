@@ -26,6 +26,8 @@ namespace NLP
         private double lambda1, lambda2, lambda3;
         private double lambda1Bi, lambda2Bi;
 
+        private const double CapitalizationConst = 2.0d;
+
         public HashSet<string> UnknownWords;
 
         public Decoder() { }
@@ -205,7 +207,7 @@ namespace NLP
                 if (startPoint) // first node (start)
                 {
                     triPoz = 0;
-                    HMMTagger.EmissionProbabilisticModel foundWord = this.EmissionProbabilities.Find(x => x.Word == testWords[i].word.ToLower()); 
+                    HMMTagger.EmissionProbabilisticModel foundWord = this.EmissionProbabilities.Find(x => x.Word == testWords[i].word.ToLower());
                     List <ViterbiNode> vList = new List<ViterbiNode>();
 
                     if(foundWord != null)
@@ -250,7 +252,11 @@ namespace NLP
 
                             double biTrans = (double)(uniVal * lambda1Bi) + (biTransition * lambda2Bi);
 
-                            double product = (double)emissionFreqValue * biTrans; 
+                            double capitalization = 1.0d;
+                            if (wt.Key == "NN" && char.IsUpper(testWords[i].word[0]))
+                                capitalization += CapitalizationConst;
+
+                            double product = (double)emissionFreqValue * biTrans * capitalization; 
                             ViterbiNode node = new ViterbiNode(product, wt.Key);
                             vList.Add(node);
                         }
@@ -369,7 +375,11 @@ namespace NLP
 
                                     double triTransition = (double)(lambda3 * triVal) + (lambda2 * biVal) + (lambda1 * uniVal);
 
-                                    double product = (double)vn.value * triTransition * tf.Value;
+                                    double capitalization = 1.0d;
+                                    if (tf.Key == "NN" && char.IsUpper(testWords[i].word[0]))
+                                        capitalization += CapitalizationConst;
+
+                                    double product = (double)vn.value * triTransition * tf.Value * capitalization;
                                     if(product >= vGoodNode.value)
                                     {
                                         vGoodNode.value = product;
@@ -388,7 +398,11 @@ namespace NLP
 
                                     double biTrans = (double)(uniVal * lambda1Bi) + (biTransition * lambda2Bi);
 
-                                    double product = (double)vn.value * biTrans * tf.Value;
+                                    double capitalization = 1.0d;
+                                    if (tf.Key == "NN" && char.IsUpper(testWords[i].word[0]))
+                                        capitalization += CapitalizationConst;
+
+                                    double product = (double)vn.value * biTrans * tf.Value * capitalization;
                                     if (product >= vGoodNode.value)
                                     {
                                         vGoodNode.value = product;
@@ -431,7 +445,7 @@ namespace NLP
                 if (startPoint)
                 {
                     triPoz = 0;
-                    HMMTagger.EmissionProbabilisticModel foundWord = this.EmissionProbabilities.Find(x => x.Word.Equals(testWords[i].word.ToLower()));
+                    HMMTagger.EmissionProbabilisticModel foundWord = this.EmissionProbabilities.Find(x => x.Word == testWords[i].word.ToLower());
                     List<ViterbiNode> vList = new List<ViterbiNode>();
 
                     if (foundWord != null)
@@ -475,7 +489,11 @@ namespace NLP
 
                             double biTrans = (double)(uniVal * lambda1Bi) + (biTransition * lambda2Bi);
 
-                            double product = (double)emissionFreqValue * biTrans;
+                            double capitalization = 1.0d;
+                            if (wt.Key == "NN" && char.IsUpper(testWords[i].word[0]))
+                                capitalization += CapitalizationConst;
+
+                            double product = (double)emissionFreqValue * biTrans * capitalization;
                             ViterbiNode node = new ViterbiNode(product, wt.Key);
                             vList.Add(node);
                         }
@@ -485,7 +503,7 @@ namespace NLP
                 }
                 else
                 {
-                    HMMTagger.EmissionProbabilisticModel foundWord = this.EmissionProbabilities.Find(x => x.Word.Equals(testWords[i].word.ToLower()));
+                    HMMTagger.EmissionProbabilisticModel foundWord = this.EmissionProbabilities.Find(x => x.Word == testWords[i].word.ToLower());
                     List<ViterbiNode> vList = new List<ViterbiNode>();
 
                     if (foundWord != null)
@@ -591,7 +609,12 @@ namespace NLP
                                     double uniVal = this.UnigramProbabilities.FirstOrDefault(x => x.Key.Equals(tf.Key)).Value;
 
                                     double triTransition = (double)(lambda3 * triVal) + (lambda2 * biVal) + (lambda1 * uniVal);
-                                    double product = (double)vn.value * triTransition * tf.Value;
+
+                                    double capitalization = 1.0d;
+                                    if (tf.Key == "NN" && char.IsUpper(testWords[i].word[0]))
+                                        capitalization += CapitalizationConst;
+
+                                    double product = (double)vn.value * triTransition * tf.Value * capitalization;
 
                                     if (product >= vGoodNode.value)
                                     {
@@ -611,7 +634,11 @@ namespace NLP
 
                                     double biTrans = (double)(uniVal * lambda1Bi) + (biTransition * lambda2Bi);
 
-                                    double product = (double)vn.value * biTrans * tf.Value;
+                                    double capitalization = 1.0d;
+                                    if (tf.Key == "NN" && char.IsUpper(testWords[i].word[0]))
+                                        capitalization += CapitalizationConst;
+
+                                    double product = (double)vn.value * biTrans * tf.Value * capitalization;
                                     if (product >= vGoodNode.value)
                                     {
                                         vGoodNode.value = product;

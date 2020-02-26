@@ -83,7 +83,7 @@ namespace NLP
 
         private void TrainSuffixPreffixEmission(List<Tokenizer.WordTag> words)
         {
-            List<string> preff = new List<string>() { "inter", "mis", "dis", "re", "anti", "in", "over", "en",
+            List<string> preff = new List<string>() {"inter", "mis", "dis", "re", "anti", "in", "over", "en",
                                                     "il", "im", "ir", "non", "ob", "op", "pre", "un", "epi",
                                                     "multi", "bi", "mono", "de", "super", "cyber", "for",
                                                     "ex", "hy", "post", "sub", "co", "semi", "vice", "poly" }; // starts with
