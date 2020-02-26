@@ -170,13 +170,13 @@ namespace NLP
             if ((lowerWord.EndsWith("\'s") || lowerWord.EndsWith("s\'")) && currentTag == "NN")
                 proc += (double)maxVal;
             if (lowerWord.Contains(".") && currentTag == "NN")
-                proc += (double)(maxVal - 0.25d);
+                proc += (double)minVal;
             if ((lowerWord.Contains("-") || lowerWord.Contains("/")) && currentTag == "NN")
-                proc += (double)(maxVal - 0.25d); // NN
+                proc += (double)minVal;// NN
             if ((lowerWord.Contains("-") || lowerWord.Contains("/")) && currentTag == "JJ")
-                proc += (double)(maxVal - 0.25d); // JJ
+                proc += (double)minVal; // JJ
             if ((lowerWord.Contains("-") && lowerWord.Count(x => x == '-') > 2) && currentTag == "OT")
-                proc += (double)maxVal; // OT (e.g.: At-the-central-library)
+                proc += (double)minVal; // OT (e.g.: At-the-central-library)
             if (lowerWord.Contains("/") && currentTag == "OT")
                 proc += (double)minVal; // OT
             if (lowerWord.EndsWith("\'t") && currentTag == "VB")
