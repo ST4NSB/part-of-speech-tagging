@@ -6,7 +6,7 @@ using System.Text.RegularExpressions;
 
 namespace NLP
 {
-    public class TextNormalization
+    public static class TextNormalization
     {
         public static double MinMaxNormalization(double value, double newMax, double newMin, double oldMax = 1.0d, double oldMin = 0.0d)
         {

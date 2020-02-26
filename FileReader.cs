@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace NLP
 {
-    public class FileReader
+    public static class FileReader
     {
         /// <summary>
         /// Static method to read all text from inputFile and returns a string.

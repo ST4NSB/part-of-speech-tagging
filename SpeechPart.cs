@@ -4,7 +4,7 @@ using System.Text;
 
 namespace NLP
 {
-    public class SpeechPart
+    public static class SpeechPart
     {
         /// <summary>
         /// Static Method to count the frequency of every individual Part of Speech in the Corpus
@@ -63,11 +63,11 @@ namespace NLP
                 tag = "RB";
             else if (tagIndex >= 53 && tagIndex <= 54)
                 tag = "PP";
-            else if (tagIndex >= 55 && tagIndex <= 57)
+            else if (tagIndex >= 55 && tagIndex <= 56)
                 tag = "CC";
-            else if (tagIndex >= 58 && tagIndex <= 70)
+            else if (tagIndex >= 57 && tagIndex <= 69)
                 tag = "AT/DT";
-            else if (tagIndex == 71)
+            else if (tagIndex == 70)
                 tag = ".";
             else
                 tag = "OT";
@@ -91,19 +91,19 @@ namespace NLP
                 "jj", "jjr", "jjs", "jjt", 
                 "rb", "rbr", "rbt", "rn", "rp", "wrb", "ql", "qlp",
                 "in", "to", 
-                "cc", "cs", "wql", 
+                "cc", "cs",
                 "at", "ap", "abl", "abn", "abx", "dt", "dti", "dts", "dtx", "be", "beg", "ex", "wdt",
                 "."
             };
 
             for (int i = 0; i < BrownCorpusTags.Count; i++)
             {
-                string[] splittedWord = Word.tag.Split(new Char[] { '+', '-' });
-                foreach (string w in splittedWord)
+                string[] splittedTag = Word.tag.Split(new Char[] { '+', '-' });
+                foreach (string w in splittedTag)
                 {
                     if (Word.tag.Equals("wql") || Word.tag.Equals("wql-tl")) // special case where wql is found in RB at ql
                     {
-                        tagIndex = 57;
+                        tagIndex = 55; // CC
                         return tagIndex;
                     }
                     else if (Word.tag.Contains(BrownCorpusTags[i]))
