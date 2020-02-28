@@ -18,7 +18,7 @@ namespace NLP
             List<Tokenizer.WordTag> newWords = new List<Tokenizer.WordTag>();
             foreach (var sw in words)
             {
-                if (IsStopWord(sw.word)) continue;
+                //if (IsStopWord(sw.word)) continue;
                 string tsw = EliminateDigitsFromWord(sw.word);
                 if (string.IsNullOrEmpty(tsw)) continue;
                 if (toLowerTxt)
@@ -51,7 +51,9 @@ namespace NLP
             {
                 string output = Regex.Replace(word, @"[\d-]", string.Empty);
                 var count = output.Count(char.IsLetter);
-                if (count >= 3) // verifies if has at least 3 letters left
+
+                const int x = 2;
+                if (count >= x) // verifies if has at least x letters left
                     return output;
                 return string.Empty;
             }

@@ -8,49 +8,22 @@ namespace NLP
 {
     public class Decoder
     {
-        public List<HMMTagger.EmissionProbabilisticModel> EmissionProbabilities;
-        public Dictionary<string, double> UnigramProbabilities;
-        public Dictionary<Tuple<string, string>, double> BigramTransitionProbabilities;
-        public Dictionary<Tuple<string, string, string>, double> TrigramTransitionProbabilities;
-
-        public List<HMMTagger.EmissionProbabilisticModel> SuffixProbs, PreffixProbs;
-
         public List<string> PredictedTags;
 
         public List<List<ViterbiNode>> ViterbiGraph;
-
-        private Stopwatch ViterbiDecodeTime;
-
         private List<ViterbiNode> ForwardHistory, BackwardHistory;
-
-        private double lambda1, lambda2, lambda3;
-        private double lambda1Bi, lambda2Bi;
-
         private const double CapitalizationConst = 2.0d;
-
         public HashSet<string> UnknownWords;
 
         public Decoder() { }
-
-        public Decoder(
-            List<HMMTagger.EmissionProbabilisticModel> EmissionProbabilities,
-            Dictionary<string, double> UnigramProbabilities,
-            Dictionary<Tuple<string, string>, double> BigramTransitionProbabilities,
-            Dictionary<Tuple<string, string, string>, double> TrigramTransitionProbabilities = null)
-        {
-            this.EmissionProbabilities = EmissionProbabilities;
-            this.UnigramProbabilities = UnigramProbabilities;
-            this.BigramTransitionProbabilities = BigramTransitionProbabilities;
-            this.TrigramTransitionProbabilities = TrigramTransitionProbabilities;
-        }
-
+        
         public class ViterbiNode
         {
             public double value;
             public string CurrentTag;
-            public List<ViterbiNode> PrevNode;
-            public List<ViterbiNode> NextNode; // + bidirectionality
-            public ViterbiNode(double value, string CurrentTag, List<ViterbiNode> PrevNode = null, List<ViterbiNode> NextNode = null)
+            public ViterbiNode PrevNode;
+            public ViterbiNode NextNode; // + bidirectionality
+            public ViterbiNode(double value, string CurrentTag, ViterbiNode PrevNode = null, ViterbiNode NextNode = null)
             {
                 this.value = value;
                 this.CurrentTag = CurrentTag;
@@ -59,26 +32,9 @@ namespace NLP
             }
         }
 
-        public void SetLambdaValues(Tuple<double, double, double> lambdaTriTuple, Tuple<double,double> lambdaBiTuple)
-        {
-            lambda1 = lambdaTriTuple.Item1;
-            lambda2 = lambdaTriTuple.Item2;
-            lambda3 = lambdaTriTuple.Item3;
-            lambda1Bi = lambdaBiTuple.Item1;
-            lambda2Bi = lambdaBiTuple.Item2;
-        }
-
-        public void SetPreffixAndSuffixProbabilities(List<HMMTagger.EmissionProbabilisticModel> PreffixProbs, List<HMMTagger.EmissionProbabilisticModel> SuffixProbs)
-        { 
-            this.PreffixProbs = PreffixProbs;
-            this.SuffixProbs = SuffixProbs;
-        }
 
         public void ViterbiDecoding(HMMTagger tagger, List<Tokenizer.WordTag> testWords, string modelForward = "bigram",string modelBackward = "bigram", string mode = "forward")
         {
-            this.ViterbiDecodeTime = new Stopwatch();
-            this.ViterbiDecodeTime.Start();
-
             this.UnknownWords = new HashSet<string>();
 
             this.ForwardHistory = new List<ViterbiNode>();
@@ -94,8 +50,6 @@ namespace NLP
 
             if(mode.Equals("f+b"))
                 BiDirectionalModelTrace();
-
-            this.ViterbiDecodeTime.Stop();
         }
 
         private double GetProcentForUnknownWord(HMMTagger tagger, string testWord, string currentTag)
@@ -112,7 +66,7 @@ namespace NLP
 
             if(testWordIsCapitalized)
             {
-                foreach (var pfx in tagger.CapitalPreffixEmission)
+                foreach (var pfx in tagger.PrefixCapitalizedWordEmissionProbabilities)
                 {
                     if (lowerWord.StartsWith(pfx.Word))
                     {
@@ -124,7 +78,7 @@ namespace NLP
                     }
                 }
 
-                foreach (var sfx in tagger.CapitalSuffixEmission)
+                foreach (var sfx in tagger.SuffixCapitalizedWordEmissionProbabilities)
                 {
                     if (lowerWord.EndsWith(sfx.Word))
                     {
@@ -139,7 +93,7 @@ namespace NLP
 
             if (preffixVal == 0.0d)
             {
-                foreach (var pfx in this.PreffixProbs)
+                foreach (var pfx in tagger.PrefixEmissionProbabilities)
                 {
                     if (lowerWord.StartsWith(pfx.Word))
                     {
@@ -154,7 +108,7 @@ namespace NLP
 
             if (suffixVal == 0.0d)
             {
-                foreach (var sfx in this.SuffixProbs)
+                foreach (var sfx in tagger.SuffixEmissionProbabilities)
                 {
                     if (lowerWord.EndsWith(sfx.Word))
                     {
@@ -183,7 +137,7 @@ namespace NLP
                 }
                 if (isPlural)
                 {
-                    foreach (var sfx in this.SuffixProbs)
+                    foreach (var sfx in tagger.SuffixEmissionProbabilities)
                     {
                         if (singularWord.EndsWith(sfx.Word))
                         {
@@ -241,9 +195,9 @@ namespace NLP
                 if (startPoint) // first node (start)
                 {
                     triPoz = 0;
-                    HMMTagger.EmissionProbabilisticModel foundWord = tagger.CapitalEmissionProb.Find(x => x.Word == testWords[i].word);
+                    HMMTagger.EmissionProbabilisticModel foundWord = tagger.WordCapitalizedTagsEmissionProbabilities.Find(x => x.Word == testWords[i].word);
                     if(foundWord == null)
-                        foundWord = this.EmissionProbabilities.Find(x => x.Word == testWords[i].word.ToLower());
+                        foundWord = tagger.WordTagsEmissionProbabilities.Find(x => x.Word == testWords[i].word.ToLower());
                     List <ViterbiNode> vList = new List<ViterbiNode>();
 
                     if(foundWord != null)
@@ -255,16 +209,16 @@ namespace NLP
                         UnknownWords.Add(testWords[i].word);
                         // we take the best transition case where first item is "."
                         // case 2: all the transitions
-                        var orderedTransitions = BigramTransitionProbabilities.OrderByDescending(x => x.Value).ToList();
+                        var orderedTransitions = tagger.BigramTransitionProbabilities.OrderByDescending(x => x.Value).ToList();
                         double product = 0.0d;
                         string nodeTag = "NULL";
 
                         foreach (var item in orderedTransitions)
                             if (item.Key.Item1.Equals(".") && item.Key.Item2 != ".")
                             {
-                                double uniVal = this.UnigramProbabilities.FirstOrDefault(x => x.Key.Equals(item.Key.Item2)).Value;
+                                double uniVal = tagger.UnigramProbabilities.FirstOrDefault(x => x.Key.Equals(item.Key.Item2)).Value;
 
-                                double biTrans = (double)(uniVal * lambda1Bi) + (item.Value * lambda2Bi);
+                                double biTrans = (double)(uniVal * tagger.BgramLambda1) + (item.Value * tagger.BgramLambda2);
 
                                 double unknownProcent = GetProcentForUnknownWord(tagger, testWords[i].word, item.Key.Item2);
 
@@ -282,11 +236,11 @@ namespace NLP
                                 continue;
                             double emissionFreqValue = wt.Value; // eg. Jane -> 0.1111 (NN)
                             Tuple<string, string> tuple = new Tuple<string, string>(".", wt.Key);
-                            double biTransition = BigramTransitionProbabilities.FirstOrDefault(x => x.Key.Equals(tuple)).Value; // eg. NN->VB - 0.25
+                            double biTransition = tagger.BigramTransitionProbabilities.FirstOrDefault(x => x.Key.Equals(tuple)).Value; // eg. NN->VB - 0.25
 
-                            double uniVal = this.UnigramProbabilities.FirstOrDefault(x => x.Key.Equals(wt.Key)).Value;
+                            double uniVal = tagger.UnigramProbabilities.FirstOrDefault(x => x.Key.Equals(wt.Key)).Value;
 
-                            double biTrans = (double)(uniVal * lambda1Bi) + (biTransition * lambda2Bi);
+                            double biTrans = (double)(uniVal * tagger.BgramLambda1) + (biTransition * tagger.BgramLambda2);
 
                             double capitalization = 1.0d;
                             if (wt.Key == "NN" && char.IsUpper(testWords[i].word[0]))
@@ -302,9 +256,9 @@ namespace NLP
                 }
                 else
                 {
-                    HMMTagger.EmissionProbabilisticModel foundWord = tagger.CapitalEmissionProb.Find(x => x.Word == testWords[i].word);
+                    HMMTagger.EmissionProbabilisticModel foundWord = tagger.WordCapitalizedTagsEmissionProbabilities.Find(x => x.Word == testWords[i].word);
                     if (foundWord == null)
-                        foundWord = this.EmissionProbabilities.Find(x => x.Word == testWords[i].word.ToLower());
+                        foundWord = tagger.WordTagsEmissionProbabilities.Find(x => x.Word == testWords[i].word.ToLower());
                     List <ViterbiNode> vList = new List<ViterbiNode>();
 
                     if (foundWord != null)
@@ -320,15 +274,14 @@ namespace NLP
                             ViterbiNode elem = this.ViterbiGraph[this.ViterbiGraph.Count - 1][j];
                             // we take the best transition case where first item is "."
 
-                            var orderedTransitions = BigramTransitionProbabilities.OrderByDescending(x => x.Value).ToList();
+                            var orderedTransitions = tagger.BigramTransitionProbabilities.OrderByDescending(x => x.Value).ToList();
 
                             if (model == "trigram" && triPoz >= 2)
                             {
                                 if (elem.PrevNode == null)
                                     continue;
-                                elem.PrevNode = elem.PrevNode.OrderByDescending(x => x.value).ToList();
-                                ViterbiNode elem2 = elem.PrevNode[0];
-                                var orderedTransitionsTri = TrigramTransitionProbabilities.OrderByDescending(x => x.Value).ToList();
+                                ViterbiNode elem2 = elem.PrevNode;
+                                var orderedTransitionsTri = tagger.TrigramTransitionProbabilities.OrderByDescending(x => x.Value).ToList();
                                 
                                 double product = 0.0d;
                                 string nodeTag = "NULL_TRI";
@@ -337,11 +290,11 @@ namespace NLP
                                     if (item.Key.Item1.Equals(elem2.CurrentTag) && item.Key.Item2.Equals(elem.CurrentTag) && item.Key.Item3 != ".")
                                     {
                                         Tuple<string, string> biTuple = new Tuple<string, string>(elem.CurrentTag, item.Key.Item3);
-                                        double biVal = this.BigramTransitionProbabilities.FirstOrDefault(x => x.Key.Equals(biTuple)).Value;
+                                        double biVal = tagger.BigramTransitionProbabilities.FirstOrDefault(x => x.Key.Equals(biTuple)).Value;
 
-                                        double uniVal = this.UnigramProbabilities.FirstOrDefault(x => x.Key.Equals(item.Key.Item3)).Value;
+                                        double uniVal = tagger.UnigramProbabilities.FirstOrDefault(x => x.Key.Equals(item.Key.Item3)).Value;
 
-                                        double triTransition = (double)(lambda3 * item.Value) + (lambda2 * biVal) + (lambda1 * uniVal);
+                                        double triTransition = (double)(tagger.TgramLambda3 * item.Value) + (tagger.TgramLambda2 * biVal) + (tagger.TgramLambda1 * uniVal);
 
                                         double unknownProcent = GetProcentForUnknownWord(tagger, testWords[i].word, item.Key.Item3);
 
@@ -349,12 +302,11 @@ namespace NLP
                                         nodeTag = item.Key.Item3;
                                         if (product >= vGoodNode.value)
                                         {
-                                            vGoodNode.value = product;
-                                            vGoodNode.CurrentTag = nodeTag;
-                                            List<ViterbiNode> prevNodesGoodNode = new List<ViterbiNode>();
-                                            prevNodesGoodNode.Add(elem);
-                                            vGoodNode.PrevNode = prevNodesGoodNode;
-                                            //break;
+                                            vGoodNode = new ViterbiNode(product, nodeTag, PrevNode: elem);
+                                            //vGoodNode.value = product;
+                                            // vGoodNode.CurrentTag = nodeTag;
+                                            //vGoodNode.PrevNode = elem;
+                                            ////break;
                                         }
                                     }
                             }
@@ -366,9 +318,9 @@ namespace NLP
                                 foreach (var item in orderedTransitions)
                                     if (item.Key.Item1.Equals(elem.CurrentTag) && item.Key.Item2 != ".")
                                     {
-                                        double uniVal = this.UnigramProbabilities.FirstOrDefault(x => x.Key.Equals(item.Key.Item2)).Value;
+                                        double uniVal = tagger.UnigramProbabilities.FirstOrDefault(x => x.Key.Equals(item.Key.Item2)).Value;
 
-                                        double biTrans = (double)(uniVal * lambda1Bi) + (item.Value * lambda2Bi);
+                                        double biTrans = (double)(uniVal * tagger.BgramLambda1) + (item.Value * tagger.BgramLambda2);
 
                                         double unknownProcent = GetProcentForUnknownWord(tagger, testWords[i].word, item.Key.Item2);
 
@@ -376,12 +328,11 @@ namespace NLP
                                         nodeTag = item.Key.Item2;
                                         if (product >= vGoodNode.value)
                                         {
-                                            vGoodNode.value = product;
-                                            vGoodNode.CurrentTag = nodeTag;
-                                            List<ViterbiNode> prevNodesGoodNode = new List<ViterbiNode>();
-                                            prevNodesGoodNode.Add(elem);
-                                            vGoodNode.PrevNode = prevNodesGoodNode;
-                                            //break;
+                                            vGoodNode = new ViterbiNode(product, nodeTag, PrevNode: elem);
+                                            //vGoodNode.value = product;
+                                            // vGoodNode.CurrentTag = nodeTag;
+                                            //vGoodNode.PrevNode = elem;
+                                           // //break;
                                         }
                                     }
                             }
@@ -401,16 +352,15 @@ namespace NLP
                                 {
                                     if (vn.PrevNode == null)
                                         continue;
-                                    vn.PrevNode = vn.PrevNode.OrderByDescending(x => x.value).ToList();
-                                    Tuple<string, string, string> triTuple = new Tuple<string, string, string>(vn.PrevNode[0].CurrentTag, vn.CurrentTag, tf.Key);
-                                    double triVal = this.TrigramTransitionProbabilities.FirstOrDefault(x => x.Key.Equals(triTuple)).Value;
+                                    Tuple<string, string, string> triTuple = new Tuple<string, string, string>(vn.PrevNode.CurrentTag, vn.CurrentTag, tf.Key);
+                                    double triVal = tagger.TrigramTransitionProbabilities.FirstOrDefault(x => x.Key.Equals(triTuple)).Value;
 
                                     Tuple<string, string> biTuple = new Tuple<string, string>(vn.CurrentTag, tf.Key);
-                                    double biVal = this.BigramTransitionProbabilities.FirstOrDefault(x => x.Key.Equals(biTuple)).Value;
+                                    double biVal = tagger.BigramTransitionProbabilities.FirstOrDefault(x => x.Key.Equals(biTuple)).Value;
 
-                                    double uniVal = this.UnigramProbabilities.FirstOrDefault(x => x.Key.Equals(tf.Key)).Value;
+                                    double uniVal = tagger.UnigramProbabilities.FirstOrDefault(x => x.Key.Equals(tf.Key)).Value;
 
-                                    double triTransition = (double)(lambda3 * triVal) + (lambda2 * biVal) + (lambda1 * uniVal);
+                                    double triTransition = (double)(tagger.TgramLambda3 * triVal) + (tagger.TgramLambda2 * biVal) + (tagger.TgramLambda1 * uniVal);
 
                                     double capitalization = 1.0d;
                                     if (tf.Key == "NN" && char.IsUpper(testWords[i].word[0]))
@@ -419,21 +369,20 @@ namespace NLP
                                     double product = (double)vn.value * triTransition * tf.Value * capitalization;
                                     if(product >= vGoodNode.value)
                                     {
-                                        vGoodNode.value = product;
-                                        vGoodNode.CurrentTag = tf.Key;
-                                        List<ViterbiNode> prevNodesGoodNode = new List<ViterbiNode>();
-                                        prevNodesGoodNode.Add(vn);
-                                        vGoodNode.PrevNode = prevNodesGoodNode;
+                                        vGoodNode = new ViterbiNode(product, tf.Key, PrevNode: vn);
+                                        //vGoodNode.value = product;
+                                        //vGoodNode.CurrentTag = tf.Key;
+                                        //vGoodNode.PrevNode = vn;
                                     }
                                 }
                                 else
                                 {
                                     Tuple<string, string> tuple = new Tuple<string, string>(vn.CurrentTag, tf.Key);
-                                    double biTransition = BigramTransitionProbabilities.FirstOrDefault(x => x.Key.Equals(tuple)).Value; // eg. NN->VB - 0.25
+                                    double biTransition = tagger.BigramTransitionProbabilities.FirstOrDefault(x => x.Key.Equals(tuple)).Value; // eg. NN->VB - 0.25
 
-                                    double uniVal = this.UnigramProbabilities.FirstOrDefault(x => x.Key.Equals(tf.Key)).Value;
+                                    double uniVal = tagger.UnigramProbabilities.FirstOrDefault(x => x.Key.Equals(tf.Key)).Value;
 
-                                    double biTrans = (double)(uniVal * lambda1Bi) + (biTransition * lambda2Bi);
+                                    double biTrans = (double)(uniVal * tagger.BgramLambda1) + (biTransition * tagger.BgramLambda2);
 
                                     double capitalization = 1.0d;
                                     if (tf.Key == "NN" && char.IsUpper(testWords[i].word[0]))
@@ -442,11 +391,10 @@ namespace NLP
                                     double product = (double)vn.value * biTrans * tf.Value * capitalization;
                                     if (product >= vGoodNode.value)
                                     {
-                                        vGoodNode.value = product;
-                                        vGoodNode.CurrentTag = tf.Key;
-                                        List<ViterbiNode> prevNodesGoodNode = new List<ViterbiNode>();
-                                        prevNodesGoodNode.Add(vn);
-                                        vGoodNode.PrevNode = prevNodesGoodNode;
+                                        vGoodNode = new ViterbiNode(product, tf.Key, PrevNode: vn);
+                                        //vGoodNode.value = product;
+                                        //vGoodNode.CurrentTag = tf.Key;
+                                        //vGoodNode.PrevNode = vn;
                                     }
                                 }
                             }
@@ -482,9 +430,9 @@ namespace NLP
                 if (startPoint)
                 {
                     triPoz = 0;
-                    HMMTagger.EmissionProbabilisticModel foundWord = tagger.CapitalEmissionProb.Find(x => x.Word == testWords[i].word);
+                    HMMTagger.EmissionProbabilisticModel foundWord = tagger.WordCapitalizedTagsEmissionProbabilities.Find(x => x.Word == testWords[i].word);
                     if (foundWord == null)
-                        foundWord = this.EmissionProbabilities.Find(x => x.Word == testWords[i].word.ToLower());
+                        foundWord = tagger.WordTagsEmissionProbabilities.Find(x => x.Word == testWords[i].word.ToLower());
                     List<ViterbiNode> vList = new List<ViterbiNode>();
 
                     if (foundWord != null)
@@ -495,16 +443,16 @@ namespace NLP
                     {
                         UnknownWords.Add(testWords[i].word);
                         // we take the best transition case where first item is "."
-                        var orderedTransitions = BigramTransitionProbabilities.OrderByDescending(x => x.Value).ToList();
+                        var orderedTransitions = tagger.BigramTransitionProbabilities.OrderByDescending(x => x.Value).ToList();
                         double product = 0.0d;
                         string nodeTag = "NULL";
 
                         foreach (var item in orderedTransitions)
                             if (item.Key.Item2.Equals(".") && item.Key.Item1 != ".")
                             {
-                                double uniVal = this.UnigramProbabilities.FirstOrDefault(x => x.Key.Equals(item.Key.Item1)).Value;
+                                double uniVal = tagger.UnigramProbabilities.FirstOrDefault(x => x.Key.Equals(item.Key.Item1)).Value;
 
-                                double biTrans = (double)(uniVal * lambda1Bi) + (item.Value * lambda2Bi);
+                                double biTrans = (double)(uniVal * tagger.BgramLambda1) + (item.Value * tagger.BgramLambda2);
 
                                 double unknownProcent = GetProcentForUnknownWord(tagger, testWords[i].word, item.Key.Item1);
 
@@ -522,11 +470,11 @@ namespace NLP
                                 continue;
                             double emissionFreqValue = wt.Value; // eg. Jane -> 0.1111 (NN)
                             Tuple<string, string> tuple = new Tuple<string, string>(wt.Key, ".");
-                            double biTransition = BigramTransitionProbabilities.FirstOrDefault(x => x.Key.Equals(tuple)).Value; // eg. NN->VB - 0.25
+                            double biTransition = tagger.BigramTransitionProbabilities.FirstOrDefault(x => x.Key.Equals(tuple)).Value; // eg. NN->VB - 0.25
 
-                            double uniVal = this.UnigramProbabilities.FirstOrDefault(x => x.Key.Equals(wt.Key)).Value;
+                            double uniVal = tagger.UnigramProbabilities.FirstOrDefault(x => x.Key.Equals(wt.Key)).Value;
 
-                            double biTrans = (double)(uniVal * lambda1Bi) + (biTransition * lambda2Bi);
+                            double biTrans = (double)(uniVal * tagger.BgramLambda1) + (biTransition * tagger.BgramLambda2);
 
                             double capitalization = 1.0d;
                             if (wt.Key == "NN" && char.IsUpper(testWords[i].word[0]))
@@ -542,9 +490,9 @@ namespace NLP
                 }
                 else
                 {
-                    HMMTagger.EmissionProbabilisticModel foundWord = tagger.CapitalEmissionProb.Find(x => x.Word == testWords[i].word);
+                    HMMTagger.EmissionProbabilisticModel foundWord = tagger.WordCapitalizedTagsEmissionProbabilities.Find(x => x.Word == testWords[i].word);
                     if (foundWord == null)
-                        foundWord = this.EmissionProbabilities.Find(x => x.Word == testWords[i].word.ToLower());
+                        foundWord = tagger.WordTagsEmissionProbabilities.Find(x => x.Word == testWords[i].word.ToLower());
                     List<ViterbiNode> vList = new List<ViterbiNode>();
 
                     if (foundWord != null)
@@ -559,15 +507,14 @@ namespace NLP
                             ViterbiNode elem = this.ViterbiGraph[this.ViterbiGraph.Count - 1][j];
                             ViterbiNode vGoodNode = new ViterbiNode(0.0d, "NULL");
                             // we take the best transition case where first item is "."
-                            var orderedTransitions = BigramTransitionProbabilities.OrderByDescending(x => x.Value).ToList();
+                            var orderedTransitions = tagger.BigramTransitionProbabilities.OrderByDescending(x => x.Value).ToList();
 
                             if (model == "trigram" && triPoz >= 2)
                             {
                                 if (elem.NextNode == null)
                                     continue;
-                                elem.NextNode = elem.NextNode.OrderByDescending(x => x.value).ToList();
-                                ViterbiNode elem2 = elem.NextNode[0];
-                                var orderedTransitionsTri = TrigramTransitionProbabilities.OrderByDescending(x => x.Value).ToList();
+                                ViterbiNode elem2 = elem.NextNode;
+                                var orderedTransitionsTri = tagger.TrigramTransitionProbabilities.OrderByDescending(x => x.Value).ToList();
 
                                 double product = 0.0d;
                                 string nodeTag = "NULL_TRI";
@@ -576,11 +523,11 @@ namespace NLP
                                     if (item.Key.Item3.Equals(elem2.CurrentTag) && item.Key.Item2.Equals(elem.CurrentTag) && item.Key.Item1 != ".")
                                     {
                                         Tuple<string, string> biTuple = new Tuple<string, string>(item.Key.Item1, elem.CurrentTag);
-                                        double biVal = this.BigramTransitionProbabilities.FirstOrDefault(x => x.Key.Equals(biTuple)).Value;
+                                        double biVal = tagger.BigramTransitionProbabilities.FirstOrDefault(x => x.Key.Equals(biTuple)).Value;
 
-                                        double uniVal = this.UnigramProbabilities.FirstOrDefault(x => x.Key.Equals(item.Key.Item1)).Value;
+                                        double uniVal = tagger.UnigramProbabilities.FirstOrDefault(x => x.Key.Equals(item.Key.Item1)).Value;
 
-                                        double triTransition = (double)(lambda3 * item.Value) + (lambda2 * biVal) + (lambda1 * uniVal);
+                                        double triTransition = (double)(tagger.TgramLambda3 * item.Value) + (tagger.TgramLambda2 * biVal) + (tagger.TgramLambda1 * uniVal);
 
                                         double unknownProcent = GetProcentForUnknownWord(tagger, testWords[i].word, item.Key.Item1);
 
@@ -588,11 +535,10 @@ namespace NLP
                                         nodeTag = item.Key.Item1;
                                         if (product >= vGoodNode.value)
                                         {
-                                            vGoodNode.value = product;
-                                            vGoodNode.CurrentTag = nodeTag;
-                                            List<ViterbiNode> nextNodeTags = new List<ViterbiNode>();
-                                            nextNodeTags.Add(elem);
-                                            vGoodNode.NextNode = nextNodeTags;
+                                            vGoodNode = new ViterbiNode(product, nodeTag, NextNode: elem);
+                                            //vGoodNode.value = product;
+                                            //vGoodNode.CurrentTag = nodeTag;
+                                            //vGoodNode.NextNode = elem;
                                             //break;
                                         }
                                     }
@@ -605,9 +551,9 @@ namespace NLP
                                 foreach (var item in orderedTransitions)
                                     if (item.Key.Item2.Equals(elem.CurrentTag) && item.Key.Item1 != ".")
                                     {
-                                        double uniVal = this.UnigramProbabilities.FirstOrDefault(x => x.Key.Equals(item.Key.Item1)).Value;
+                                        double uniVal = tagger.UnigramProbabilities.FirstOrDefault(x => x.Key.Equals(item.Key.Item1)).Value;
 
-                                        double biTrans = (double)(uniVal * lambda1Bi) + (item.Value * lambda2Bi);
+                                        double biTrans = (double)(uniVal * tagger.BgramLambda1) + (item.Value * tagger.BgramLambda2);
 
                                         double unknownProcent = GetProcentForUnknownWord(tagger, testWords[i].word, item.Key.Item1);
 
@@ -615,11 +561,10 @@ namespace NLP
                                         nodeTag = item.Key.Item1;
                                         if (product >= vGoodNode.value)
                                         {
-                                            vGoodNode.value = product;
-                                            vGoodNode.CurrentTag = nodeTag;
-                                            List<ViterbiNode> nextGoodNodes = new List<ViterbiNode>();
-                                            nextGoodNodes.Add(elem);
-                                            vGoodNode.NextNode = nextGoodNodes;
+                                            vGoodNode = new ViterbiNode(product, nodeTag, NextNode: elem);
+                                            //vGoodNode.value = product;
+                                            //vGoodNode.CurrentTag = nodeTag;
+                                            //vGoodNode.NextNode = elem;
                                             //break;
                                         }
                                     }
@@ -640,16 +585,15 @@ namespace NLP
                                 {
                                     if (vn.NextNode == null)
                                         continue;
-                                    vn.NextNode = vn.NextNode.OrderByDescending(x => x.value).ToList();
-                                    Tuple<string, string, string> triTuple = new Tuple<string, string, string>(tf.Key, vn.CurrentTag, vn.NextNode[0].CurrentTag);
-                                    double triVal = this.TrigramTransitionProbabilities.FirstOrDefault(x => x.Key.Equals(triTuple)).Value;
+                                    Tuple<string, string, string> triTuple = new Tuple<string, string, string>(tf.Key, vn.CurrentTag, vn.NextNode.CurrentTag);
+                                    double triVal = tagger.TrigramTransitionProbabilities.FirstOrDefault(x => x.Key.Equals(triTuple)).Value;
 
                                     Tuple<string, string> biTuple = new Tuple<string, string>(tf.Key, vn.CurrentTag);
-                                    double biVal = this.BigramTransitionProbabilities.FirstOrDefault(x => x.Key.Equals(biTuple)).Value;
+                                    double biVal = tagger.BigramTransitionProbabilities.FirstOrDefault(x => x.Key.Equals(biTuple)).Value;
 
-                                    double uniVal = this.UnigramProbabilities.FirstOrDefault(x => x.Key.Equals(tf.Key)).Value;
+                                    double uniVal = tagger.UnigramProbabilities.FirstOrDefault(x => x.Key.Equals(tf.Key)).Value;
 
-                                    double triTransition = (double)(lambda3 * triVal) + (lambda2 * biVal) + (lambda1 * uniVal);
+                                    double triTransition = (double)(tagger.TgramLambda3 * triVal) + (tagger.TgramLambda2 * biVal) + (tagger.TgramLambda1 * uniVal);
 
                                     double capitalization = 1.0d;
                                     if (tf.Key == "NN" && char.IsUpper(testWords[i].word[0]))
@@ -659,21 +603,20 @@ namespace NLP
 
                                     if (product >= vGoodNode.value)
                                     {
-                                        vGoodNode.value = product;
-                                        vGoodNode.CurrentTag = tf.Key;
-                                        List<ViterbiNode> nextGoodNodes = new List<ViterbiNode>();
-                                        nextGoodNodes.Add(vn);
-                                        vGoodNode.NextNode = nextGoodNodes;
+                                        vGoodNode = new ViterbiNode(product, tf.Key, NextNode: vn);
+                                        //vGoodNode.value = product;
+                                        //vGoodNode.CurrentTag = tf.Key;
+                                        //vGoodNode.NextNode = vn;
                                     }
                                 }
                                 else
                                 {
                                     Tuple<string, string> tuple = new Tuple<string, string>(tf.Key, vn.CurrentTag);
-                                    double biTransition = BigramTransitionProbabilities.FirstOrDefault(x => x.Key.Equals(tuple)).Value; // eg. NN->VB - 0.25
+                                    double biTransition = tagger.BigramTransitionProbabilities.FirstOrDefault(x => x.Key.Equals(tuple)).Value; // eg. NN->VB - 0.25
 
-                                    double uniVal = this.UnigramProbabilities.FirstOrDefault(x => x.Key.Equals(tf.Key)).Value;
+                                    double uniVal = tagger.UnigramProbabilities.FirstOrDefault(x => x.Key.Equals(tf.Key)).Value;
 
-                                    double biTrans = (double)(uniVal * lambda1Bi) + (biTransition * lambda2Bi);
+                                    double biTrans = (double)(uniVal * tagger.BgramLambda1) + (biTransition * tagger.BgramLambda2);
 
                                     double capitalization = 1.0d;
                                     if (tf.Key == "NN" && char.IsUpper(testWords[i].word[0]))
@@ -682,11 +625,10 @@ namespace NLP
                                     double product = (double)vn.value * biTrans * tf.Value * capitalization;
                                     if (product >= vGoodNode.value)
                                     {
-                                        vGoodNode.value = product;
-                                        vGoodNode.CurrentTag = tf.Key;
-                                        List<ViterbiNode> nextGoodNode = new List<ViterbiNode>();
-                                        nextGoodNode.Add(vn);
-                                        vGoodNode.NextNode = nextGoodNode;
+                                        vGoodNode = new ViterbiNode(product, tf.Key, NextNode: vn);
+                                        //vGoodNode.value = product;
+                                        //vGoodNode.CurrentTag = tf.Key;
+                                        //vGoodNode.NextNode = vn;
                                     }
                                 }
                             }
@@ -711,7 +653,7 @@ namespace NLP
                             tagsViterbi.Add(historyCopy[i].CurrentTag);
                         if (historyCopy[i].NextNode == null)
                             break;
-                        historyCopy[i] = historyCopy[i].NextNode[0];
+                        historyCopy[i] = historyCopy[i].NextNode;
                     }
                     this.PredictedTags.AddRange(tagsViterbi);
                 }
@@ -731,7 +673,7 @@ namespace NLP
                         tagsViterbi.Insert(0, lastElement.CurrentTag);
                     if (lastElement.PrevNode == null)
                         break;
-                    lastElement = lastElement.PrevNode[0];
+                    lastElement = lastElement.PrevNode;
                 }
                 this.PredictedTags.AddRange(tagsViterbi);
 
@@ -759,7 +701,7 @@ namespace NLP
                             tagsViterbi.Add(BackwardHistory[i].CurrentTag);
                         if (BackwardHistory[i].NextNode == null)
                             break;
-                        BackwardHistory[i] = BackwardHistory[i].NextNode[0];
+                        BackwardHistory[i] = BackwardHistory[i].NextNode;
                     }
                     this.PredictedTags.AddRange(tagsViterbi);
                 }
@@ -773,16 +715,12 @@ namespace NLP
                             tagsViterbi.Insert(0, ForwardHistory[i].CurrentTag);
                         if (ForwardHistory[i].PrevNode == null)
                             break;
-                        ForwardHistory[i] = ForwardHistory[i].PrevNode[0];
+                        ForwardHistory[i] = ForwardHistory[i].PrevNode;
                     }
                     this.PredictedTags.AddRange(tagsViterbi);
                 }
             }
         }
 
-        public long GetViterbiDecodingTime()
-        {
-            return this.ViterbiDecodeTime.ElapsedMilliseconds;
-        }
     }
 }

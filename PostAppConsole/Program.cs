@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
@@ -54,8 +55,11 @@ namespace PostAppConsole
 
             HMMTagger tagger = new HMMTagger();
 
-            tagger.TrainModel(words, capWords);
-            Console.WriteLine("Done with training MODEL!");
+            Stopwatch sw = new Stopwatch();
+
+            sw.Start();
+            tagger.CreateHiddenMarkovModel(words, capWords);
+            
 
             //foreach (var model in tagger.EmissionFreq)
             //{
@@ -78,7 +82,6 @@ namespace PostAppConsole
             //WriteToTxtFile("Trained Files", "bigram.json", JsonConvert.SerializeObject(tagger.BigramTransition));
             //WriteToTxtFile("Trained Files", "trigram.json", JsonConvert.SerializeObject(tagger.TrigramTransition));
 
-            Console.WriteLine("Duration of training model: " + tagger.GetTrainingTimeMs() + " ms!");
 
             Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 
@@ -90,16 +93,19 @@ namespace PostAppConsole
 
 
             wordsTest = tagger.EliminateDuplicateSequenceOfEndOfSentenceTags(wordsTest);
-            tagger.CalculateProbabilitiesForTestFiles(wordsTest, model: "trigram");
+            tagger.CalculateHiddenMarkovModelProbabilitiesForTestCorpus(wordsTest, model: "trigram");
 
-            Decoder decoder = new Decoder(tagger.EmissionProbabilities, tagger.UnigramProbabilities, tagger.BigramTransitionProbabilities, tagger.TrigramTransitionProbabilities);
-            decoder.SetPreffixAndSuffixProbabilities(tagger.PreffixEmission, tagger.SuffixesEmission);
-            Console.WriteLine("\nInterpolation: " + tagger.DeletedInterpolationTrigram() + " , " + tagger.DeletedInterpolationBigram());
-            decoder.SetLambdaValues(tagger.DeletedInterpolationTrigram(), tagger.DeletedInterpolationBigram());
+            sw.Stop();
+            Console.WriteLine("Done with training HIDDEN MARKOV MODEL & loading test files! Time: " + sw.ElapsedMilliseconds + " ms");
+
+            Decoder decoder = new Decoder();
+
+            sw.Reset();
+            sw.Start();
             decoder.ViterbiDecoding(tagger, wordsTest, modelForward: "trigram", modelBackward: "trigram", mode: "f+b");
-
+            sw.Stop();
             tagger.EliminateAllEndOfSentenceTags(wordsTest);
-
+            Console.WriteLine("Done with VITERBI DECODING MODEL! Time: " + sw.ElapsedMilliseconds + " ms");
 
 
             //Decoder decoder = new Decoder();
@@ -145,7 +151,6 @@ namespace PostAppConsole
             //foreach (var item in decoder.PredictedTags)
             //    Console.Write(item + " ");
 
-            Console.WriteLine("\nDuration of Viterbi Decoding: " + decoder.GetViterbiDecodingTime() + " ms!\n");
 
             Console.WriteLine("testwords: " + wordsTest.Count + " , predwords: " + decoder.PredictedTags.Count);
             Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
@@ -169,19 +174,19 @@ namespace PostAppConsole
 
 
 
-            //using (System.IO.StreamWriter file = new System.IO.StreamWriter("trigram_bidirectional.csv"))
-            //{
-            //    file.WriteLine("Word,Real Tag,Prediction Tag,Is in Train T/F,Predicted T/F");
-            //    for (int i = 0; i < wordsTest.Count; i++)
-            //    {
-            //        bool isInTrain = true, predictedB = false;
-            //        if (decoder.UnknownWords.Contains(wordsTest[i].word))
-            //            isInTrain = false;
-            //        if (wordsTest[i].tag == decoder.PredictedTags[i])
-            //            predictedB = true;
-            //        file.WriteLine("\"" + wordsTest[i].word + "\"," + wordsTest[i].tag + "," + decoder.PredictedTags[i] + "," + isInTrain + "," + predictedB);
-            //    }
-            //}
+            using (System.IO.StreamWriter file = new System.IO.StreamWriter("trigram_bidirectional.csv"))
+            {
+                file.WriteLine("Word,Real Tag,Prediction Tag,Is in Train T/F,Predicted T/F");
+                for (int i = 0; i < wordsTest.Count; i++)
+                {
+                    bool isInTrain = true, predictedB = false;
+                    if (decoder.UnknownWords.Contains(wordsTest[i].word))
+                        isInTrain = false;
+                    if (wordsTest[i].tag == decoder.PredictedTags[i])
+                        predictedB = true;
+                    file.WriteLine("\"" + wordsTest[i].word + "\"," + wordsTest[i].tag + "," + decoder.PredictedTags[i] + "," + isInTrain + "," + predictedB);
+                }
+            }
 
         }
     }
