@@ -174,7 +174,7 @@ namespace PostAppConsole
 
 
 
-            using (System.IO.StreamWriter file = new System.IO.StreamWriter("trigram_bidirectional.csv"))
+            using (System.IO.StreamWriter file = new System.IO.StreamWriter(path + "Informations\\" + "trigram_bidirectional.csv"))
             {
                 file.WriteLine("Word,Real Tag,Prediction Tag,Is in Train T/F,Predicted T/F");
                 for (int i = 0; i < wordsTest.Count; i++)

@@ -16,15 +16,15 @@ namespace NLP
             this.EvaluationHistory = new List<List<List<float>>>();
         }
 
-        public float GetSimpleAccuracy(List<Tokenizer.WordTag> realTags, List<string> predictedTags, HashSet<string> unknownWords, string evalMode = "k+u")
+        public float GetSimpleAccuracy(List<Tokenizer.WordTag> testData, List<string> predictedTags, HashSet<string> unknownWords, string evalMode = "k+u")
         {
             int wordsHit = 0;
             int nrOfWords = 0;
-            for (int i = 0; i < realTags.Count; i++)
+            for (int i = 0; i < testData.Count; i++)
             {
                 if (evalMode != "k+u")
                 {
-                    if (unknownWords.Contains(realTags[i].word))
+                    if (unknownWords.Contains(testData[i].word))
                     {
                         if (evalMode == "k")
                             continue;
@@ -36,19 +36,19 @@ namespace NLP
                     }
                     
                 }
-                if (realTags[i].tag == predictedTags[i])
+                if (testData[i].tag == predictedTags[i])
                     wordsHit++;
                 nrOfWords++;
             }
             return (float)wordsHit / nrOfWords;
         }
 
-        public void CreateSupervizedEvaluationsMatrix(List<Tokenizer.WordTag> realTags, List<string> predictedTags, HashSet<string> unknownWords, string evalMode = "k+u", int fbeta = 1)
+        public void CreateSupervizedEvaluationsMatrix(List<Tokenizer.WordTag> testData, List<string> predictedTags, HashSet<string> unknownWords, string evalMode = "k+u", int fbeta = 1)
         {
             ClassTags = new HashSet<string>();
             finalMatrix = new List<List<float>>();
 
-            foreach (var item in realTags)
+            foreach (var item in testData)
                 this.ClassTags.Add(item.tag);
 
             foreach (string item in predictedTags)
@@ -57,11 +57,11 @@ namespace NLP
             foreach(var tag in this.ClassTags)
             {
                 int tp = 0, fp = 0, fn = 0, tn = 0; 
-                for (int i = 0; i < realTags.Count; i++)
+                for (int i = 0; i < testData.Count; i++)
                 {
                     if (evalMode != "k+u")
                     {
-                        if (unknownWords.Contains(realTags[i].word))
+                        if (unknownWords.Contains(testData[i].word))
                         {
                             if (evalMode == "k")
                                 continue;
@@ -74,13 +74,13 @@ namespace NLP
                     }
                     
 
-                    if (realTags[i].tag != tag && predictedTags[i] != tag)
+                    if (testData[i].tag != tag && predictedTags[i] != tag)
                         tn++;
-                    else if (realTags[i].tag == tag && predictedTags[i] == tag)
+                    else if (testData[i].tag == tag && predictedTags[i] == tag)
                         tp++;
-                    else if (realTags[i].tag == tag && predictedTags[i] != tag)
+                    else if (testData[i].tag == tag && predictedTags[i] != tag)
                         fn++;
-                    else if (realTags[i].tag != tag && predictedTags[i] == tag)
+                    else if (testData[i].tag != tag && predictedTags[i] == tag)
                         fp++;
                 }
                 float accuracy = (float)(tp + tn) / (tp + tn + fn + fp);
