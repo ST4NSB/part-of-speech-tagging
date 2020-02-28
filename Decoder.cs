@@ -171,7 +171,7 @@ namespace NLP
                 proc += (double)minVal; // OT
             if (lowerWord.EndsWith("\'t") && currentTag == "VB")
                 proc += (double)maxVal;
-            if (lowerWord.EndsWith("\'ve") && currentTag == "PN")
+            if ((lowerWord.EndsWith("\'ve") || lowerWord.EndsWith("\'ll")) && currentTag == "PN")
                 proc += (double)maxVal;
 
             return proc;

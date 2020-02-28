@@ -102,18 +102,18 @@ namespace NLP
         private void GetEmissionProbabilitiesForSuffixesAndPrefixes(List<Tokenizer.WordTag> uncapitalizedWords, List<Tokenizer.WordTag> capitalizedWords)
         {
             // list of prefixes & suffixes
-            List<string> pref = new List<string>() {"inter", "mis", "dis", "re", "anti", "in", "over", "en",
-                                                    "il", "im", "ir", "non", "ob", "op", "pre", "un", "epi",
-                                                    "multi", "bi", "mono", "de", "super", "cyber", "for",
+            List<string> pref = new List<string>() {"inter", "mis", "dis", "di", "re", "anti", "in", "over", "en", "em", "neo",
+                                                    "il", "im", "ir", "non", "ob", "op", "pre", "under", "un", "epi", "off", 
+                                                    "multi", "bi", "mono", "de", "super", "cyber", "for", "para", "mega",
                                                     "ex", "hy", "post", "sub", "co", "semi", "vice", "poly" }; // starts with
 
             List<string> suff = new List<string>() { "able", "ible", "ble", "ade", "al", "cian", "ance", "ite", "genic", "phile", "ian", "ery", "ory",
                                                     "ary", "ate", "man", "an", "cule", "ency", "dom", "eon", "ex", "ix","acy", "escent",
-                                                    "ee", "en","ence", "cy", "eer", "ier", "er", "or", "ar", "ium",
-                                                    "ment", "ese", "ness", "ship", "ed", "ant", "ow", "land", "ure",
-                                                    "esis", "osis", "et", "ette", "ful", "ify", "fy", "ine", "sion", "tion", "ion", "ity",
+                                                    "ee", "en","ence", "cy", "eer", "ier", "er", "or", "ar", "ium", "ous", 
+                                                    "ment", "ese", "ness", "ship", "ed", "ant", "ow", "land", "ure", "ity",
+                                                    "esis", "osis", "et", "ette", "ful", "ify", "fy", "ine", "sion", "tion", "ion",
                                                     "ish", "ism", "ist", "ty", "less", "ly", "ess", "ward", "em", "fic",
-                                                    "ous", "ent", "ise", "ize", "ling", "ing", "ive", "ic", "ways", "in", "ology",
+                                                    "ent", "ise", "ize", "ling", "ing", "ive", "ic", "ways", "in", "ology",
                                                     "hood", "logy", "ice", "oid", "id", "ide", "age", "worthy", "ae"}; // ends with
 
 
