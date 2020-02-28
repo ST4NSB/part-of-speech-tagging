@@ -9,16 +9,19 @@ namespace NLP
     {
         private int N;// nr of tokens
 
+        public List<EmissionModel> CapitalEmissionFreq;
         public List<EmissionModel> EmissionFreq;
         public Dictionary<string, int> UnigramFreq = new Dictionary<string, int>();
         public Dictionary<Tuple<string, string>, int> BigramTransition;
         public Dictionary<Tuple<string, string, string>, int> TrigramTransition;
 
+        public List<EmissionProbabilisticModel> CapitalEmissionProb;
         public List<EmissionProbabilisticModel> EmissionProbabilities;
         public Dictionary<string, double> UnigramProbabilities;
         public Dictionary<Tuple<string, string>, double> BigramTransitionProbabilities;
         public Dictionary<Tuple<string, string, string>, double> TrigramTransitionProbabilities;
 
+        public List<EmissionProbabilisticModel> CapitalSuffixEmission, CapitalPreffixEmission;
         public List<EmissionProbabilisticModel> SuffixesEmission, PreffixEmission;
 
         private Stopwatch TrainingTime;
@@ -64,24 +67,24 @@ namespace NLP
         /// Function that creates the Emission & Transition Matrix
         /// </summary>
         /// <param name="wordsInput">List of words - tag, eg. The - at)</param>
-        public void TrainModel(List<Tokenizer.WordTag> wordsInput)
+        public void TrainModel(List<Tokenizer.WordTag> wordsInput, List<Tokenizer.WordTag> wordsWithCapital)
         {
             this.TrainingTime = new Stopwatch();
             this.TrainingTime.Start();
 
             this.N = wordsInput.Count; // nr of tokens
 
-            this.TrainSuffixPreffixEmission(wordsInput);
+            this.TrainSuffixPreffixEmission(wordsInput, wordsWithCapital);
 
 
-            this.CalculateEmissionAndTransitionOccurrences(wordsInput);
+            this.CalculateEmissionAndTransitionOccurrences(wordsInput, wordsWithCapital);
             this.CalculateBigramOccurences(wordsInput);
             this.CalculateTrigramOccurences(wordsInput);
 
             this.TrainingTime.Stop();
         }
 
-        private void TrainSuffixPreffixEmission(List<Tokenizer.WordTag> words)
+        private void TrainSuffixPreffixEmission(List<Tokenizer.WordTag> words, List<Tokenizer.WordTag> wordsWithCapital)
         {
             List<string> preff = new List<string>() {"inter", "mis", "dis", "re", "anti", "in", "over", "en",
                                                     "il", "im", "ir", "non", "ob", "op", "pre", "un", "epi",
@@ -98,6 +101,9 @@ namespace NLP
                                                     "hood", "logy", "ice", "oid", "id", "ide", "age", "worthy", "ae"}; // ends with
 
 
+            var capitalSuff = new List<EmissionModel>();
+            var capitalPref = new List<EmissionModel>();
+
             var suffxem = new List<EmissionModel>();
             var preffxem = new List<EmissionModel>();
 
@@ -106,6 +112,7 @@ namespace NLP
                 var em = new EmissionModel();
                 em.Word = item;
                 suffxem.Add(em);
+                capitalSuff.Add(em);
             }
 
             foreach (var item in preff)
@@ -113,8 +120,45 @@ namespace NLP
                 var em = new EmissionModel();
                 em.Word = item;
                 preffxem.Add(em);
+                capitalPref.Add(em);
             }
-        
+
+            foreach (var w in wordsWithCapital)
+            {
+                if (!char.IsUpper(w.word[0])) continue;
+                foreach (var sfx in capitalSuff)
+                {
+                    if (w.word.EndsWith(sfx.Word))
+                    {
+                        var tag = sfx.TagFreq.FirstOrDefault(x => x.Key == w.tag);
+                        if (tag.Key == null)
+                        {
+                            sfx.TagFreq.Add(w.tag, 1);
+                        }
+                        else
+                        {
+                            sfx.TagFreq[tag.Key] += 1;
+                        }
+                    }
+                }
+
+                foreach (var pfx in capitalPref)
+                {
+                    string pfxLow = pfx.Word.ToLower();
+                    if (w.word.StartsWith(pfxLow))
+                    {
+                        var tag = pfx.TagFreq.FirstOrDefault(x => x.Key == w.tag);
+                        if (tag.Key == null)
+                        {
+                            pfx.TagFreq.Add(w.tag, 1);
+                        }
+                        else
+                        {
+                            pfx.TagFreq[tag.Key] += 1;
+                        }
+                    }
+                }
+            }
 
             foreach (var w in words)
             {
@@ -151,10 +195,43 @@ namespace NLP
                 }
             }
 
+            this.CapitalSuffixEmission = new List<EmissionProbabilisticModel>();
+            this.CapitalPreffixEmission = new List<EmissionProbabilisticModel>();
+
             this.SuffixesEmission = new List<EmissionProbabilisticModel>();
             this.PreffixEmission = new List<EmissionProbabilisticModel>();
 
-            foreach(var sfx in suffxem)
+            foreach (var sfx in capitalSuff)
+            {
+                var tagSum = sfx.TagFreq.Sum(x => x.Value);
+                Dictionary<string, double> tgfreq = new Dictionary<string, double>();
+                foreach (var tg in sfx.TagFreq)
+                {
+                    tgfreq.Add(tg.Key, (double)tg.Value / tagSum);
+                }
+
+                var em = new EmissionProbabilisticModel();
+                em.Word = sfx.Word;
+                em.TagFreq = tgfreq;
+                this.CapitalSuffixEmission.Add(em);
+            }
+
+            foreach (var pfx in capitalPref)
+            {
+                var tagSum = pfx.TagFreq.Sum(x => x.Value);
+                Dictionary<string, double> tgfreq = new Dictionary<string, double>();
+                foreach (var tg in pfx.TagFreq)
+                {
+                    tgfreq.Add(tg.Key, (double)tg.Value / tagSum);
+                }
+
+                var em = new EmissionProbabilisticModel();
+                em.Word = pfx.Word;
+                em.TagFreq = tgfreq;
+                this.CapitalPreffixEmission.Add(em);
+            }
+
+            foreach (var sfx in suffxem)
             {
                 var tagSum = sfx.TagFreq.Sum(x => x.Value);
                 Dictionary<string, double> tgfreq = new Dictionary<string, double>();
@@ -210,12 +287,33 @@ namespace NLP
 
         public void CalculateProbabilitiesForTestFiles(List<Tokenizer.WordTag> testWords, string model = "bigram")
         {
+            this.CapitalEmissionProb = new List<EmissionProbabilisticModel>();
             this.EmissionProbabilities = new List<EmissionProbabilisticModel>();
             this.UnigramProbabilities = new Dictionary<string, double>();
             this.BigramTransitionProbabilities = new Dictionary<Tuple<string, string>, double>();
 
-         
+
             // emission stage
+            foreach (var tw in testWords)
+            {
+                if (!char.IsUpper(tw.word[0])) continue;
+                string sWord = tw.word;
+                HMMTagger.EmissionModel wmFind = CapitalEmissionFreq.Find(x => x.Word == sWord);
+                EmissionProbabilisticModel wFind = CapitalEmissionProb.Find(x => x.Word == sWord);
+                if (wmFind != null && wFind == null)
+                {
+                    EmissionProbabilisticModel epModel = new EmissionProbabilisticModel();
+                    epModel.Word = wmFind.Word;
+                    foreach (var tf in wmFind.TagFreq)
+                    {
+                        int cti = this.UnigramFreq.FirstOrDefault(x => x.Key == tf.Key).Value;
+                        float pwiti = (float)tf.Value / cti; // Emission probability: p(wi/ti) = C(ti, wi) / C(ti)
+                        epModel.TagFreq.Add(tf.Key, pwiti);
+                    }
+                    this.CapitalEmissionProb.Add(epModel);
+                }
+            }
+
             foreach (var tw in testWords)
             {
                 string sWord = tw.word.ToLower();
@@ -325,9 +423,37 @@ namespace NLP
         }
 
 
-        private void CalculateEmissionAndTransitionOccurrences(List<Tokenizer.WordTag> wordsInput)
+        private void CalculateEmissionAndTransitionOccurrences(List<Tokenizer.WordTag> wordsInput, List<Tokenizer.WordTag> wordsCapitalized)
         {
+            this.CapitalEmissionFreq = new List<EmissionModel>();
             this.EmissionFreq = new List<EmissionModel>();
+
+            foreach (var w in wordsCapitalized)
+            {
+                if (!char.IsUpper(w.word[0])) continue;
+                EmissionModel wmFind = CapitalEmissionFreq.Find(x => x.Word == w.word);
+                if (wmFind == null)
+                {
+                    EmissionModel wModel = new EmissionModel();
+                    wModel.Word = w.word;
+                    wModel.TagFreq.Add(w.tag, 1);
+                    this.CapitalEmissionFreq.Add(wModel);
+                }
+                else
+                {
+                    var tag = wmFind.TagFreq.FirstOrDefault(x => x.Key == w.tag);
+                    if (tag.Key == null)
+                    {
+                        wmFind.TagFreq.Add(w.tag, 1);
+                    }
+                    else
+                    {
+                        wmFind.TagFreq[tag.Key] += 1;
+                    }
+                }
+            }
+
+
             foreach (var w in wordsInput)
             {
                 EmissionModel wmFind = EmissionFreq.Find(x => x.Word == w.word);

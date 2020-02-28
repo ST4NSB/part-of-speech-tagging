@@ -74,7 +74,7 @@ namespace NLP
             this.SuffixProbs = SuffixProbs;
         }
 
-        public void ViterbiDecoding(List<Tokenizer.WordTag> testWords, string modelForward = "bigram",string modelBackward = "bigram", string mode = "forward")
+        public void ViterbiDecoding(HMMTagger tagger, List<Tokenizer.WordTag> testWords, string modelForward = "bigram",string modelBackward = "bigram", string mode = "forward")
         {
             this.ViterbiDecodeTime = new Stopwatch();
             this.ViterbiDecodeTime.Start();
@@ -88,9 +88,9 @@ namespace NLP
             this.ViterbiGraph = new List<List<ViterbiNode>>();
 
             if(mode.Equals("forward") || mode.Equals("f+b"))
-                this.ForwardAlgorithm(testWords, modelForward, mode);
+                this.ForwardAlgorithm(tagger, testWords, modelForward, mode);
             if (mode.Equals("backward") || mode.Equals("f+b"))
-                this.BackwardAlgorithm(testWords, modelBackward, mode);
+                this.BackwardAlgorithm(tagger, testWords, modelBackward, mode);
 
             if(mode.Equals("f+b"))
                 BiDirectionalModelTrace();
@@ -98,7 +98,7 @@ namespace NLP
             this.ViterbiDecodeTime.Stop();
         }
 
-        private double GetProcentForUnknownWord(string testWord, string currentTag)
+        private double GetProcentForUnknownWord(HMMTagger tagger, string testWord, string currentTag)
         {
             double proc = 1.0d;
             const double maxVal = 2.0d, minVal = 1.0d;
@@ -109,26 +109,60 @@ namespace NLP
             string lowerWord = testWord.ToLower();
 
             double suffixVal = 0.0d, preffixVal = 0.0d;
-            foreach (var pfx in this.PreffixProbs)
+
+            if(testWordIsCapitalized)
             {
-                if (lowerWord.StartsWith(pfx.Word))
+                foreach (var pfx in tagger.CapitalPreffixEmission)
                 {
-                    if (pfx.TagFreq.ContainsKey(currentTag))
+                    if (lowerWord.StartsWith(pfx.Word))
                     {
-                        preffixVal = pfx.TagFreq[currentTag];
-                        break;
+                        if (pfx.TagFreq.ContainsKey(currentTag))
+                        {
+                            preffixVal = pfx.TagFreq[currentTag];
+                            break;
+                        }
+                    }
+                }
+
+                foreach (var sfx in tagger.CapitalSuffixEmission)
+                {
+                    if (lowerWord.EndsWith(sfx.Word))
+                    {
+                        if (sfx.TagFreq.ContainsKey(currentTag))
+                        {
+                            suffixVal = sfx.TagFreq[currentTag];
+                            break;
+                        }
                     }
                 }
             }
 
-            foreach (var sfx in this.SuffixProbs)
+            if (preffixVal == 0.0d)
             {
-                if (lowerWord.EndsWith(sfx.Word))
+                foreach (var pfx in this.PreffixProbs)
                 {
-                    if (sfx.TagFreq.ContainsKey(currentTag))
+                    if (lowerWord.StartsWith(pfx.Word))
                     {
-                        suffixVal = sfx.TagFreq[currentTag];
-                        break;
+                        if (pfx.TagFreq.ContainsKey(currentTag))
+                        {
+                            preffixVal = pfx.TagFreq[currentTag];
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (suffixVal == 0.0d)
+            {
+                foreach (var sfx in this.SuffixProbs)
+                {
+                    if (lowerWord.EndsWith(sfx.Word))
+                    {
+                        if (sfx.TagFreq.ContainsKey(currentTag))
+                        {
+                            suffixVal = sfx.TagFreq[currentTag];
+                            break;
+                        }
                     }
                 }
             }
@@ -190,7 +224,7 @@ namespace NLP
         }
 
 
-        private void ForwardAlgorithm(List<Tokenizer.WordTag> testWords, string model, string mode)
+        private void ForwardAlgorithm(HMMTagger tagger, List<Tokenizer.WordTag> testWords, string model, string mode)
         {
             // left to right encoding - forward approach
             bool startPoint = true;
@@ -207,7 +241,9 @@ namespace NLP
                 if (startPoint) // first node (start)
                 {
                     triPoz = 0;
-                    HMMTagger.EmissionProbabilisticModel foundWord = this.EmissionProbabilities.Find(x => x.Word == testWords[i].word.ToLower());
+                    HMMTagger.EmissionProbabilisticModel foundWord = tagger.CapitalEmissionProb.Find(x => x.Word == testWords[i].word);
+                    if(foundWord == null)
+                        foundWord = this.EmissionProbabilities.Find(x => x.Word == testWords[i].word.ToLower());
                     List <ViterbiNode> vList = new List<ViterbiNode>();
 
                     if(foundWord != null)
@@ -230,7 +266,7 @@ namespace NLP
 
                                 double biTrans = (double)(uniVal * lambda1Bi) + (item.Value * lambda2Bi);
 
-                                double unknownProcent = GetProcentForUnknownWord(testWords[i].word, item.Key.Item2);
+                                double unknownProcent = GetProcentForUnknownWord(tagger, testWords[i].word, item.Key.Item2);
 
                                 product = biTrans * unknownProcent;
                                 nodeTag = item.Key.Item2;
@@ -266,8 +302,9 @@ namespace NLP
                 }
                 else
                 {
-                    HMMTagger.EmissionProbabilisticModel foundWord = this.EmissionProbabilities.Find(x => x.Word == testWords[i].word.ToLower());
-
+                    HMMTagger.EmissionProbabilisticModel foundWord = tagger.CapitalEmissionProb.Find(x => x.Word == testWords[i].word);
+                    if (foundWord == null)
+                        foundWord = this.EmissionProbabilities.Find(x => x.Word == testWords[i].word.ToLower());
                     List <ViterbiNode> vList = new List<ViterbiNode>();
 
                     if (foundWord != null)
@@ -306,7 +343,7 @@ namespace NLP
 
                                         double triTransition = (double)(lambda3 * item.Value) + (lambda2 * biVal) + (lambda1 * uniVal);
 
-                                        double unknownProcent = GetProcentForUnknownWord(testWords[i].word, item.Key.Item3);
+                                        double unknownProcent = GetProcentForUnknownWord(tagger, testWords[i].word, item.Key.Item3);
 
                                         product = (double)elem.value * triTransition * unknownProcent;
                                         nodeTag = item.Key.Item3;
@@ -333,7 +370,7 @@ namespace NLP
 
                                         double biTrans = (double)(uniVal * lambda1Bi) + (item.Value * lambda2Bi);
 
-                                        double unknownProcent = GetProcentForUnknownWord(testWords[i].word, item.Key.Item2);
+                                        double unknownProcent = GetProcentForUnknownWord(tagger, testWords[i].word, item.Key.Item2);
 
                                         product = (double)elem.value * biTrans * unknownProcent;
                                         nodeTag = item.Key.Item2;
@@ -422,7 +459,7 @@ namespace NLP
             }
         }
 
-        private void BackwardAlgorithm(List<Tokenizer.WordTag> testWords, string model, string mode)
+        private void BackwardAlgorithm(HMMTagger tagger, List<Tokenizer.WordTag> testWords, string model, string mode)
         {
             // right to left encoding - backward approach
             bool startPoint = true;
@@ -445,7 +482,9 @@ namespace NLP
                 if (startPoint)
                 {
                     triPoz = 0;
-                    HMMTagger.EmissionProbabilisticModel foundWord = this.EmissionProbabilities.Find(x => x.Word == testWords[i].word.ToLower());
+                    HMMTagger.EmissionProbabilisticModel foundWord = tagger.CapitalEmissionProb.Find(x => x.Word == testWords[i].word);
+                    if (foundWord == null)
+                        foundWord = this.EmissionProbabilities.Find(x => x.Word == testWords[i].word.ToLower());
                     List<ViterbiNode> vList = new List<ViterbiNode>();
 
                     if (foundWord != null)
@@ -467,7 +506,7 @@ namespace NLP
 
                                 double biTrans = (double)(uniVal * lambda1Bi) + (item.Value * lambda2Bi);
 
-                                double unknownProcent = GetProcentForUnknownWord(testWords[i].word, item.Key.Item1);
+                                double unknownProcent = GetProcentForUnknownWord(tagger, testWords[i].word, item.Key.Item1);
 
                                 product = biTrans * unknownProcent;
                                 nodeTag = item.Key.Item1;
@@ -503,7 +542,9 @@ namespace NLP
                 }
                 else
                 {
-                    HMMTagger.EmissionProbabilisticModel foundWord = this.EmissionProbabilities.Find(x => x.Word == testWords[i].word.ToLower());
+                    HMMTagger.EmissionProbabilisticModel foundWord = tagger.CapitalEmissionProb.Find(x => x.Word == testWords[i].word);
+                    if (foundWord == null)
+                        foundWord = this.EmissionProbabilities.Find(x => x.Word == testWords[i].word.ToLower());
                     List<ViterbiNode> vList = new List<ViterbiNode>();
 
                     if (foundWord != null)
@@ -541,7 +582,7 @@ namespace NLP
 
                                         double triTransition = (double)(lambda3 * item.Value) + (lambda2 * biVal) + (lambda1 * uniVal);
 
-                                        double unknownProcent = GetProcentForUnknownWord(testWords[i].word, item.Key.Item1);
+                                        double unknownProcent = GetProcentForUnknownWord(tagger, testWords[i].word, item.Key.Item1);
 
                                         product = (double)elem.value * triTransition * unknownProcent;
                                         nodeTag = item.Key.Item1;
@@ -568,7 +609,7 @@ namespace NLP
 
                                         double biTrans = (double)(uniVal * lambda1Bi) + (item.Value * lambda2Bi);
 
-                                        double unknownProcent = GetProcentForUnknownWord(testWords[i].word, item.Key.Item1);
+                                        double unknownProcent = GetProcentForUnknownWord(tagger, testWords[i].word, item.Key.Item1);
 
                                         product = (double)elem.value * biTrans * unknownProcent;
                                         nodeTag = item.Key.Item1;

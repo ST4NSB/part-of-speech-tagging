@@ -46,6 +46,7 @@ namespace PostAppConsole
             var text = LoadAndReadFolderFiles(BrownfolderTrain);
             var oldWords = Tokenizer.SeparateTagFromWord(Tokenizer.WordTokenizeCorpus(text));
             var words = SpeechPart.GetNewHierarchicTags(oldWords);
+            var capWords = TextNormalization.PreProcessingPipeline(words, toLowerTxt: false);
             words = TextNormalization.PreProcessingPipeline(words, toLowerTxt: true);
 
             
@@ -53,7 +54,7 @@ namespace PostAppConsole
 
             HMMTagger tagger = new HMMTagger();
 
-            tagger.TrainModel(words);
+            tagger.TrainModel(words, capWords);
             Console.WriteLine("Done with training MODEL!");
 
             //foreach (var model in tagger.EmissionFreq)
@@ -71,6 +72,7 @@ namespace PostAppConsole
             //foreach (var item in tagger.TrigramTransition)
             //    Console.WriteLine(item.Key + " -> " + item.Value);
 
+            //WriteToTxtFile("Trained Files", "emissionWithCapital.json", JsonConvert.SerializeObject(tagger.CapitalEmissionFreq));
             //WriteToTxtFile("Trained Files", "emission.json", JsonConvert.SerializeObject(tagger.EmissionFreq));
             // WriteToTxtFile("Trained Files", "unigram.json", JsonConvert.SerializeObject(tagger.UnigramFreq));
             //WriteToTxtFile("Trained Files", "bigram.json", JsonConvert.SerializeObject(tagger.BigramTransition));
@@ -94,7 +96,7 @@ namespace PostAppConsole
             decoder.SetPreffixAndSuffixProbabilities(tagger.PreffixEmission, tagger.SuffixesEmission);
             Console.WriteLine("\nInterpolation: " + tagger.DeletedInterpolationTrigram() + " , " + tagger.DeletedInterpolationBigram());
             decoder.SetLambdaValues(tagger.DeletedInterpolationTrigram(), tagger.DeletedInterpolationBigram());
-            decoder.ViterbiDecoding(wordsTest, modelForward: "trigram", modelBackward: "trigram", mode: "f+b");
+            decoder.ViterbiDecoding(tagger, wordsTest, modelForward: "trigram", modelBackward: "trigram", mode: "f+b");
 
             tagger.EliminateAllEndOfSentenceTags(wordsTest);
 
@@ -167,19 +169,19 @@ namespace PostAppConsole
 
 
 
-            using (System.IO.StreamWriter file = new System.IO.StreamWriter("trigram_bidirectional.csv"))
-            {
-                file.WriteLine("Word,Real Tag,Prediction Tag,Is in Train T/F,Predicted T/F");
-                for (int i = 0; i < wordsTest.Count; i++)
-                {
-                    bool isInTrain = true, predictedB = false;
-                    if (decoder.UnknownWords.Contains(wordsTest[i].word))
-                        isInTrain = false;
-                    if (wordsTest[i].tag == decoder.PredictedTags[i])
-                        predictedB = true;
-                    file.WriteLine("\"" + wordsTest[i].word + "\"," + wordsTest[i].tag + "," + decoder.PredictedTags[i] + "," + isInTrain + "," + predictedB);
-                }
-            }
+            //using (System.IO.StreamWriter file = new System.IO.StreamWriter("trigram_bidirectional.csv"))
+            //{
+            //    file.WriteLine("Word,Real Tag,Prediction Tag,Is in Train T/F,Predicted T/F");
+            //    for (int i = 0; i < wordsTest.Count; i++)
+            //    {
+            //        bool isInTrain = true, predictedB = false;
+            //        if (decoder.UnknownWords.Contains(wordsTest[i].word))
+            //            isInTrain = false;
+            //        if (wordsTest[i].tag == decoder.PredictedTags[i])
+            //            predictedB = true;
+            //        file.WriteLine("\"" + wordsTest[i].word + "\"," + wordsTest[i].tag + "," + decoder.PredictedTags[i] + "," + isInTrain + "," + predictedB);
+            //    }
+            //}
 
         }
     }

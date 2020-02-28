@@ -9,11 +9,11 @@ namespace NLP
         HashSet<string> ClassTags;
         List<List<float>> finalMatrix;
 
-        public List<List<List<float>>> CrossValEval; // TOTO ADD LOGIC HERE
+        public List<List<List<float>>> EvaluationHistory; // TOTO ADD LOGIC HERE
 
         public Evaluation()
         {
-            this.CrossValEval = new List<List<List<float>>>();
+            this.EvaluationHistory = new List<List<List<float>>>();
         }
 
         public float GetSimpleAccuracy(List<Tokenizer.WordTag> realTags, List<string> predictedTags, HashSet<string> unknownWords, string evalMode = "k+u")
@@ -97,7 +97,7 @@ namespace NLP
                     fmeasure = 0.0f;
                 finalMatrix.Add(new List<float>() { accuracy, precision, recall, fmeasure });
             }
-            this.CrossValEval.Add(finalMatrix);
+            this.EvaluationHistory.Add(finalMatrix);
         }
 
         public HashSet<string> GetClassTags()
