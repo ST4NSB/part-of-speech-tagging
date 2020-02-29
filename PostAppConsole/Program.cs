@@ -166,12 +166,96 @@ namespace PostAppConsole
                 Console.WriteLine();
             }
 
-            Console.WriteLine("\nAccuracy for known words: " + eval.GetSimpleAccuracy(wordsTest, decoder.PredictedTags, decoder.UnknownWords, evalMode: "k"));
-            Console.WriteLine("Accuracy for unknown words: " + eval.GetSimpleAccuracy(wordsTest, decoder.PredictedTags, decoder.UnknownWords, evalMode: "u"));
-            Console.WriteLine("Accuracy on both: " + eval.GetSimpleAccuracy(wordsTest, decoder.PredictedTags, decoder.UnknownWords, evalMode: "k+u"));
+            Console.WriteLine("\nAccuracy for known words: " + eval.GetHitRateAccuracy(wordsTest, decoder.PredictedTags, decoder.UnknownWords, evalMode: "k"));
+            Console.WriteLine("Accuracy for unknown words: " + eval.GetHitRateAccuracy(wordsTest, decoder.PredictedTags, decoder.UnknownWords, evalMode: "u"));
+            Console.WriteLine("Accuracy on both: " + eval.GetHitRateAccuracy(wordsTest, decoder.PredictedTags, decoder.UnknownWords, evalMode: "k+u"));
 
             Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 
+            List<string> suffixStr = new List<string>();
+            List<string> prefixStr = new List<string>();
+            List<Tuple<int, int>> suffixHR = new List<Tuple<int, int>>();
+            List<Tuple<int, int>> prefixHR = new List<Tuple<int, int>>();
+
+            foreach (var item in tagger.SuffixEmissionProbabilities)
+            {
+                suffixStr.Add(item.Word);
+                suffixHR.Add(new Tuple<int, int>(0, 0));
+            }
+            foreach (var item in tagger.PrefixEmissionProbabilities)
+            {
+                prefixStr.Add(item.Word);
+                prefixHR.Add(new Tuple<int, int>(0, 0));
+            }
+
+            for (int i = 0; i < wordsTest.Count; i++)
+            {
+                if (!decoder.UnknownWords.Contains(wordsTest[i].word)) continue;
+                for (int j = 0; j < suffixStr.Count; j++) 
+                {
+                    if(wordsTest[i].word.EndsWith(suffixStr[j]))
+                    {
+                        int hitr = suffixHR[j].Item1;
+                        int allr = suffixHR[j].Item2 + 1;
+                        if (wordsTest[i].tag == decoder.PredictedTags[i])
+                            suffixHR[j] = new Tuple<int, int>(hitr + 1, allr);
+                        else suffixHR[j] = new Tuple<int, int>(hitr, allr);
+                        break;
+                    }
+                    else
+                    {
+                        bool isPlural = false;
+                        string singularWord = "";
+                        if (wordsTest[i].word.EndsWith("s\'")) // wordsTest[i].word.EndsWith("\'s") || 
+                        {
+                            singularWord = wordsTest[i].word.Remove(wordsTest[i].word.Length - 2);
+                            isPlural = true;
+                        }
+                        else if (wordsTest[i].word.EndsWith("s"))
+                        {
+                            singularWord = wordsTest[i].word.Remove(wordsTest[i].word.Length - 1);
+                            isPlural = true;
+                        }
+                        if (isPlural)
+                        {
+                            if (singularWord.EndsWith(suffixStr[j]))
+                            {
+                                int hitr = suffixHR[j].Item1;
+                                int allr = suffixHR[j].Item2 + 1;
+                                if (wordsTest[i].tag == decoder.PredictedTags[i])
+                                    suffixHR[j] = new Tuple<int, int>(hitr + 1, allr);
+                                else suffixHR[j] = new Tuple<int, int>(hitr, allr);
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                for (int j = 0; j < prefixStr.Count; j++)
+                {
+                    if (wordsTest[i].word.ToLower().StartsWith(prefixStr[j]))
+                    {
+                        int hitr = prefixHR[j].Item1;
+                        int allr = prefixHR[j].Item2 + 1;
+                        if (wordsTest[i].tag == decoder.PredictedTags[i])
+                            prefixHR[j] = new Tuple<int, int>(hitr + 1, allr);
+                        else prefixHR[j] = new Tuple<int, int>(hitr, allr);
+                        break;
+                    }
+                }
+            }
+
+            Console.WriteLine("Prefixes: ");
+            for (int i = 0; i < prefixStr.Count; i++)
+            {
+                Console.WriteLine(prefixStr[i] + ": (" + prefixHR[i].Item1 + ", " + prefixHR[i].Item2 + ") -> " + (float)prefixHR[i].Item1 / prefixHR[i].Item2);
+            }
+
+            Console.WriteLine("\nSuffixes: ");
+            for (int i = 0; i < suffixStr.Count; i++)
+            {
+                Console.WriteLine(suffixStr[i] + ": (" + suffixHR[i].Item1 + ", " + suffixHR[i].Item2 + ") -> " + (float)suffixHR[i].Item1 / suffixHR[i].Item2);
+            }
 
 
             using (System.IO.StreamWriter file = new System.IO.StreamWriter(path + "Informations\\" + "trigram_bidirectional.csv"))

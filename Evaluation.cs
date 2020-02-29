@@ -16,7 +16,7 @@ namespace NLP
             this.EvaluationHistory = new List<List<List<float>>>();
         }
 
-        public float GetSimpleAccuracy(List<Tokenizer.WordTag> testData, List<string> predictedTags, HashSet<string> unknownWords, string evalMode = "k+u")
+        public float GetHitRateAccuracy(List<Tokenizer.WordTag> testData, List<string> predictedTags, HashSet<string> unknownWords, string evalMode = "k+u")
         {
             int wordsHit = 0;
             int nrOfWords = 0;

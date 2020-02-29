@@ -101,20 +101,32 @@ namespace NLP
 
         private void GetEmissionProbabilitiesForSuffixesAndPrefixes(List<Tokenizer.WordTag> uncapitalizedWords, List<Tokenizer.WordTag> capitalizedWords)
         {
-            // list of prefixes & suffixes
-            List<string> pref = new List<string>() {"inter", "mis", "dis", "di", "re", "anti", "in", "over", "en", "em", "neo",
-                                                    "il", "im", "ir", "non", "ob", "op", "pre", "under", "un", "epi", "off", 
-                                                    "multi", "bi", "mono", "de", "super", "cyber", "for", "para", "mega",
-                                                    "ex", "hy", "post", "sub", "co", "semi", "vice", "poly" }; // starts with
+            // BlackList -> prefix: neo[(0, 2) -> 0], over[(17, 45) -> 0.3777778], mega[(0, 2) -> 0], 
+            //                      eco[(1, 3) -> 0.3333333], dif[(1, 3) -> 0.3333333], post[post: (1, 3) -> 0.3333333],
+            //                      exo[(0, 2) -> 0], contra[(1, 3) -> 0.3333333], quad[(1, 3) -> 0.3333333],
+            //                      per[(12, 27) -> 0.4444444], sup[(0, 2) -> 0], sym[(1, 3) -> 0.3333333], up[(3, 7) -> 0.4285714]
+            //           -> suffix: cule[(0, 2) -> 0], dom[dom: (0, 1) -> 0], ward[dom: (1, 3) -> 0.333333] 
+            //                      less[(12, 29) -> 0.4137931], ize[(9, 23) -> 0.3913043], cy[(1, 3) -> 0.3333333]
+            //                      ess[(18, 43) -> 0.4186046]
 
-            List<string> suff = new List<string>() { "able", "ible", "ble", "ade", "al", "cian", "ance", "ite", "genic", "phile", "ian", "ery", "ory",
-                                                    "ary", "ate", "man", "an", "cule", "ency", "dom", "eon", "ex", "ix","acy", "escent",
-                                                    "ee", "en","ence", "cy", "eer", "ier", "er", "or", "ar", "ium", "ous", 
-                                                    "ment", "ese", "ness", "ship", "ed", "ant", "ow", "land", "ure", "ity",
-                                                    "esis", "osis", "et", "ette", "ful", "ify", "fy", "ine", "sion", "tion", "ion",
-                                                    "ish", "ism", "ist", "ty", "less", "ly", "ess", "ward", "em", "fic",
-                                                    "ent", "ise", "ize", "ling", "ing", "ive", "ic", "ways", "in", "ology",
-                                                    "hood", "logy", "ice", "oid", "id", "ide", "age", "worthy", "ae"}; // ends with
+            // list of prefixes & suffixes
+            List<string> pref = new List<string>() { "inter", "intra", "mis", "mid", "mini", "dis", "di", "re", "anti", "in", "en", "em", "auto",
+                                                    "il", "im", "ir", "ig", "non", "ob", "op", "octo", "oc", "pre", "pro", "under", "epi", "off", "on", "circum",
+                                                    "multi", "bio", "bi", "mono", "demo", "de", "super", "supra", "cyber", "fore", "for", "para", "extra", "extro",
+                                                    "ex", "hyper", "hypo", "hy", "sub","com", "counter", "con", "co", "semi", "vice", "poly", "trans",
+                                                    "out", "step", "ben", "with", "an", "el", "ep", "geo", "iso", "meta", "ab", "ad", "ac", "as", "ante",
+                                                    "pan", "ped", "peri", "socio", "sur", "syn", "sy", "tri", "uni", "un", "eu", "ecto",
+                                                    "mal", "macro", "micro", "sus", "ultra", "omni", "prim", "sept", "se", "nano", "tera", "giga", "kilo", "cent", 
+                                                    "penta"}; // starts with   
+
+            List<string> suff = new List<string>() { "able", "ible", "ble", "ade", "cian", "ance", "ite", "genic", "phile", "ian", "ery", "ory",
+                                                    "ary", "ate", "man", "an", "ency", "eon", "ex", "ix","acy", "escent", "tial", "cial", "al",
+                                                    "ee", "en","ence", "ancy", "eer", "ier", "er", "or", "ar", "ium", "ous", "est", 
+                                                    "ment", "ese", "ness", "ship", "ed", "ant", "ow", "land", "ure", "ity", 
+                                                    "esis", "osis", "et", "ette", "ful", "ify", "fy", "ine", "sion", "fication", "tion", "ion",
+                                                    "ish", "ism", "ist", "ty", "ly", "em", "fic", "olve", 
+                                                    "ent", "ise", "ling", "ing", "ive", "ic", "ways", "in", "ology",
+                                                    "hood", "logy", "ice", "oid", "id", "ide", "age", "worthy", "ae", "es" }; // ends with   
 
 
             var capitalSuff = new List<EmissionModel>();
@@ -174,6 +186,36 @@ namespace NLP
                             sfx.TagFreq[tag.Key] += 1;
                         }
                     }
+                    else
+                    {
+                        string singularWord = "";
+                        bool isPlural = false;
+                        if (w.word.EndsWith("s\'")) //w.word.EndsWith("\'s") 
+                        {
+                            singularWord = w.word.Remove(w.word.Length - 2);
+                            isPlural = true;
+                        }
+                        else if (w.word.EndsWith("s"))
+                        {
+                            singularWord = w.word.Remove(w.word.Length - 1);
+                            isPlural = true;
+                        }
+                        if (isPlural)
+                        {
+                            if (singularWord.EndsWith(sfx.Word))
+                            {
+                                var tag = sfx.TagFreq.FirstOrDefault(x => x.Key == w.tag);
+                                if (tag.Key == null)
+                                {
+                                    sfx.TagFreq.Add(w.tag, 1);
+                                }
+                                else
+                                {
+                                    sfx.TagFreq[tag.Key] += 1;
+                                }
+                            }
+                        }
+                    }
                 }
 
                 foreach (var pfx in capitalPref)
@@ -208,6 +250,36 @@ namespace NLP
                         else
                         {
                             sfx.TagFreq[tag.Key] += 1;
+                        }
+                    }
+                    else
+                    {
+                        string singularWord = "";
+                        bool isPlural = false;
+                        if (w.word.EndsWith("s\'")) // w.word.EndsWith("\'s")
+                        {
+                            singularWord = w.word.Remove(w.word.Length - 2);
+                            isPlural = true;
+                        }
+                        else if (w.word.EndsWith("s"))
+                        {
+                            singularWord = w.word.Remove(w.word.Length - 1);
+                            isPlural = true;
+                        }
+                        if (isPlural)
+                        {
+                            if (singularWord.EndsWith(sfx.Word))
+                            {
+                                var tag = sfx.TagFreq.FirstOrDefault(x => x.Key == w.tag);
+                                if (tag.Key == null)
+                                {
+                                    sfx.TagFreq.Add(w.tag, 1);
+                                }
+                                else
+                                {
+                                    sfx.TagFreq[tag.Key] += 1;
+                                }
+                            }
                         }
                     }
                 }

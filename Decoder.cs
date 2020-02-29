@@ -125,14 +125,14 @@ namespace NLP
             {
                 string singularWord = "";
                 bool isPlural = false;
-                if (lowerWord.EndsWith("s"))
-                {
-                    singularWord = lowerWord.Remove(lowerWord.Length - 1);
-                    isPlural = true;
-                }
-                else if(lowerWord.EndsWith("\'s") || lowerWord.EndsWith("s\'"))
+                if (lowerWord.EndsWith("s\'")) //lowerWord.EndsWith("\'s") || )
                 {
                     singularWord = lowerWord.Remove(lowerWord.Length - 2);
+                    isPlural = true;
+                }
+                else if (lowerWord.EndsWith("s"))
+                {
+                    singularWord = lowerWord.Remove(lowerWord.Length - 1);
                     isPlural = true;
                 }
                 if (isPlural)
@@ -157,7 +157,7 @@ namespace NLP
 
             if (testWordIsCapitalized && currentTag == "NN")
                 proc += (double)maxVal; // max value to be a NN
-            if ((lowerWord.EndsWith("\'s") || lowerWord.EndsWith("s\'")) && currentTag == "NN")
+            if ((lowerWord.EndsWith("\'s") || lowerWord.EndsWith("s\'") || lowerWord.EndsWith("s")) && currentTag == "NN")
                 proc += (double)maxVal;
             if (lowerWord.Contains(".") && currentTag == "NN")
                 proc += (double)minVal;
@@ -186,18 +186,42 @@ namespace NLP
             for (int i = 0; i < testWords.Count; i++) // starting from left (0 index)
             {
                 triPoz++;
-               if (testWords[i].tag == ".") // we can verify word instead of tag here
+                if (testWords[i].tag == ".") // we can verify word instead of tag here
                 {
                     Backtrace(method: "forward"); // decompress method, going from right to left using prev nodes, applied only when '.' is met
                     startPoint = true;
                     continue;
                 }
+
+                HMMTagger.EmissionProbabilisticModel foundWord = tagger.WordCapitalizedTagsEmissionProbabilities.Find(x => x.Word == testWords[i].word);
+                if (foundWord == null)
+                    foundWord = tagger.WordTagsEmissionProbabilities.Find(x => x.Word == testWords[i].word.ToLower());
+                //if (foundWord == null)
+                //{
+                //    string singularWord = "";
+                //    if (testWords[i].word.EndsWith("\'s") || testWords[i].word.EndsWith("s\'") || testWords[i].word.EndsWith("\'t"))
+                //    {
+                //        singularWord = testWords[i].word.Remove(testWords[i].word.Length - 2);
+                //    }
+                //    //else if (testWords[i].word.EndsWith("s"))
+                //    //{
+                //    //    singularWord = testWords[i].word.Remove(testWords[i].word.Length - 1);
+                //    //}
+                //    else if (testWords[i].word.EndsWith("\'ve") || testWords[i].word.EndsWith("\'ll"))
+                //    {
+                //        singularWord = testWords[i].word.Remove(testWords[i].word.Length - 3);
+                //    }
+                //    foundWord = tagger.WordCapitalizedTagsEmissionProbabilities.Find(x => x.Word == singularWord);
+                //    if (foundWord == null)
+                //        foundWord = tagger.WordTagsEmissionProbabilities.Find(x => x.Word == singularWord.ToLower());
+                //}
+
                 if (startPoint) // first node (start)
                 {
                     triPoz = 0;
-                    HMMTagger.EmissionProbabilisticModel foundWord = tagger.WordCapitalizedTagsEmissionProbabilities.Find(x => x.Word == testWords[i].word);
-                    if(foundWord == null)
-                        foundWord = tagger.WordTagsEmissionProbabilities.Find(x => x.Word == testWords[i].word.ToLower());
+                    //HMMTagger.EmissionProbabilisticModel foundWord = tagger.WordCapitalizedTagsEmissionProbabilities.Find(x => x.Word == testWords[i].word);
+                    //if(foundWord == null)
+                    //    foundWord = tagger.WordTagsEmissionProbabilities.Find(x => x.Word == testWords[i].word.ToLower());
                     List <ViterbiNode> vList = new List<ViterbiNode>();
 
                     if(foundWord != null)
@@ -256,9 +280,9 @@ namespace NLP
                 }
                 else
                 {
-                    HMMTagger.EmissionProbabilisticModel foundWord = tagger.WordCapitalizedTagsEmissionProbabilities.Find(x => x.Word == testWords[i].word);
-                    if (foundWord == null)
-                        foundWord = tagger.WordTagsEmissionProbabilities.Find(x => x.Word == testWords[i].word.ToLower());
+                    //HMMTagger.EmissionProbabilisticModel foundWord = tagger.WordCapitalizedTagsEmissionProbabilities.Find(x => x.Word == testWords[i].word);
+                    //if (foundWord == null)
+                    //    foundWord = tagger.WordTagsEmissionProbabilities.Find(x => x.Word == testWords[i].word.ToLower());
                     List <ViterbiNode> vList = new List<ViterbiNode>();
 
                     if (foundWord != null)
@@ -427,12 +451,32 @@ namespace NLP
                     startPoint = true;
                     continue;
                 }
+
+                HMMTagger.EmissionProbabilisticModel foundWord = tagger.WordCapitalizedTagsEmissionProbabilities.Find(x => x.Word == testWords[i].word);
+                if (foundWord == null)
+                    foundWord = tagger.WordTagsEmissionProbabilities.Find(x => x.Word == testWords[i].word.ToLower());
+                //if (foundWord == null)
+                //{
+                //    string singularWord = "";
+                //    if (testWords[i].word.EndsWith("\'s") || testWords[i].word.EndsWith("s\'") || testWords[i].word.EndsWith("\'t"))
+                //    {
+                //        singularWord = testWords[i].word.Remove(testWords[i].word.Length - 2);
+                //    }
+                //    else if (testWords[i].word.EndsWith("\'ve") || testWords[i].word.EndsWith("\'ll"))
+                //    {
+                //        singularWord = testWords[i].word.Remove(testWords[i].word.Length - 3);
+                //    }
+                //    foundWord = tagger.WordCapitalizedTagsEmissionProbabilities.Find(x => x.Word == singularWord);
+                //    if (foundWord == null)
+                //        foundWord = tagger.WordTagsEmissionProbabilities.Find(x => x.Word == singularWord.ToLower());
+                //}
+
                 if (startPoint)
                 {
                     triPoz = 0;
-                    HMMTagger.EmissionProbabilisticModel foundWord = tagger.WordCapitalizedTagsEmissionProbabilities.Find(x => x.Word == testWords[i].word);
-                    if (foundWord == null)
-                        foundWord = tagger.WordTagsEmissionProbabilities.Find(x => x.Word == testWords[i].word.ToLower());
+                    //HMMTagger.EmissionProbabilisticModel foundWord = tagger.WordCapitalizedTagsEmissionProbabilities.Find(x => x.Word == testWords[i].word);
+                    //if (foundWord == null)
+                    //    foundWord = tagger.WordTagsEmissionProbabilities.Find(x => x.Word == testWords[i].word.ToLower());
                     List<ViterbiNode> vList = new List<ViterbiNode>();
 
                     if (foundWord != null)
@@ -490,9 +534,9 @@ namespace NLP
                 }
                 else
                 {
-                    HMMTagger.EmissionProbabilisticModel foundWord = tagger.WordCapitalizedTagsEmissionProbabilities.Find(x => x.Word == testWords[i].word);
-                    if (foundWord == null)
-                        foundWord = tagger.WordTagsEmissionProbabilities.Find(x => x.Word == testWords[i].word.ToLower());
+                    //HMMTagger.EmissionProbabilisticModel foundWord = tagger.WordCapitalizedTagsEmissionProbabilities.Find(x => x.Word == testWords[i].word);
+                    //if (foundWord == null)
+                    //    foundWord = tagger.WordTagsEmissionProbabilities.Find(x => x.Word == testWords[i].word.ToLower());
                     List<ViterbiNode> vList = new List<ViterbiNode>();
 
                     if (foundWord != null)
