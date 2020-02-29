@@ -121,35 +121,35 @@ namespace NLP
                 }
             }
 
-            if(suffixVal == 0.0d) // plural case: "violonists" -> "violonIST"
-            {
-                string singularWord = "";
-                bool isPlural = false;
-                if (lowerWord.EndsWith("s\'")) //lowerWord.EndsWith("\'s") || )
-                {
-                    singularWord = lowerWord.Remove(lowerWord.Length - 2);
-                    isPlural = true;
-                }
-                else if (lowerWord.EndsWith("s"))
-                {
-                    singularWord = lowerWord.Remove(lowerWord.Length - 1);
-                    isPlural = true;
-                }
-                if (isPlural)
-                {
-                    foreach (var sfx in tagger.SuffixEmissionProbabilities)
-                    {
-                        if (singularWord.EndsWith(sfx.Word))
-                        {
-                            if (sfx.TagFreq.ContainsKey(currentTag))
-                            {
-                                suffixVal = sfx.TagFreq[currentTag];
-                                break;
-                            }
-                        }
-                    }
-                }
-            }
+            //if(suffixVal == 0.0d) // plural case: "violonists" -> "violonIST"
+            //{
+                //string singularWord = "";
+                //bool isPlural = false;
+                //if (lowerWord.EndsWith("\'s") || lowerWord.EndsWith("s\'")) // )
+                //{
+                //    singularWord = lowerWord.Remove(lowerWord.Length - 2);
+                //    isPlural = true;
+                //}
+                //else if (lowerWord.EndsWith("s"))
+                //{
+                //    singularWord = lowerWord.Remove(lowerWord.Length - 1);
+                //    isPlural = true;
+                //}
+                //if (isPlural)
+                //{
+                //    foreach (var sfx in tagger.SuffixEmissionProbabilities)
+                //    {
+                //        if (singularWord.EndsWith(sfx.Word))
+                //        {
+                //            if (sfx.TagFreq.ContainsKey(currentTag))
+                //            {
+                //                suffixVal = sfx.TagFreq[currentTag];
+                //                break;
+                //            }
+                //        }
+                //    }
+                //}
+            //}
 
             double sumOfPreSuf = (double)preffixVal + suffixVal;
             if (sumOfPreSuf > 0.0d)
@@ -157,7 +157,7 @@ namespace NLP
 
             if (testWordIsCapitalized && currentTag == "NN")
                 proc += (double)maxVal; // max value to be a NN
-            if ((lowerWord.EndsWith("\'s") || lowerWord.EndsWith("s\'") || lowerWord.EndsWith("s")) && currentTag == "NN")
+            if ((lowerWord.EndsWith("\'s") || lowerWord.EndsWith("s\'") || lowerWord.EndsWith("s")) && currentTag == "NN") 
                 proc += (double)maxVal;
             if (lowerWord.Contains(".") && currentTag == "NN")
                 proc += (double)minVal;

@@ -124,7 +124,7 @@ namespace NLP
                                                     "ee", "en","ence", "ancy", "eer", "ier", "er", "or", "ar", "ium", "ous", "est", 
                                                     "ment", "ese", "ness", "ship", "ed", "ant", "ow", "land", "ure", "ity", 
                                                     "esis", "osis", "et", "ette", "ful", "ify", "fy", "ine", "sion", "fication", "tion", "ion",
-                                                    "ish", "ism", "ist", "ty", "ly", "em", "fic", "olve", 
+                                                    "ish", "ism", "ist", "ty", "ly", "em", "fic", "olve", "ope",
                                                     "ent", "ise", "ling", "ing", "ive", "ic", "ways", "in", "ology",
                                                     "hood", "logy", "ice", "oid", "id", "ide", "age", "worthy", "ae", "es" }; // ends with   
 
@@ -186,36 +186,36 @@ namespace NLP
                             sfx.TagFreq[tag.Key] += 1;
                         }
                     }
-                    else
-                    {
-                        string singularWord = "";
-                        bool isPlural = false;
-                        if (w.word.EndsWith("s\'")) //w.word.EndsWith("\'s") 
-                        {
-                            singularWord = w.word.Remove(w.word.Length - 2);
-                            isPlural = true;
-                        }
-                        else if (w.word.EndsWith("s"))
-                        {
-                            singularWord = w.word.Remove(w.word.Length - 1);
-                            isPlural = true;
-                        }
-                        if (isPlural)
-                        {
-                            if (singularWord.EndsWith(sfx.Word))
-                            {
-                                var tag = sfx.TagFreq.FirstOrDefault(x => x.Key == w.tag);
-                                if (tag.Key == null)
-                                {
-                                    sfx.TagFreq.Add(w.tag, 1);
-                                }
-                                else
-                                {
-                                    sfx.TagFreq[tag.Key] += 1;
-                                }
-                            }
-                        }
-                    }
+                   // else
+                    //{
+                        //string singularWord = "";
+                        //bool isPlural = false;
+                        //if (w.word.EndsWith("s\'") || w.word.EndsWith("\'s")) //
+                        //{
+                        //    singularWord = w.word.Remove(w.word.Length - 2);
+                        //    isPlural = true;
+                        //}
+                        //else if (w.word.EndsWith("s"))
+                        //{
+                        //    singularWord = w.word.Remove(w.word.Length - 1);
+                        //    isPlural = true;
+                        //}
+                        //if (isPlural)
+                        //{
+                        //    if (singularWord.EndsWith(sfx.Word))
+                        //    {
+                        //        var tag = sfx.TagFreq.FirstOrDefault(x => x.Key == w.tag);
+                        //        if (tag.Key == null)
+                        //        {
+                        //            sfx.TagFreq.Add(w.tag, 1);
+                        //        }
+                        //        else
+                        //        {
+                        //            sfx.TagFreq[tag.Key] += 1;
+                        //        }
+                        //    }
+                        //}
+                    //}
                 }
 
                 foreach (var pfx in capitalPref)
@@ -252,36 +252,36 @@ namespace NLP
                             sfx.TagFreq[tag.Key] += 1;
                         }
                     }
-                    else
-                    {
-                        string singularWord = "";
-                        bool isPlural = false;
-                        if (w.word.EndsWith("s\'")) // w.word.EndsWith("\'s")
-                        {
-                            singularWord = w.word.Remove(w.word.Length - 2);
-                            isPlural = true;
-                        }
-                        else if (w.word.EndsWith("s"))
-                        {
-                            singularWord = w.word.Remove(w.word.Length - 1);
-                            isPlural = true;
-                        }
-                        if (isPlural)
-                        {
-                            if (singularWord.EndsWith(sfx.Word))
-                            {
-                                var tag = sfx.TagFreq.FirstOrDefault(x => x.Key == w.tag);
-                                if (tag.Key == null)
-                                {
-                                    sfx.TagFreq.Add(w.tag, 1);
-                                }
-                                else
-                                {
-                                    sfx.TagFreq[tag.Key] += 1;
-                                }
-                            }
-                        }
-                    }
+                    //else
+                    //{
+                        //string singularWord = "";
+                        //bool isPlural = false;
+                        //if (w.word.EndsWith("s\'") || w.word.EndsWith("\'s")) // 
+                        //{
+                        //    singularWord = w.word.Remove(w.word.Length - 2);
+                        //    isPlural = true;
+                        //}
+                        //else if (w.word.EndsWith("s"))
+                        //{
+                        //    singularWord = w.word.Remove(w.word.Length - 1);
+                        //    isPlural = true;
+                        //}
+                        //if (isPlural)
+                        //{
+                        //    if (singularWord.EndsWith(sfx.Word))
+                        //    {
+                        //        var tag = sfx.TagFreq.FirstOrDefault(x => x.Key == w.tag);
+                        //        if (tag.Key == null)
+                        //        {
+                        //            sfx.TagFreq.Add(w.tag, 1);
+                        //        }
+                        //        else
+                        //        {
+                        //            sfx.TagFreq[tag.Key] += 1;
+                        //        }
+                        //    }
+                        //}
+                    //}
                 }
 
                 foreach (var pfx in preffxem)

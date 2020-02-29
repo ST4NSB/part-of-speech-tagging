@@ -79,23 +79,23 @@ Accuracy on both: 0.8986582
 ~~~~~~~~~~~~~~~~~~~~
 
 8. Trigram + f+b:
-{Done with training HIDDEN MARKOV MODEL & loading test files! Time: 305309 ms}
-{Done with VITERBI DECODING MODEL! Time: 589932 ms}
+{Done with training HIDDEN MARKOV MODEL & loading test files! Time: 264083 ms}
+{Done with VITERBI DECODING MODEL! Time: 526597 ms}
 TAG             ACCURACY                PRECISION               RECALL                  F1-SCORE
-NN              0.9779059               0.9560325               0.9554119               0.9557221
-OT              0.9985203               0.9917254               0.991793                0.9917592
-CC              0.9936992               0.9188271               0.9751777               0.9461641
-JJ              0.9871141               0.8773223               0.939065                0.9071443
-PP              0.9939805               0.9767347               0.9759129               0.9763236
-AT/DT           0.9934118               0.9796554               0.9694482               0.974525
-VB              0.9854876               0.9695711               0.9389844               0.9540327
-PN              0.9983063               0.986963                0.9873294               0.9871461
-RB              0.9884745               0.9038416               0.8776748               0.8905661
-TOTAL           0.9907668               0.9511859               0.9567552               0.9537092
+NN              0.9779273               0.9562152               0.9553016               0.9557582
+OT              0.9985142               0.9916579               0.991793                0.9917254
+CC              0.9936962               0.9187804               0.9751777               0.9461395
+JJ              0.987111                0.8770921               0.9393387               0.9071488
+PP              0.9940202               0.9770632               0.9758888               0.9764757
+AT/DT           0.9934301               0.9797951               0.9694482               0.9745942
+VB              0.9855121               0.9694466               0.9392703               0.9541199
+PN              0.9983063               0.9869178               0.9873759               0.9871467
+RB              0.9884684               0.90364         	0.8777892               0.890527
+TOTAL           0.9907763               0.9511788               0.9568204               0.9537373
 
-Accuracy for known words: 0.9670437
-Accuracy for unknown words: 0.7579409
-Accuracy on both: 0.9584501
+Accuracy for known words: 0.9670469
+Accuracy for unknown words: 0.758908
+Accuracy on both: 0.9584929
 ~~~~~~~~~~~~~~~~~~~~
 
 

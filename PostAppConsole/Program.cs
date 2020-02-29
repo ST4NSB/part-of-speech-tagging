@@ -202,33 +202,6 @@ namespace PostAppConsole
                         else suffixHR[j] = new Tuple<int, int>(hitr, allr);
                         break;
                     }
-                    else
-                    {
-                        bool isPlural = false;
-                        string singularWord = "";
-                        if (wordsTest[i].word.EndsWith("s\'")) // wordsTest[i].word.EndsWith("\'s") || 
-                        {
-                            singularWord = wordsTest[i].word.Remove(wordsTest[i].word.Length - 2);
-                            isPlural = true;
-                        }
-                        else if (wordsTest[i].word.EndsWith("s"))
-                        {
-                            singularWord = wordsTest[i].word.Remove(wordsTest[i].word.Length - 1);
-                            isPlural = true;
-                        }
-                        if (isPlural)
-                        {
-                            if (singularWord.EndsWith(suffixStr[j]))
-                            {
-                                int hitr = suffixHR[j].Item1;
-                                int allr = suffixHR[j].Item2 + 1;
-                                if (wordsTest[i].tag == decoder.PredictedTags[i])
-                                    suffixHR[j] = new Tuple<int, int>(hitr + 1, allr);
-                                else suffixHR[j] = new Tuple<int, int>(hitr, allr);
-                                break;
-                            }
-                        }
-                    }
                 }
 
                 for (int j = 0; j < prefixStr.Count; j++)
