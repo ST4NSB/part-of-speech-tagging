@@ -93,7 +93,7 @@ namespace PostAppConsole
 
 
             wordsTest = tagger.EliminateDuplicateSequenceOfEndOfSentenceTags(wordsTest);
-            tagger.CalculateHiddenMarkovModelProbabilitiesForTestCorpus(wordsTest, model: "trigram");
+            tagger.CalculateHiddenMarkovModelProbabilitiesForTestCorpus(wordsTest, model: "bigram");
 
             sw.Stop();
             Console.WriteLine("Done with training HIDDEN MARKOV MODEL & loading test files! Time: " + sw.ElapsedMilliseconds + " ms");
@@ -102,7 +102,7 @@ namespace PostAppConsole
 
             sw.Reset();
             sw.Start();
-            decoder.ViterbiDecoding(tagger, wordsTest, modelForward: "trigram", modelBackward: "trigram", mode: "f+b");
+            decoder.ViterbiDecoding(tagger, wordsTest, modelForward: "bigram", modelBackward: "bigram", mode: "forward");
             sw.Stop();
             tagger.EliminateAllEndOfSentenceTags(wordsTest);
             Console.WriteLine("Done with VITERBI DECODING MODEL! Time: " + sw.ElapsedMilliseconds + " ms");
@@ -231,7 +231,7 @@ namespace PostAppConsole
             }
 
 
-            using (System.IO.StreamWriter file = new System.IO.StreamWriter(path + "Informations\\" + "trigram_bidirectional.csv"))
+            using (System.IO.StreamWriter file = new System.IO.StreamWriter(path + "Informations\\" + "bigram_forward.csv"))
             {
                 file.WriteLine("Word,Real Tag,Prediction Tag,Is in Train T/F,Predicted T/F");
                 for (int i = 0; i < wordsTest.Count; i++)

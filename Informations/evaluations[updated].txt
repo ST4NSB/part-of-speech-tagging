@@ -59,7 +59,21 @@ Accuracy on both: 0.8986582
 ~~~~~~~~~~~~~~~~~~~~
 
 3. Bigram + forward:
+TAG             ACCURACY                PRECISION               RECALL                  F1-SCORE
+NN              0.9753532               0.937004                0.9662036               0.9513798
+OT              0.9985662               0.9905942               0.9934616               0.9920259
+CC              0.9926261               0.9095702               0.9661856               0.9370235
+JJ              0.986894                0.9296502               0.8703307               0.899013
+PP              0.9935372               0.9706759               0.9787495               0.974696
+AT/DT           0.9923143               0.9671181               0.9739875               0.9705406
+VB              0.9845705               0.9640613               0.9387938               0.9512597
+PN              0.9975451               0.9945639               0.9680219               0.9811134
+RB              0.9876369               0.909723                0.8533013               0.8806093
+TOTAL           0.9898937               0.9525512               0.9454483               0.9486291
 
+Accuracy for known words: 0.9650639
+Accuracy for unknown words: 0.7085472
+Accuracy on both: 0.9545217
 ~~~~~~~~~~~~~~~~~~~~
 
 4. Bigram + backward:
@@ -81,7 +95,6 @@ Accuracy on both: 0.8986582
 8. Trigram + f+b:
 {Done with training HIDDEN MARKOV MODEL & loading test files! Time: 264083 ms}
 {Done with VITERBI DECODING MODEL! Time: 526597 ms}
-TAG             ACCURACY                PRECISION               RECALL                  F1-SCORE
 TAG             ACCURACY                PRECISION               RECALL                  F1-SCORE
 NN              0.9779273               0.9562152               0.9553016               0.9557582
 OT              0.9985142               0.9916579               0.991793                0.9917254
