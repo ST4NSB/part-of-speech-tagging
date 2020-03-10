@@ -7,8 +7,8 @@ namespace NLP
     public class HMMTagger
     {
         private int N; // nr of tokens
-        private List<EmissionModel> WordCapitalizedTagsEmissionFrequence;
-        private List<EmissionModel> WordTagsEmissionFrequence;
+        public List<EmissionModel> WordCapitalizedTagsEmissionFrequence;
+        public List<EmissionModel> WordTagsEmissionFrequence;
         private Dictionary<string, int> UnigramFrequence = new Dictionary<string, int>();
         private Dictionary<Tuple<string, string>, int> BigramTransitionFrequence;
         private Dictionary<Tuple<string, string, string>, int> TrigramTransitionFrequence;

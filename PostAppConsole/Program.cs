@@ -36,31 +36,46 @@ namespace PostAppConsole
         static void Main(string[] args)
         {
             string path = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.Parent.FullName + "\\";
-            string BrownFolderPath = path + "Brown Corpus\\brown";
-            const int fold = 4;
+            string BrownFolderPath = path + "Brown_Corpus\\full_brown";
 
-            const string BrownfolderTrain = "Brown Corpus\\Rule 70-30\\1_Train", BrownfolderTest = "Brown Corpus\\Rule 70-30\\2_Test";
+            const string BrownfolderTrain = "Brown_Corpus\\70_30\\1_Train", BrownfolderTest = "Brown_Corpus\\70_30\\2_Test";
             const string demoFileTrain = "demo files\\train", demoFileTest = "demo files\\test";
-            string demoBrown = path + "demo files\\cross";
-           
 
+            //const int fold = 4;
+            //string demoBrown = path + "demo files\\cross";
+
+            #region Load Train Files & pre-process data
             var text = LoadAndReadFolderFiles(BrownfolderTrain);
             var oldWords = Tokenizer.SeparateTagFromWord(Tokenizer.WordTokenizeCorpus(text));
             var words = SpeechPart.GetNewHierarchicTags(oldWords);
             var capWords = TextNormalization.PreProcessingPipeline(words, toLowerTxt: false);
-            words = TextNormalization.PreProcessingPipeline(words, toLowerTxt: true);
+            var uncapWords = TextNormalization.PreProcessingPipeline(words, toLowerTxt: true);
+            #endregion
 
-            
-            Console.WriteLine("Done with loading and creating tokens!");
+            #region Load Test Files & pre-process data
+            var textTest = LoadAndReadFolderFiles(BrownfolderTest);
+            var oldWordsTest = Tokenizer.SeparateTagFromWord(Tokenizer.WordTokenizeCorpus(textTest));
+            var wordsTest = SpeechPart.GetNewHierarchicTags(oldWordsTest);
+            wordsTest = TextNormalization.PreProcessingPipeline(wordsTest, toLowerTxt: false);
+            #endregion
 
+            Console.WriteLine("Done with loading and creating tokens for train & test files!");
+
+            #region Hidden Markov Model Training
             HMMTagger tagger = new HMMTagger();
 
             Stopwatch sw = new Stopwatch();
 
             sw.Start();
-            tagger.CreateHiddenMarkovModel(words, capWords);
-            
+            tagger.CreateHiddenMarkovModel(uncapWords, capWords);
 
+            wordsTest = tagger.EliminateDuplicateSequenceOfEndOfSentenceTags(wordsTest);
+            //tagger.CalculateHiddenMarkovModelProbabilitiesForTestCorpus(wordsTest, model: "bigram");
+
+            sw.Stop();
+            #endregion
+
+            #region Debug for Emissions & Transitions matrix & write trained files
             //foreach (var model in tagger.EmissionFreq)
             //{
             //    Console.WriteLine(model.Word);
@@ -78,55 +93,56 @@ namespace PostAppConsole
 
             //WriteToTxtFile("Trained Files", "emissionWithCapital.json", JsonConvert.SerializeObject(tagger.CapitalEmissionFreq));
             //WriteToTxtFile("Trained Files", "emission.json", JsonConvert.SerializeObject(tagger.EmissionFreq));
-            // WriteToTxtFile("Trained Files", "unigram.json", JsonConvert.SerializeObject(tagger.UnigramFreq));
+            //WriteToTxtFile("Trained Files", "unigram.json", JsonConvert.SerializeObject(tagger.UnigramFreq));
             //WriteToTxtFile("Trained Files", "bigram.json", JsonConvert.SerializeObject(tagger.BigramTransition));
             //WriteToTxtFile("Trained Files", "trigram.json", JsonConvert.SerializeObject(tagger.TrigramTransition));
+            #endregion
 
-
+            Console.WriteLine("Done with training HIDDEN MARKOV MODEL & calculating probabilities! Time: " + sw.ElapsedMilliseconds + " ms");
             Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 
-            var textTest = LoadAndReadFolderFiles(BrownfolderTest);
-
-            var oldWordsTest = Tokenizer.SeparateTagFromWord(Tokenizer.WordTokenizeCorpus(textTest));
-            var wordsTest = SpeechPart.GetNewHierarchicTags(oldWordsTest);
-            wordsTest = TextNormalization.PreProcessingPipeline(wordsTest, toLowerTxt: false);
-
-
-            wordsTest = tagger.EliminateDuplicateSequenceOfEndOfSentenceTags(wordsTest);
-            tagger.CalculateHiddenMarkovModelProbabilitiesForTestCorpus(wordsTest, model: "bigram");
-
-            sw.Stop();
-            Console.WriteLine("Done with training HIDDEN MARKOV MODEL & loading test files! Time: " + sw.ElapsedMilliseconds + " ms");
-
+            #region Decoding Viterbi Model
             Decoder decoder = new Decoder();
 
-            sw.Reset();
-            sw.Start();
+            sw.Reset(); sw.Start();
             decoder.ViterbiDecoding(tagger, wordsTest, modelForward: "bigram", modelBackward: "bigram", mode: "forward");
             sw.Stop();
             tagger.EliminateAllEndOfSentenceTags(wordsTest);
-            Console.WriteLine("Done with VITERBI DECODING MODEL! Time: " + sw.ElapsedMilliseconds + " ms");
+            #endregion
 
+            Console.WriteLine("Done with DECODING VITERBI MODEL! Time: " + sw.ElapsedMilliseconds + " ms");
 
-            //Decoder decoder = new Decoder();
-            //decoder.UnknownWords = new HashSet<string>();
-            //const string deftag = "NN";
-            //decoder.PredictedTags = new List<string>();
-            //foreach (var tw in wordsTest)
-            //{
-            //    var modelMax = tagger.EmissionFreq.Find(x => x.Word == tw.word);
-            //    if (modelMax != null)
-            //    {
-            //        string maxTag = modelMax.TagFreq.OrderByDescending(x => x.Value).FirstOrDefault().Key;
-            //        decoder.PredictedTags.Add(deftag);
-            //    }
-            //    else
-            //    {
-            //        decoder.PredictedTags.Add(deftag); // NULL / NN
-            //        decoder.UnknownWords.Add(tw.word);
-            //    }
-            //}
+            #region Old method to guess probabilities
+            decoder.UnknownWords = new HashSet<string>();
+            decoder.PredictedTags = new List<string>();
+            foreach (var tw in wordsTest)
+            {
+                HMMTagger.EmissionModel modelMax;
+               // if (char.IsUpper(tw.word[0]))
+               //     modelMax = tagger.WordCapitalizedTagsEmissionFrequence.Find(x => x.Word == tw.word);
+               // else
+                    modelMax = tagger.WordTagsEmissionFrequence.Find(x => x.Word == tw.word.ToLower());
 
+                if (modelMax != null)
+                {
+                    string maxTag = modelMax.TagFreq.OrderByDescending(x => x.Value).FirstOrDefault().Key;
+
+                    // case default-tag NN ONLY
+                    //decoder.PredictedTags.Add("NN");
+
+                    // case maxTag
+                    decoder.PredictedTags.Add(maxTag);
+                }
+                else
+                {
+                    const string deftag = "NN";
+                    decoder.PredictedTags.Add(deftag); // NULL / NN
+                    decoder.UnknownWords.Add(tw.word);
+                }
+            }
+            #endregion
+
+            #region Debug for Emissions & Transitions
             //foreach (var item in decoder.EmissionProbabilities)
             //{
             //    Console.WriteLine(item.Word);
@@ -151,14 +167,16 @@ namespace PostAppConsole
             //foreach (var item in decoder.PredictedTags)
             //    Console.Write(item + " ");
 
-
             Console.WriteLine("testwords: " + wordsTest.Count + " , predwords: " + decoder.PredictedTags.Count);
+            #endregion
+
             Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 
+            #region Evaluations & results
             Evaluation eval = new Evaluation();
             eval.CreateSupervizedEvaluationsMatrix(wordsTest, decoder.PredictedTags, decoder.UnknownWords, fbeta: 1);
-            Console.WriteLine("TAG\t\tACCURACY\t\tPRECISION\t\tRECALL\t\t\tF1-SCORE");
-            var fullMatrix = eval.GetFullClassificationMatrix();
+            Console.WriteLine("TAG\t\tACCURACY\t\tPRECISION\t\tRECALL(TPR)\t\tF1-SCORE\t\tSPECIFICITY(TNR)");
+            var fullMatrix = eval.PrintClassificationResultsMatrix();
             for (int i = 0; i < eval.GetFullMatrixLineLength(); i++)
             {
                 for (int j = 0; j < eval.GetFullMatrixColLength(); j++)
@@ -169,81 +187,99 @@ namespace PostAppConsole
             Console.WriteLine("\nAccuracy for known words: " + eval.GetHitRateAccuracy(wordsTest, decoder.PredictedTags, decoder.UnknownWords, evalMode: "k"));
             Console.WriteLine("Accuracy for unknown words: " + eval.GetHitRateAccuracy(wordsTest, decoder.PredictedTags, decoder.UnknownWords, evalMode: "u"));
             Console.WriteLine("Accuracy on both: " + eval.GetHitRateAccuracy(wordsTest, decoder.PredictedTags, decoder.UnknownWords, evalMode: "k+u"));
+            #endregion
 
             Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 
-            List<string> suffixStr = new List<string>();
-            List<string> prefixStr = new List<string>();
-            List<Tuple<int, int>> suffixHR = new List<Tuple<int, int>>();
-            List<Tuple<int, int>> prefixHR = new List<Tuple<int, int>>();
-
-            foreach (var item in tagger.SuffixEmissionProbabilities)
+            #region Count known&unknown words
+            int unkwordscount = 0, knownwordscount = 0;
+            foreach(var item in wordsTest)
             {
-                suffixStr.Add(item.Word);
-                suffixHR.Add(new Tuple<int, int>(0, 0));
-            }
-            foreach (var item in tagger.PrefixEmissionProbabilities)
-            {
-                prefixStr.Add(item.Word);
-                prefixHR.Add(new Tuple<int, int>(0, 0));
+                if (decoder.UnknownWords.Contains(item.word))
+                    unkwordscount++;
+                else knownwordscount++;
             }
 
-            for (int i = 0; i < wordsTest.Count; i++)
-            {
-                if (!decoder.UnknownWords.Contains(wordsTest[i].word)) continue;
-                for (int j = 0; j < suffixStr.Count; j++) 
-                {
-                    if(wordsTest[i].word.EndsWith(suffixStr[j]))
-                    {
-                        int hitr = suffixHR[j].Item1;
-                        int allr = suffixHR[j].Item2 + 1;
-                        if (wordsTest[i].tag == decoder.PredictedTags[i])
-                            suffixHR[j] = new Tuple<int, int>(hitr + 1, allr);
-                        else suffixHR[j] = new Tuple<int, int>(hitr, allr);
-                        break;
-                    }
-                }
+            Console.WriteLine("Unknown words nr: " + unkwordscount);
+            Console.WriteLine("Known words nr: " + knownwordscount);
+            Console.WriteLine("U+K nr: " + wordsTest.Count);
+            #endregion
 
-                for (int j = 0; j < prefixStr.Count; j++)
-                {
-                    if (wordsTest[i].word.ToLower().StartsWith(prefixStr[j]))
-                    {
-                        int hitr = prefixHR[j].Item1;
-                        int allr = prefixHR[j].Item2 + 1;
-                        if (wordsTest[i].tag == decoder.PredictedTags[i])
-                            prefixHR[j] = new Tuple<int, int>(hitr + 1, allr);
-                        else prefixHR[j] = new Tuple<int, int>(hitr, allr);
-                        break;
-                    }
-                }
-            }
+            #region Suffix & Prefix hitrate
+            //List<string> suffixStr = new List<string>();
+            //List<string> prefixStr = new List<string>();
+            //List<Tuple<int, int>> suffixHR = new List<Tuple<int, int>>();
+            //List<Tuple<int, int>> prefixHR = new List<Tuple<int, int>>();
 
-            Console.WriteLine("Prefixes: ");
-            for (int i = 0; i < prefixStr.Count; i++)
-            {
-                Console.WriteLine(prefixStr[i] + ": (" + prefixHR[i].Item1 + ", " + prefixHR[i].Item2 + ") -> " + (float)prefixHR[i].Item1 / prefixHR[i].Item2);
-            }
+            //foreach (var item in tagger.SuffixEmissionProbabilities)
+            //{
+            //    suffixStr.Add(item.Word);
+            //    suffixHR.Add(new Tuple<int, int>(0, 0));
+            //}
+            //foreach (var item in tagger.PrefixEmissionProbabilities)
+            //{
+            //    prefixStr.Add(item.Word);
+            //    prefixHR.Add(new Tuple<int, int>(0, 0));
+            //}
 
-            Console.WriteLine("\nSuffixes: ");
-            for (int i = 0; i < suffixStr.Count; i++)
-            {
-                Console.WriteLine(suffixStr[i] + ": (" + suffixHR[i].Item1 + ", " + suffixHR[i].Item2 + ") -> " + (float)suffixHR[i].Item1 / suffixHR[i].Item2);
-            }
+            //for (int i = 0; i < wordsTest.Count; i++)
+            //{
+            //    if (!decoder.UnknownWords.Contains(wordsTest[i].word)) continue;
+            //    for (int j = 0; j < suffixStr.Count; j++)
+            //    {
+            //        if (wordsTest[i].word.EndsWith(suffixStr[j]))
+            //        {
+            //            int hitr = suffixHR[j].Item1;
+            //            int allr = suffixHR[j].Item2 + 1;
+            //            if (wordsTest[i].tag == decoder.PredictedTags[i])
+            //                suffixHR[j] = new Tuple<int, int>(hitr + 1, allr);
+            //            else suffixHR[j] = new Tuple<int, int>(hitr, allr);
+            //            break;
+            //        }
+            //    }
 
+            //    for (int j = 0; j < prefixStr.Count; j++)
+            //    {
+            //        if (wordsTest[i].word.ToLower().StartsWith(prefixStr[j]))
+            //        {
+            //            int hitr = prefixHR[j].Item1;
+            //            int allr = prefixHR[j].Item2 + 1;
+            //            if (wordsTest[i].tag == decoder.PredictedTags[i])
+            //                prefixHR[j] = new Tuple<int, int>(hitr + 1, allr);
+            //            else prefixHR[j] = new Tuple<int, int>(hitr, allr);
+            //            break;
+            //        }
+            //    }
+            //}
 
-            using (System.IO.StreamWriter file = new System.IO.StreamWriter(path + "Informations\\" + "bigram_forward.csv"))
-            {
-                file.WriteLine("Word,Real Tag,Prediction Tag,Is in Train T/F,Predicted T/F");
-                for (int i = 0; i < wordsTest.Count; i++)
-                {
-                    bool isInTrain = true, predictedB = false;
-                    if (decoder.UnknownWords.Contains(wordsTest[i].word))
-                        isInTrain = false;
-                    if (wordsTest[i].tag == decoder.PredictedTags[i])
-                        predictedB = true;
-                    file.WriteLine("\"" + wordsTest[i].word + "\"," + wordsTest[i].tag + "," + decoder.PredictedTags[i] + "," + isInTrain + "," + predictedB);
-                }
-            }
+            //Console.WriteLine("Prefixes: ");
+            //for (int i = 0; i < prefixStr.Count; i++)
+            //{
+            //    Console.WriteLine(prefixStr[i] + ": (" + prefixHR[i].Item1 + ", " + prefixHR[i].Item2 + ") -> " + (float)prefixHR[i].Item1 / prefixHR[i].Item2);
+            //}
+
+            //Console.WriteLine("\nSuffixes: ");
+            //for (int i = 0; i < suffixStr.Count; i++)
+            //{
+            //    Console.WriteLine(suffixStr[i] + ": (" + suffixHR[i].Item1 + ", " + suffixHR[i].Item2 + ") -> " + (float)suffixHR[i].Item1 / suffixHR[i].Item2);
+            //}
+            #endregion
+
+            #region Save predictions tags to excel
+            //using (System.IO.StreamWriter file = new System.IO.StreamWriter(path + "Informations\\" + "bigram_forward.csv"))
+            //{
+            //    file.WriteLine("Word,Real Tag,Prediction Tag,Is in Train T/F,Predicted T/F");
+            //    for (int i = 0; i < wordsTest.Count; i++)
+            //    {
+            //        bool isInTrain = true, predictedB = false;
+            //        if (decoder.UnknownWords.Contains(wordsTest[i].word))
+            //            isInTrain = false;
+            //        if (wordsTest[i].tag == decoder.PredictedTags[i])
+            //            predictedB = true;
+            //        file.WriteLine("\"" + wordsTest[i].word + "\"," + wordsTest[i].tag + "," + decoder.PredictedTags[i] + "," + isInTrain + "," + predictedB);
+            //    }
+            //}
+            #endregion
 
         }
     }

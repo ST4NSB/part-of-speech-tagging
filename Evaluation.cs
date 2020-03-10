@@ -16,6 +16,7 @@ namespace NLP
             this.EvaluationHistory = new List<List<List<float>>>();
         }
 
+        // k+u - known + unknown words
         public float GetHitRateAccuracy(List<Tokenizer.WordTag> testData, List<string> predictedTags, HashSet<string> unknownWords, string evalMode = "k+u")
         {
             int wordsHit = 0;
@@ -89,13 +90,16 @@ namespace NLP
                 float precision = (float)tp / (tp + fp);
                 if (float.IsNaN(precision) || float.IsInfinity(precision))
                     precision = 0.0f;
-                float recall = (float)tp / (tp + fn);
+                float recall = (float)tp / (tp + fn); // true positive rate
                 if (float.IsNaN(recall) || float.IsInfinity(recall))
                     recall = 0.0f;
                 float fmeasure = (float) ((fbeta * fbeta + 1) * precision * recall) / ((fbeta * fbeta) * precision + recall);
                 if (float.IsNaN(fmeasure) || float.IsInfinity(fmeasure))
                     fmeasure = 0.0f;
-                finalMatrix.Add(new List<float>() { accuracy, precision, recall, fmeasure });
+                float specificity = (float)tn / (tn + fp); // true negative rate
+                if (float.IsNaN(specificity) || float.IsInfinity(specificity))
+                    specificity = 0.0f;
+                finalMatrix.Add(new List<float>() { accuracy, precision, recall, fmeasure, specificity });
             }
             this.EvaluationHistory.Add(finalMatrix);
         }
@@ -117,10 +121,11 @@ namespace NLP
         
         public int GetFullMatrixColLength()
         {
-            return 5;
+            // tag, acc, prec, recall, f1-score, specificity
+            return 6;
         }
 
-        public List<List<string>> GetFullClassificationMatrix()
+        public List<List<string>> PrintClassificationResultsMatrix()
         {
             List<List<string>> matrix = new List<List<string>>();
             int i = 0;
@@ -132,23 +137,26 @@ namespace NLP
                     this.finalMatrix[i][0].ToString(),
                     this.finalMatrix[i][1].ToString(),
                     this.finalMatrix[i][2].ToString(),
-                    this.finalMatrix[i][3].ToString()
+                    this.finalMatrix[i][3].ToString(), 
+                    this.finalMatrix[i][4].ToString()
                 });
                 i++;
             }
 
-            float totalAccuracy = 0.0f, totalPrecision = 0.0f, totalRecall = 0.0f, totalFmeasure = 0.0f;
+            float totalAccuracy = 0.0f, totalPrecision = 0.0f, totalRecall = 0.0f, totalFmeasure = 0.0f, totalSpecificity = 0.0f;
             for (int j = 0; j < ClassTags.Count; j++)
             {
                 totalAccuracy += finalMatrix[j][0];
                 totalPrecision += finalMatrix[j][1];
                 totalRecall += finalMatrix[j][2];
                 totalFmeasure += finalMatrix[j][3];
+                totalSpecificity += finalMatrix[j][4];
             }
             totalAccuracy = (float)totalAccuracy / ClassTags.Count;
             totalPrecision = (float)totalPrecision / ClassTags.Count;
             totalRecall = (float)totalRecall / ClassTags.Count;
             totalFmeasure = (float)totalFmeasure / ClassTags.Count;
+            totalSpecificity = (float)totalSpecificity / ClassTags.Count;
 
             matrix.Add(new List<string>()
             {
@@ -156,7 +164,8 @@ namespace NLP
                 totalAccuracy.ToString(),
                 totalPrecision.ToString(),
                 totalRecall.ToString(),
-                totalFmeasure.ToString()
+                totalFmeasure.ToString(),
+                totalSpecificity.ToString()
             });
 
             return matrix;

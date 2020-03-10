@@ -36,6 +36,7 @@ namespace NLP
         public void ViterbiDecoding(HMMTagger tagger, List<Tokenizer.WordTag> testWords, string modelForward = "bigram",string modelBackward = "bigram", string mode = "forward")
         {
             this.UnknownWords = new HashSet<string>();
+           // return;
 
             this.ForwardHistory = new List<ViterbiNode>();
             this.BackwardHistory = new List<ViterbiNode>();
