@@ -70,7 +70,7 @@ namespace PostAppConsole
             tagger.CreateHiddenMarkovModel(uncapWords, capWords);
 
             wordsTest = tagger.EliminateDuplicateSequenceOfEndOfSentenceTags(wordsTest);
-            //tagger.CalculateHiddenMarkovModelProbabilitiesForTestCorpus(wordsTest, model: "bigram");
+            tagger.CalculateHiddenMarkovModelProbabilitiesForTestCorpus(wordsTest, model: "trigram");
 
             sw.Stop();
             #endregion
@@ -105,7 +105,7 @@ namespace PostAppConsole
             Decoder decoder = new Decoder();
 
             sw.Reset(); sw.Start();
-            decoder.ViterbiDecoding(tagger, wordsTest, modelForward: "bigram", modelBackward: "bigram", mode: "forward");
+            decoder.ViterbiDecoding(tagger, wordsTest, modelForward: "trigram", modelBackward: "trigram", mode: "f+b");
             sw.Stop();
             tagger.EliminateAllEndOfSentenceTags(wordsTest);
             #endregion
@@ -113,33 +113,30 @@ namespace PostAppConsole
             Console.WriteLine("Done with DECODING VITERBI MODEL! Time: " + sw.ElapsedMilliseconds + " ms");
 
             #region Old method to guess probabilities
-            decoder.UnknownWords = new HashSet<string>();
-            decoder.PredictedTags = new List<string>();
-            foreach (var tw in wordsTest)
-            {
-                HMMTagger.EmissionModel modelMax;
-               // if (char.IsUpper(tw.word[0]))
-               //     modelMax = tagger.WordCapitalizedTagsEmissionFrequence.Find(x => x.Word == tw.word);
-               // else
-                    modelMax = tagger.WordTagsEmissionFrequence.Find(x => x.Word == tw.word.ToLower());
+            //decoder.UnknownWords = new HashSet<string>();
+            //decoder.PredictedTags = new List<string>();
+            //foreach (var tw in wordsTest)
+            //{
+            //    HMMTagger.EmissionModel modelMax;
+            //    modelMax = tagger.WordTagsEmissionFrequence.Find(x => x.Word == tw.word);
 
-                if (modelMax != null)
-                {
-                    string maxTag = modelMax.TagFreq.OrderByDescending(x => x.Value).FirstOrDefault().Key;
+            //    if (modelMax != null)
+            //    {
+            //        string maxTag = modelMax.TagFreq.OrderByDescending(x => x.Value).FirstOrDefault().Key;
 
-                    // case default-tag NN ONLY
-                    //decoder.PredictedTags.Add("NN");
+            //        // case default-tag NN ONLY
+            //        //decoder.PredictedTags.Add("NN");
 
-                    // case maxTag
-                    decoder.PredictedTags.Add(maxTag);
-                }
-                else
-                {
-                    const string deftag = "NN";
-                    decoder.PredictedTags.Add(deftag); // NULL / NN
-                    decoder.UnknownWords.Add(tw.word);
-                }
-            }
+            //        // case maxTag
+            //        decoder.PredictedTags.Add(maxTag);
+            //    }
+            //    else
+            //    {
+            //        const string deftag = "NN";
+            //        decoder.PredictedTags.Add(deftag); // NULL / NN
+            //        decoder.UnknownWords.Add(tw.word);
+            //    }
+            //}
             #endregion
 
             #region Debug for Emissions & Transitions
@@ -200,9 +197,9 @@ namespace PostAppConsole
                 else knownwordscount++;
             }
 
-            Console.WriteLine("Unknown words nr: " + unkwordscount);
-            Console.WriteLine("Known words nr: " + knownwordscount);
-            Console.WriteLine("U+K nr: " + wordsTest.Count);
+            Console.WriteLine("Unknown words (count): " + unkwordscount + " | Procentage (%): " + (float)unkwordscount/wordsTest.Count);
+            Console.WriteLine("Known words (count): " + knownwordscount + " | Procentage (%): " + (float)knownwordscount/wordsTest.Count);
+            Console.WriteLine("Total words (count): " + wordsTest.Count);
             #endregion
 
             #region Suffix & Prefix hitrate
