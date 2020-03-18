@@ -10,7 +10,7 @@ namespace NLP
 
         public CrossValidation() { }
 
-        public void SetFilesForCrossValidation(string filePath, int fold = 10, bool shuffle = false) // TODO later add shuffle function
+        public void SetFilesForCrossValidation(string filePath, int fold = 10, bool shuffle = false) 
         {
             List<string> files = FileReader.GetAllTextFromDirectoryAsList(filePath);
             int filesPerFold = files.Count / fold;

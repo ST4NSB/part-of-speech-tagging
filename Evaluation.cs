@@ -9,12 +9,15 @@ namespace NLP
         HashSet<string> ClassTags;
         List<List<float>> finalMatrix;
 
-        public List<List<List<float>>> EvaluationHistory; // TOTO ADD LOGIC HERE
+        //public List<List<List<float>>> MatrixEvaluationHistory;
+        //public List<float> HitRateHistory;
+        //public List<HashSet<string>> unknownWordsHistory;
 
         public Evaluation()
         {
-            this.EvaluationHistory = new List<List<List<float>>>();
+
         }
+
 
         // k+u - known + unknown words
         public float GetHitRateAccuracy(List<Tokenizer.WordTag> testData, List<string> predictedTags, HashSet<string> unknownWords, string evalMode = "k+u")
@@ -41,7 +44,9 @@ namespace NLP
                     wordsHit++;
                 nrOfWords++;
             }
-            return (float)wordsHit / nrOfWords;
+
+            float hitRate = (float)wordsHit / nrOfWords;
+            return hitRate;
         }
 
         public void CreateSupervizedEvaluationsMatrix(List<Tokenizer.WordTag> testData, List<string> predictedTags, HashSet<string> unknownWords, string evalMode = "k+u", int fbeta = 1)
@@ -101,7 +106,6 @@ namespace NLP
                     specificity = 0.0f;
                 finalMatrix.Add(new List<float>() { accuracy, precision, recall, fmeasure, specificity });
             }
-            this.EvaluationHistory.Add(finalMatrix);
         }
 
         public HashSet<string> GetClassTags()

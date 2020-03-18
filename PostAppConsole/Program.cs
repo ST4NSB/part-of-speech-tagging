@@ -1,4 +1,7 @@
-﻿using System;
+﻿#define RULE_70_30
+#define CROSS_VALIDATION
+
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -36,13 +39,11 @@ namespace PostAppConsole
         static void Main(string[] args)
         {
             string path = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.Parent.FullName + "\\";
-            string BrownFolderPath = path + "Brown_Corpus\\full_brown";
 
+#if (RULE_70_30)
+            Console.WriteLine("You chose Rule 70-30 for training set!");
             const string BrownfolderTrain = "Brown_Corpus\\70_30\\1_Train", BrownfolderTest = "Brown_Corpus\\70_30\\2_Test";
             const string demoFileTrain = "demo files\\train", demoFileTest = "demo files\\test";
-
-            //const int fold = 4;
-            //string demoBrown = path + "demo files\\cross";
 
             #region Load Train Files & pre-process data
             var text = LoadAndReadFolderFiles(BrownfolderTrain);
@@ -278,6 +279,14 @@ namespace PostAppConsole
             //}
             #endregion
 
+#elif (CROSS_VALIDATION)
+            Console.WriteLine("You chose Cross-Validation for training set!");
+            string BrownFolderPath = path + "Brown_Corpus\\full_brown";
+            string demoBrown = path + "demo files\\cross"
+
+            const int fold = 4;
+            
+#endif
         }
     }
 }
