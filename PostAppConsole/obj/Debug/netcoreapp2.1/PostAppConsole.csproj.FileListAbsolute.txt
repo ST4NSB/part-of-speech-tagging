@@ -12,3 +12,16 @@ D:\Projects\github\Nlp-PosTagger\PostAppConsole\obj\Debug\netcoreapp2.1\PostAppC
 D:\Projects\github\Nlp-PosTagger\PostAppConsole\obj\Debug\netcoreapp2.1\PostAppConsole.dll
 D:\Projects\github\Nlp-PosTagger\PostAppConsole\obj\Debug\netcoreapp2.1\PostAppConsole.pdb
 D:\Projects\github\Nlp-PosTagger\PostAppConsole\obj\Debug\netcoreapp2.1\PostAppConsole.csprojAssemblyReference.cache
+D:\Projects\github\part-of-speech-tagging\PostAppConsole\bin\Debug\netcoreapp2.1\PostAppConsole.deps.json
+D:\Projects\github\part-of-speech-tagging\PostAppConsole\bin\Debug\netcoreapp2.1\PostAppConsole.runtimeconfig.json
+D:\Projects\github\part-of-speech-tagging\PostAppConsole\bin\Debug\netcoreapp2.1\PostAppConsole.runtimeconfig.dev.json
+D:\Projects\github\part-of-speech-tagging\PostAppConsole\bin\Debug\netcoreapp2.1\PostAppConsole.dll
+D:\Projects\github\part-of-speech-tagging\PostAppConsole\bin\Debug\netcoreapp2.1\PostAppConsole.pdb
+D:\Projects\github\part-of-speech-tagging\PostAppConsole\bin\Debug\netcoreapp2.1\Nlp-PosTagger.dll
+D:\Projects\github\part-of-speech-tagging\PostAppConsole\bin\Debug\netcoreapp2.1\Nlp-PosTagger.pdb
+D:\Projects\github\part-of-speech-tagging\PostAppConsole\obj\Debug\netcoreapp2.1\PostAppConsole.csprojAssemblyReference.cache
+D:\Projects\github\part-of-speech-tagging\PostAppConsole\obj\Debug\netcoreapp2.1\PostAppConsole.AssemblyInfoInputs.cache
+D:\Projects\github\part-of-speech-tagging\PostAppConsole\obj\Debug\netcoreapp2.1\PostAppConsole.AssemblyInfo.cs
+D:\Projects\github\part-of-speech-tagging\PostAppConsole\obj\Debug\netcoreapp2.1\PostAppConsole.csproj.CopyComplete
+D:\Projects\github\part-of-speech-tagging\PostAppConsole\obj\Debug\netcoreapp2.1\PostAppConsole.dll
+D:\Projects\github\part-of-speech-tagging\PostAppConsole\obj\Debug\netcoreapp2.1\PostAppConsole.pdb

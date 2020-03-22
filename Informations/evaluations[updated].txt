@@ -75,24 +75,24 @@ Total words (count): 327101
 
 3. Bigram + forward:
 TAG             ACCURACY                PRECISION               RECALL(TPR)             F1-SCORE                SPECIFICITY(TNR)
-NN              0.9753532               0.937004                0.9662036               0.9513798               0.9783961
-OT              0.9985662               0.9905942               0.9934616               0.9920259               0.9990696
-CC              0.9926261               0.9095702               0.9661856               0.9370235               0.9942177
-JJ              0.986894                0.9296502               0.8703307               0.899013                0.9952683
-PP              0.9935372               0.9706759               0.9787495               0.974696                0.9956918
-AT/DT           0.9923143               0.9671181               0.9739875               0.9705406               0.9950524
-VB              0.9845705               0.9640613               0.9387938               0.9512597               0.9933149
-PN              0.9975451               0.9945639               0.9680219               0.9811134               0.9996269
-RB              0.9876369               0.909723                0.8533013               0.8806093               0.99522
-TOTAL           0.9898937               0.9525512               0.9454483               0.9486291               0.9939842
+NN              0.977001                0.9425449               0.9667794               0.9545084               0.9804004
+OT              0.9984409               0.9894494               0.9932232               0.9913327               0.9989554
+CC              0.992565                0.9088975               0.9658626               0.9365146               0.9941723
+JJ              0.9875237               0.9286126               0.881642                0.9045179               0.9951307
+PP              0.9935586               0.9711525               0.9784129               0.9747692               0.9957653
+AT/DT           0.9930938               0.9733123               0.9735641               0.9734382               0.9960117
+VB              0.9859034               0.9660842               0.9452937               0.9555759               0.9936607
+PN              0.9975084               0.9941835               0.9678363               0.980833                0.9996007
+RB              0.988071                0.9091622               0.8629706               0.8854644               0.9951328
+TOTAL           0.9904073               0.953711                0.9483984               0.9507727               0.9943145
 
-Accuracy for known words: 0.9650639
-Accuracy for unknown words: 0.7085472
-Accuracy on both: 0.9545217
-
+Accuracy for known words: 0.9649236
+Accuracy for unknown words: 0.7680577
+Accuracy on both: 0.9568329
++
 Unknown words (count): 13443 | Procentage (%): 0.0410974
 Known words (count): 313658 | Procentage (%): 0.9589026
-Total words (count): 327101
+Total words (count): 327101 | Procentage (%): 1.0
 ~~~~~~~~~~~~~~~~~~~~
 
 4. Bigram + backward:
@@ -115,35 +115,35 @@ Total words (count): 327101
 {Done with training HIDDEN MARKOV MODEL & loading test files! Time: 264083 ms}
 {Done with VITERBI DECODING MODEL! Time: 526597 ms}
 TAG             ACCURACY                PRECISION               RECALL(TPR)             F1-SCORE                SPECIFICITY(TNR)
-NN              0.9779273               0.9562152               0.9553016               0.9557582               0.9854521
-OT              0.9985142               0.9916579               0.991793                0.9917254               0.9991771
-CC              0.9936962               0.9187804               0.9751777               0.9461395               0.9948109
-JJ              0.987111                0.8770921               0.9393387               0.9071488               0.9905432
-PP              0.9940202               0.9770632               0.9758888               0.9764757               0.996662
-AT/DT           0.9934301               0.9797951               0.9694482               0.9745942               0.9970132
-VB              0.9855121               0.9694466               0.9392703               0.9541199               0.9943453
-PN              0.9983063               0.9869178               0.9873759               0.9871467               0.9990771
-RB              0.9884684               0.90364         	0.8777892               0.890527                0.9947162
-TOTAL           0.9907763               0.9511788               0.9568204               0.9537373               0.9946442
+NN              0.9785693               0.954726                0.9596379               0.9571757               0.9848655
+OT              0.9984286               0.9909137               0.9915887               0.9912511               0.9991032
+CC              0.993632                0.9181841               0.9746931               0.9455951               0.994772
+JJ              0.9882758               0.9015003               0.9262942               0.9137291               0.9927288
+PP              0.9940447               0.9776423               0.9754802               0.9765601               0.9967496
+AT/DT           0.9936808               0.982145                0.9690014               0.9755289               0.9973681
+VB              0.9863467               0.9676149               0.9465518               0.9569675               0.9939484
+PN              0.9984623               0.9895315               0.9870974               0.988313                0.9992636
+RB              0.988658                0.9014462               0.8844261               0.8928551               0.9945418
+TOTAL           0.991122                0.9537449               0.9571968               0.9553306               0.9948156
 
-Accuracy for known words: 0.9670469
-Accuracy for unknown words: 0.758908
-Accuracy on both: 0.9584929
-
+Accuracy for known words: 0.9668556
+Accuracy for unknown words: 0.8012348
+Accuracy on both: 0.960049
++
 Unknown words (count): 13443 | Procentage (%): 0.0410974
 Known words (count): 313658 | Procentage (%): 0.9589026
-Total words (count): 327101
+Total words (count): 327101 | Procentage (%): 1.0
 ~~~~~~~~~~~~~~~~~~~~
 
 
 II:
 Exemplu pe Bigram-forward:
-1) Fara functie pt. unknown words:
+1) Fara functie pt. unknown words (foloseste doar deleted interpolation pt bigram):
 Accuracy for known words: 0.9640755
 Accuracy for unknown words: 0.3783382
 Accuracy on both: 0.9400032
 
 2) Cu functie dar weights calculate statistic:
-Accuracy for known words: 0.9650639
-Accuracy for unknown words: 0.7085472
-Accuracy on both: 0.9545217
+Accuracy for known words: 0.9649236
+Accuracy for unknown words: 0.7680577
+Accuracy on both: 0.9568329

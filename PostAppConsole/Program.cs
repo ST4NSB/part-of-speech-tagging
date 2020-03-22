@@ -71,7 +71,7 @@ namespace PostAppConsole
             tagger.CreateHiddenMarkovModel(uncapWords, capWords);
 
             wordsTest = tagger.EliminateDuplicateSequenceOfEndOfSentenceTags(wordsTest);
-            tagger.CalculateHiddenMarkovModelProbabilitiesForTestCorpus(wordsTest, model: "trigram");
+            tagger.CalculateHiddenMarkovModelProbabilitiesForTestCorpus(wordsTest, model: "bigram");
 
             sw.Stop();
             #endregion
@@ -92,11 +92,16 @@ namespace PostAppConsole
             //foreach (var item in tagger.TrigramTransition)
             //    Console.WriteLine(item.Key + " -> " + item.Value);
 
-            //WriteToTxtFile("Trained Files", "emissionWithCapital.json", JsonConvert.SerializeObject(tagger.CapitalEmissionFreq));
-            //WriteToTxtFile("Trained Files", "emission.json", JsonConvert.SerializeObject(tagger.EmissionFreq));
-            //WriteToTxtFile("Trained Files", "unigram.json", JsonConvert.SerializeObject(tagger.UnigramFreq));
-            //WriteToTxtFile("Trained Files", "bigram.json", JsonConvert.SerializeObject(tagger.BigramTransition));
-            //WriteToTxtFile("Trained Files", "trigram.json", JsonConvert.SerializeObject(tagger.TrigramTransition));
+            //WriteToTxtFile("Models", "emissionWithCapital.json", JsonConvert.SerializeObject(tagger.CapitalEmissionFreq));
+            //WriteToTxtFile("Models", "emission.json", JsonConvert.SerializeObject(tagger.EmissionFreq));
+            //WriteToTxtFile("Models", "unigram.json", JsonConvert.SerializeObject(tagger.UnigramFreq));
+            //WriteToTxtFile("Models", "bigram.json", JsonConvert.SerializeObject(tagger.BigramTransition));
+            //WriteToTxtFile("Models", "trigram.json", JsonConvert.SerializeObject(tagger.TrigramTransition));
+            //WriteToTxtFile("Models", "nonCapitalizedPrefix.json", JsonConvert.SerializeObject(tagger.PrefixEmissionProbabilities));
+            //WriteToTxtFile("Models", "capitalizedPrefix.json", JsonConvert.SerializeObject(tagger.PrefixCapitalizedWordEmissionProbabilities));
+            //WriteToTxtFile("Models", "nonCapitalizedSuffix.json", JsonConvert.SerializeObject(tagger.SuffixEmissionProbabilities));
+            //WriteToTxtFile("Models", "capitalizedSuffix.json", JsonConvert.SerializeObject(tagger.SuffixCapitalizedWordEmissionProbabilities));
+            //Console.WriteLine("Done writing models on filesystem!");
             #endregion
 
             Console.WriteLine("Done with training HIDDEN MARKOV MODEL & calculating probabilities! Time: " + sw.ElapsedMilliseconds + " ms");
@@ -106,7 +111,7 @@ namespace PostAppConsole
             Decoder decoder = new Decoder();
 
             sw.Reset(); sw.Start();
-            decoder.ViterbiDecoding(tagger, wordsTest, modelForward: "trigram", modelBackward: "trigram", mode: "f+b");
+            decoder.ViterbiDecoding(tagger, wordsTest, modelForward: "bigram", modelBackward: "bigram", mode: "forward");
             sw.Stop();
             tagger.EliminateAllEndOfSentenceTags(wordsTest);
             #endregion
@@ -141,6 +146,9 @@ namespace PostAppConsole
             #endregion
 
             #region Debug for Emissions & Transitions
+
+
+
             //foreach (var item in decoder.EmissionProbabilities)
             //{
             //    Console.WriteLine(item.Word);
@@ -187,7 +195,7 @@ namespace PostAppConsole
             Console.WriteLine("Accuracy on both: " + eval.GetHitRateAccuracy(wordsTest, decoder.PredictedTags, decoder.UnknownWords, evalMode: "k+u"));
             #endregion
 
-            Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+            Console.WriteLine("+");
 
             #region Count known&unknown words
             int unkwordscount = 0, knownwordscount = 0;

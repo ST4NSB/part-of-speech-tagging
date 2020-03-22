@@ -56,6 +56,7 @@ namespace NLP
         {
             double proc = 1.0d;
             const double maxVal = 2.0d, minVal = 1.0d;
+            const double zeroProbabilityDifferenceToMinProbability = 0.01d; // 0.01d 10^-2
 
             bool testWordIsCapitalized = false;
             if (char.IsUpper(testWord[0]))
@@ -64,8 +65,31 @@ namespace NLP
 
             double suffixVal = 0.0d, preffixVal = 0.0d;
 
+            double minSuffix = 1.0d, minPrefix = 1.0d;
+
+            
             if(testWordIsCapitalized)
             {
+                // founding capitalized prefix min value
+                foreach (var pfx in tagger.PrefixCapitalizedWordEmissionProbabilities)
+                {
+                    foreach (var pf in pfx.TagFreq)
+                    {
+                        if (pf.Value < minPrefix)
+                            minPrefix = pf.Value;
+                    }
+                }
+
+                // founding capitalized suffix min value
+                foreach (var sfx in tagger.SuffixCapitalizedWordEmissionProbabilities)
+                {
+                    foreach (var sf in sfx.TagFreq)
+                    {
+                        if (sf.Value < minSuffix)
+                            minSuffix = sf.Value;
+                    }
+                }
+
                 foreach (var pfx in tagger.PrefixCapitalizedWordEmissionProbabilities)
                 {
                     if (lowerWord.StartsWith(pfx.Word))
@@ -73,6 +97,7 @@ namespace NLP
                         if (pfx.TagFreq.ContainsKey(currentTag))
                         {
                             preffixVal = pfx.TagFreq[currentTag];
+
                             break;
                         }
                     }
@@ -85,8 +110,35 @@ namespace NLP
                         if (sfx.TagFreq.ContainsKey(currentTag))
                         {
                             suffixVal = sfx.TagFreq[currentTag];
+
                             break;
                         }
+                    }
+                }
+            }
+
+            if(minPrefix == 1.0d)
+            {
+                // founding prefix min value
+                foreach (var pfx in tagger.PrefixEmissionProbabilities)
+                {
+                    foreach (var pf in pfx.TagFreq)
+                    {
+                        if (pf.Value < minPrefix)
+                            minPrefix = pf.Value;
+                    }
+                }
+            }
+
+            if(minSuffix == 1.0d)
+            {
+                // founding capitalized suffix min value
+                foreach (var sfx in tagger.SuffixEmissionProbabilities)
+                {
+                    foreach (var sf in sfx.TagFreq)
+                    {
+                        if (sf.Value < minSuffix)
+                            minSuffix = sf.Value;
                     }
                 }
             }
@@ -100,6 +152,7 @@ namespace NLP
                         if (pfx.TagFreq.ContainsKey(currentTag))
                         {
                             preffixVal = pfx.TagFreq[currentTag];
+
                             break;
                         }
                     }
@@ -115,64 +168,58 @@ namespace NLP
                         if (sfx.TagFreq.ContainsKey(currentTag))
                         {
                             suffixVal = sfx.TagFreq[currentTag];
+
                             break;
                         }
                     }
                 }
             }
 
-            //if(suffixVal == 0.0d) // plural case: "violonists" -> "violonIST"
-            //{
-                //string singularWord = "";
-                //bool isPlural = false;
-                //if (lowerWord.EndsWith("\'s") || lowerWord.EndsWith("s\'")) // )
-                //{
-                //    singularWord = lowerWord.Remove(lowerWord.Length - 2);
-                //    isPlural = true;
-                //}
-                //else if (lowerWord.EndsWith("s"))
-                //{
-                //    singularWord = lowerWord.Remove(lowerWord.Length - 1);
-                //    isPlural = true;
-                //}
-                //if (isPlural)
-                //{
-                //    foreach (var sfx in tagger.SuffixEmissionProbabilities)
-                //    {
-                //        if (singularWord.EndsWith(sfx.Word))
-                //        {
-                //            if (sfx.TagFreq.ContainsKey(currentTag))
-                //            {
-                //                suffixVal = sfx.TagFreq[currentTag];
-                //                break;
-                //            }
-                //        }
-                //    }
-                //}
-            //}
+            double sum = (double)preffixVal + suffixVal;
+            double minSum = (double)(minPrefix + minSuffix);
 
-            double sumOfPreSuf = (double)preffixVal + suffixVal;
-            if (sumOfPreSuf > 0.0d)
-                proc += (double)TextNormalization.MinMaxNormalization(sumOfPreSuf, maxVal, minVal);
+            if (sum == 0.0d)
+            {
+                double minProbabilityForZero = TextNormalization.MinMaxNormalization(minSum, 0.0d, 2.0d) * zeroProbabilityDifferenceToMinProbability;
+                proc *= minProbabilityForZero;
+            }
+            else
+                proc *= (double)TextNormalization.MinMaxNormalization(sum, 0.0d, 2.0d);
+
+
+            const double maxValPossible = maxVal * 2 + minVal * 2, minValPossible = minVal;
+            double occurenceAdder = 0.0d;
 
             if (testWordIsCapitalized && currentTag == "NN")
-                proc += (double)maxVal; // max value to be a NN
-            if ((lowerWord.EndsWith("\'s") || lowerWord.EndsWith("s\'") || lowerWord.EndsWith("s")) && currentTag == "NN") 
-                proc += (double)maxVal;
+                occurenceAdder += (double)maxVal; // max value to be a NN
+            if ((lowerWord.EndsWith("\'s") || lowerWord.EndsWith("s\'") || lowerWord.EndsWith("s")) && currentTag == "NN")
+                occurenceAdder += (double)maxVal;
             if (lowerWord.Contains(".") && currentTag == "NN")
-                proc += (double)minVal;
+                occurenceAdder += (double)minVal;
             if ((lowerWord.Contains("-") || lowerWord.Contains("/")) && currentTag == "NN")
-                proc += (double)minVal;// NN
+                occurenceAdder += (double)minVal;// NN
             if ((lowerWord.Contains("-") || lowerWord.Contains("/")) && currentTag == "JJ")
-                proc += (double)minVal; // JJ
+                occurenceAdder += (double)minVal; // JJ
             if ((lowerWord.Contains("-") && lowerWord.Count(x => x == '-') > 2) && currentTag == "OT")
-                proc += (double)minVal; // OT (e.g.: At-the-central-library)
+                occurenceAdder += (double)minVal; // OT (e.g.: At-the-central-library)
             if (lowerWord.Contains("/") && currentTag == "OT")
-                proc += (double)minVal; // OT
+                occurenceAdder += (double)minVal; // OT
             if (lowerWord.EndsWith("\'t") && currentTag == "VB")
-                proc += (double)maxVal;
+                occurenceAdder += (double)maxVal;
             if ((lowerWord.EndsWith("\'ve") || lowerWord.EndsWith("\'ll")) && currentTag == "PN")
-                proc += (double)maxVal;
+                occurenceAdder += (double)maxVal;
+
+            if (occurenceAdder == 0.0d)
+            {
+                double minProbabilityForZero = TextNormalization.MinMaxNormalization(minValPossible, 0, maxValPossible) * zeroProbabilityDifferenceToMinProbability;
+                proc *= minProbabilityForZero;
+            }
+            else
+                proc *= TextNormalization.MinMaxNormalization(occurenceAdder, 0, maxValPossible);
+
+            //Console.WriteLine("adder: " + occurenceAdder);
+            //Console.WriteLine("final proc: " + proc + " - current word: " + testWord + " - current tag: " + currentTag);
+            //Console.WriteLine();
 
             return proc;
         }

@@ -106,7 +106,7 @@ namespace NLP
             //                       exo[(0, 2) -> 0], contra[(1, 3) -> 0.3333333], quad[(1, 3) -> 0.3333333],
             //                       per[(12, 27) -> 0.4444444], sup[(0, 2) -> 0], sym[(1, 3) -> 0.3333333], up[(3, 7) -> 0.4285714]
             //            -> suffix: cule[(0, 2) -> 0], dom[dom: (0, 1) -> 0], ward[dom: (1, 3) -> 0.333333] 
-            //                       less[(12, 29) -> 0.4137931], ize[(9, 23) -> 0.3913043], cy[(1, 3) -> 0.3333333]
+            //                       less[(12, 29) -> 0.4137931], ize[(9, 23) -> 0.3913043], cy[(1, 3) -> 0.3333333], fy[(0, 1) -> 0]
              
             // list of prefixes & suffixes
             List<string> pref = new List<string>() { "inter", "intra", "mis", "mid", "mini", "dis", "di", "re", "anti", "in", "en", "em", "auto",
@@ -122,7 +122,7 @@ namespace NLP
                                                     "ary", "ate", "man", "an", "ency", "eon", "ex", "ix","acy", "escent", "tial", "cial", "al",
                                                     "ee", "en","ence", "ancy", "eer", "ier", "er", "or", "ar", "ium", "ous", "est", 
                                                     "ment", "ese", "ness", "ess", "ship", "ed", "ant", "ow", "land", "ure", "ity", 
-                                                    "esis", "osis", "et", "ette", "ful", "ify", "fy", "ine", "sion", "fication", "tion", "ion",
+                                                    "esis", "osis", "et", "ette", "ful", "ify", "ine", "sion", "fication", "tion", "ion",
                                                     "ish", "ism", "ist", "ty", "ly", "em", "fic", "olve", "ope",
                                                     "ent", "ise", "ling", "ing", "ive", "ic", "ways", "in", "ology",
                                                     "hood", "logy", "ice", "oid", "id", "ide", "age", "worthy", "ae", "es" }; // ends with   

@@ -1,26 +1,21 @@
 {
   "format": 1,
   "restore": {
-    "D:\\Projects\\github\\Nlp-PosTagger\\Nlp-PosTagger.csproj": {}
+    "D:\\Projects\\github\\part-of-speech-tagging\\Nlp-PosTagger.csproj": {}
   },
   "projects": {
-    "D:\\Projects\\github\\Nlp-PosTagger\\Nlp-PosTagger.csproj": {
+    "D:\\Projects\\github\\part-of-speech-tagging\\Nlp-PosTagger.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\Projects\\github\\Nlp-PosTagger\\Nlp-PosTagger.csproj",
+        "projectUniqueName": "D:\\Projects\\github\\part-of-speech-tagging\\Nlp-PosTagger.csproj",
         "projectName": "Nlp-PosTagger",
-        "projectPath": "D:\\Projects\\github\\Nlp-PosTagger\\Nlp-PosTagger.csproj",
-        "packagesPath": "C:\\Users\\adiba\\.nuget\\packages\\",
-        "outputPath": "D:\\Projects\\github\\Nlp-PosTagger\\obj\\",
+        "projectPath": "D:\\Projects\\github\\part-of-speech-tagging\\Nlp-PosTagger.csproj",
+        "packagesPath": "C:\\Users\\AdiB\\.nuget\\packages\\",
+        "outputPath": "D:\\Projects\\github\\part-of-speech-tagging\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "D:\\Microsoft\\Xamarin\\NuGet\\",
-          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
-        ],
         "configFilePaths": [
-          "C:\\Users\\adiba\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
+          "C:\\Users\\AdiB\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "netstandard2.0"
@@ -55,10 +50,16 @@
             }
           },
           "imports": [
-            "net461"
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
           ],
           "assetTargetFallback": true,
-          "warn": true
+          "warn": true,
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.101\\RuntimeIdentifierGraph.json"
         }
       }
     }
