@@ -55,7 +55,7 @@ namespace NLP
         private double GetProcentForUnknownWord(HMMTagger tagger, string testWord, string currentTag)
         {
             double proc = 1.0d;
-            const double maxVal = 2.0d, minVal = 1.0d;
+            const double maxVal = 2.0d, minVal = 1.5d;
             const double zeroProbabilityDifferenceToMinProbability = 0.01d; // 0.01d 10^-2
 
             bool testWordIsCapitalized = false;
@@ -187,7 +187,7 @@ namespace NLP
                 proc *= (double)TextNormalization.MinMaxNormalization(sum, 0.0d, 2.0d);
 
 
-            const double maxValPossible = maxVal * 2 + minVal * 2, minValPossible = minVal;
+            const double maxValPossible = maxVal + minVal, minValPossible = minVal;
             double occurenceAdder = 0.0d;
 
             if (testWordIsCapitalized && currentTag == "NN")

@@ -25,3 +25,5 @@ D:\Projects\github\part-of-speech-tagging\PostAppConsole\obj\Debug\netcoreapp2.1
 D:\Projects\github\part-of-speech-tagging\PostAppConsole\obj\Debug\netcoreapp2.1\PostAppConsole.csproj.CopyComplete
 D:\Projects\github\part-of-speech-tagging\PostAppConsole\obj\Debug\netcoreapp2.1\PostAppConsole.dll
 D:\Projects\github\part-of-speech-tagging\PostAppConsole\obj\Debug\netcoreapp2.1\PostAppConsole.pdb
+D:\Projects\github\part-of-speech-tagging\PostAppConsole\obj\Debug\netcoreapp2.1\PostAppConsole.csproj.CoreCompileInputs.cache
+D:\Projects\github\part-of-speech-tagging\PostAppConsole\obj\Debug\netcoreapp2.1\PostAppConsole.genruntimeconfig.cache
