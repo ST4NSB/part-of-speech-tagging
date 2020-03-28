@@ -55,7 +55,7 @@ namespace NLP
         private double GetProcentForUnknownWord(HMMTagger tagger, string testWord, string currentTag)
         {
             double proc = 1.0d;
-            const double maxVal = 2.0d, minVal = 1.5d;
+            const double maxVal = 2.0d, minVal = 1.5d; // 2.0 , 1.5
             const double zeroProbabilityDifferenceToMinProbability = 0.01d; // 0.01d 10^-2
 
             bool testWordIsCapitalized = false;
@@ -187,7 +187,7 @@ namespace NLP
                 proc *= (double)TextNormalization.MinMaxNormalization(sum, 0.0d, 2.0d);
 
 
-            const double maxValPossible = maxVal + minVal, minValPossible = minVal;
+            const double maxValPossible = maxVal, minValPossible = minVal;
             double occurenceAdder = 0.0d;
 
             if (testWordIsCapitalized && currentTag == "NN")
@@ -195,15 +195,15 @@ namespace NLP
             if ((lowerWord.EndsWith("\'s") || lowerWord.EndsWith("s\'") || lowerWord.EndsWith("s")) && currentTag == "NN")
                 occurenceAdder += (double)maxVal;
             if (lowerWord.Contains(".") && currentTag == "NN")
-                occurenceAdder += (double)minVal;
+                occurenceAdder += (double)minVal / 2;
             if ((lowerWord.Contains("-") || lowerWord.Contains("/")) && currentTag == "NN")
-                occurenceAdder += (double)minVal;// NN
+                occurenceAdder += (double)minVal / 2;// NN
             if ((lowerWord.Contains("-") || lowerWord.Contains("/")) && currentTag == "JJ")
-                occurenceAdder += (double)minVal; // JJ
+                occurenceAdder += (double)minVal / 2; // JJ
             if ((lowerWord.Contains("-") && lowerWord.Count(x => x == '-') > 2) && currentTag == "OT")
-                occurenceAdder += (double)minVal; // OT (e.g.: At-the-central-library)
+                occurenceAdder += (double)minVal / 2; // OT (e.g.: At-the-central-library)
             if (lowerWord.Contains("/") && currentTag == "OT")
-                occurenceAdder += (double)minVal; // OT
+                occurenceAdder += (double)minVal / 2; // OT
             if (lowerWord.EndsWith("\'t") && currentTag == "VB")
                 occurenceAdder += (double)maxVal;
             if ((lowerWord.EndsWith("\'ve") || lowerWord.EndsWith("\'ll")) && currentTag == "PN")
