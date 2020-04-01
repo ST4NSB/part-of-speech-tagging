@@ -170,7 +170,7 @@ namespace NLP
 
             foreach (var w in capitalizedWords)
             {
-                if (!char.IsUpper(w.word[0])) continue;
+                //if (!char.IsUpper(w.word[0])) continue;
                 foreach (var sfx in capitalSuff)
                 {
                     if (w.word.EndsWith(sfx.Word))
@@ -539,7 +539,7 @@ namespace NLP
 
             foreach (var w in capitalizedWords)
             {
-                if (!char.IsUpper(w.word[0])) continue; // ignore words that don't start with capitalized letter
+                //if (!char.IsUpper(w.word[0])) continue; // ignore words that don't start with capitalized letter
 
                 EmissionModel wmFind = WordCapitalizedTagsEmissionFrequence.Find(x => x.Word == w.word);
                 if (wmFind == null)

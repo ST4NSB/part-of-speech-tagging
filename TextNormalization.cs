@@ -18,7 +18,7 @@ namespace NLP
             return (double)(x - min) / (max - min);
         }
 
-        public static List<Tokenizer.WordTag> PreProcessingPipeline(List<Tokenizer.WordTag> words, bool toLowerTxt = true)
+        public static List<Tokenizer.WordTag> PreProcessingPipeline(List<Tokenizer.WordTag> words, bool toLowerOption = false, bool keepOnlyCapitalizedWords = false)
         {
             List<Tokenizer.WordTag> newWords = new List<Tokenizer.WordTag>();
             foreach (var sw in words)
@@ -26,8 +26,12 @@ namespace NLP
                 if (IsStopWord(sw.word)) continue;
                 string tsw = EliminateDigitsFromWord(sw.word);
                 if (string.IsNullOrEmpty(tsw)) continue;
-                if (toLowerTxt)
+                if (toLowerOption)
                     tsw = ToLowerCaseNormalization(tsw);
+                if(keepOnlyCapitalizedWords)
+                    if (!char.IsUpper(tsw[0]))
+                        continue;
+
                 newWords.Add(new Tokenizer.WordTag(tsw, sw.tag));
             }
             return newWords;

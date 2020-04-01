@@ -1,4 +1,4 @@
-﻿#define RULE_70_30
+﻿//#define RULE_70_30
 #define CROSS_VALIDATION
 
 using System;
@@ -41,7 +41,7 @@ namespace PostAppConsole
             string path = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.Parent.FullName + "\\";
 
 #if (RULE_70_30)
-            Console.WriteLine("You chose Rule 70-30 for training set!");
+            Console.WriteLine("You chose Rule 70% - training, 30% - testing for the data-set!");
             const string BrownfolderTrain = "Brown_Corpus\\70_30\\1_Train", BrownfolderTest = "Brown_Corpus\\70_30\\2_Test";
             const string demoFileTrain = "demo files\\train", demoFileTest = "demo files\\test";
 
@@ -49,15 +49,15 @@ namespace PostAppConsole
             var text = LoadAndReadFolderFiles(BrownfolderTrain);
             var oldWords = Tokenizer.SeparateTagFromWord(Tokenizer.WordTokenizeCorpus(text));
             var words = SpeechPart.GetNewHierarchicTags(oldWords);
-            var capWords = TextNormalization.PreProcessingPipeline(words, toLowerTxt: false);
-            var uncapWords = TextNormalization.PreProcessingPipeline(words, toLowerTxt: true);
+            var capWords = TextNormalization.PreProcessingPipeline(words, toLowerOption: false, keepOnlyCapitalizedWords: true);
+            var uncapWords = TextNormalization.PreProcessingPipeline(words, toLowerOption: true, keepOnlyCapitalizedWords: false);
             #endregion
 
             #region Load Test Files & pre-process data
             var textTest = LoadAndReadFolderFiles(BrownfolderTest);
             var oldWordsTest = Tokenizer.SeparateTagFromWord(Tokenizer.WordTokenizeCorpus(textTest));
             var wordsTest = SpeechPart.GetNewHierarchicTags(oldWordsTest);
-            wordsTest = TextNormalization.PreProcessingPipeline(wordsTest, toLowerTxt: false);
+            wordsTest = TextNormalization.PreProcessingPipeline(wordsTest);
             #endregion
 
             Console.WriteLine("Done with loading and creating tokens for train & test files!");
@@ -71,7 +71,7 @@ namespace PostAppConsole
             tagger.CreateHiddenMarkovModel(uncapWords, capWords);
 
             wordsTest = tagger.EliminateDuplicateSequenceOfEndOfSentenceTags(wordsTest);
-            tagger.CalculateHiddenMarkovModelProbabilitiesForTestCorpus(wordsTest, model: "bigram");
+            tagger.CalculateHiddenMarkovModelProbabilitiesForTestCorpus(wordsTest, model: "trigram");
 
             sw.Stop();
             #endregion
@@ -111,7 +111,7 @@ namespace PostAppConsole
             Decoder decoder = new Decoder();
 
             sw.Reset(); sw.Start();
-            decoder.ViterbiDecoding(tagger, wordsTest, modelForward: "bigram", modelBackward: "bigram", mode: "forward");
+            decoder.ViterbiDecoding(tagger, wordsTest, modelForward: "trigram", modelBackward: "trigram", mode: "f+b");
             sw.Stop();
             tagger.EliminateAllEndOfSentenceTags(wordsTest);
             #endregion
@@ -288,12 +288,98 @@ namespace PostAppConsole
             #endregion
 
 #elif (CROSS_VALIDATION)
-            Console.WriteLine("You chose Cross-Validation for training set!");
+            const int folds = 4;
+            const bool shuffle = true;
+            Console.WriteLine("You chose Cross-Validation for the data-set! Folds: " + folds + ", Shuffle-option: " + shuffle);
             string BrownFolderPath = path + "Brown_Corpus\\full_brown";
-            string demoBrown = path + "demo files\\cross"
+            string demoBrown = path + "demo files\\cross";
 
-            const int fold = 4;
-            
+            CrossValidation cv = new CrossValidation(filePath: BrownFolderPath, fold: folds, shuffle: shuffle); // with randomness
+            Console.WriteLine("Done with loading dataset & split them into folds!\n");
+            for(int foldNumber = 0; foldNumber < folds; foldNumber++)
+            {
+                #region Load Train Files & pre-process data
+                var text = cv.TrainFile[foldNumber];
+                var oldWords = Tokenizer.SeparateTagFromWord(Tokenizer.WordTokenizeCorpus(text));
+                var words = SpeechPart.GetNewHierarchicTags(oldWords);
+                var capWords = TextNormalization.PreProcessingPipeline(words, toLowerOption: false, keepOnlyCapitalizedWords: true);
+                var uncapWords = TextNormalization.PreProcessingPipeline(words, toLowerOption: true, keepOnlyCapitalizedWords: false);
+                #endregion
+
+                #region Load Test Files & pre-process data
+                var textTest = cv.TestFile[foldNumber];
+                var oldWordsTest = Tokenizer.SeparateTagFromWord(Tokenizer.WordTokenizeCorpus(textTest));
+                var wordsTest = SpeechPart.GetNewHierarchicTags(oldWordsTest);
+                wordsTest = TextNormalization.PreProcessingPipeline(wordsTest);
+                #endregion
+
+                Console.WriteLine("Done with loading and creating tokens for train & test files!");
+
+                #region Hidden Markov Model Training
+                HMMTagger tagger = new HMMTagger();
+
+                Stopwatch sw = new Stopwatch();
+
+                sw.Start();
+                tagger.CreateHiddenMarkovModel(uncapWords, capWords);
+
+                wordsTest = tagger.EliminateDuplicateSequenceOfEndOfSentenceTags(wordsTest);
+                tagger.CalculateHiddenMarkovModelProbabilitiesForTestCorpus(wordsTest, model: "trigram");
+
+                sw.Stop();
+                Console.WriteLine("Done with training HIDDEN MARKOV MODEL & calculating probabilities! Time: " + sw.ElapsedMilliseconds + " ms");
+                Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+                #endregion
+
+
+                #region Decoding Viterbi Model
+                Decoder decoder = new Decoder();
+
+                sw.Reset(); sw.Start();
+                decoder.ViterbiDecoding(tagger, wordsTest, modelForward: "trigram", modelBackward: "trigram", mode: "f+b");
+                sw.Stop();
+                tagger.EliminateAllEndOfSentenceTags(wordsTest);
+
+                Console.WriteLine("Done with DECODING VITERBI MODEL! Time: " + sw.ElapsedMilliseconds + " ms");
+                Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+                #endregion
+
+                #region Evaluations & results
+                Evaluation eval = new Evaluation();
+                eval.CreateSupervizedEvaluationsMatrix(wordsTest, decoder.PredictedTags, decoder.UnknownWords, fbeta: 1);
+                Console.WriteLine("TAG\t\tACCURACY\t\tPRECISION\t\tRECALL(TPR)\t\tF1-SCORE\t\tSPECIFICITY(TNR)");
+                var fullMatrix = eval.PrintClassificationResultsMatrix();
+                for (int i = 0; i < eval.GetFullMatrixLineLength(); i++)
+                {
+                    for (int j = 0; j < eval.GetFullMatrixColLength(); j++)
+                        Console.Write(fullMatrix[i][j] + "\t\t");
+                    Console.WriteLine();
+                }
+
+                Console.WriteLine("\nAccuracy for known words: " + eval.GetHitRateAccuracy(wordsTest, decoder.PredictedTags, decoder.UnknownWords, evalMode: "k"));
+                Console.WriteLine("Accuracy for unknown words: " + eval.GetHitRateAccuracy(wordsTest, decoder.PredictedTags, decoder.UnknownWords, evalMode: "u"));
+                Console.WriteLine("Accuracy on both: " + eval.GetHitRateAccuracy(wordsTest, decoder.PredictedTags, decoder.UnknownWords, evalMode: "k+u"));
+                #endregion
+
+                Console.WriteLine("+");
+
+                #region Count known&unknown words
+                int unkwordscount = 0, knownwordscount = 0;
+                foreach (var item in wordsTest)
+                {
+                    if (decoder.UnknownWords.Contains(item.word))
+                        unkwordscount++;
+                    else knownwordscount++;
+                }
+
+                Console.WriteLine("Unknown words (count): " + unkwordscount + " | Procentage (%): " + (float)unkwordscount / wordsTest.Count);
+                Console.WriteLine("Known words (count): " + knownwordscount + " | Procentage (%): " + (float)knownwordscount / wordsTest.Count);
+                Console.WriteLine("Total words (count): " + wordsTest.Count);
+                #endregion
+
+                Console.WriteLine("\n\n[FOLD " + (foldNumber + 1) + "/" + folds + " DONE!]\n\n");
+            }
+
 #endif
         }
     }
