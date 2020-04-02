@@ -54,9 +54,9 @@ namespace NLP
 
         private double GetProcentForUnknownWord(HMMTagger tagger, string testWord, string currentTag)
         {
-            double proc = 1.0d;
-            const double maxVal = 2.0d, minVal = 1.5d; // 2.0 , 1.5
-            const double zeroProbabilityDifferenceToMinProbability = 0.01d; // 0.01d 10^-2
+            double proc = 0.0d;
+            const double maxVal = 2.5d, minVal = 1.5d; // 2.5 , 1.5
+            const double zeroProbabilityDifferenceToMinProbability = 0.01d; // 0.01d / 10^-2
 
             bool testWordIsCapitalized = false;
             if (char.IsUpper(testWord[0]))
@@ -181,10 +181,10 @@ namespace NLP
             if (sum == 0.0d)
             {
                 double minProbabilityForZero = TextNormalization.MinMaxNormalization(minSum, 0.0d, 2.0d) * zeroProbabilityDifferenceToMinProbability;
-                proc *= minProbabilityForZero;
+                proc += minProbabilityForZero;
             }
             else
-                proc *= (double)TextNormalization.MinMaxNormalization(sum, 0.0d, 2.0d);
+                proc += (double)TextNormalization.MinMaxNormalization(sum, 0.0d, 2.0d);
 
 
             const double maxValPossible = maxVal, minValPossible = minVal;
@@ -212,14 +212,16 @@ namespace NLP
             if (occurenceAdder == 0.0d)
             {
                 double minProbabilityForZero = TextNormalization.MinMaxNormalization(minValPossible, 0, maxValPossible) * zeroProbabilityDifferenceToMinProbability;
-                proc *= minProbabilityForZero;
+                proc += minProbabilityForZero;
             }
             else
-                proc *= TextNormalization.MinMaxNormalization(occurenceAdder, 0, maxValPossible);
+                proc += TextNormalization.MinMaxNormalization(occurenceAdder, 0, maxValPossible);
 
             //Console.WriteLine("adder: " + occurenceAdder);
             //Console.WriteLine("final proc: " + proc + " - current word: " + testWord + " - current tag: " + currentTag);
             //Console.WriteLine();
+
+            proc = TextNormalization.BoundProbability(proc);
 
             return proc;
         }

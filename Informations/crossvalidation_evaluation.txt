@@ -1,119 +1,112 @@
 Trigram bidirectional algorithm
 
 You chose Cross-Validation for the data-set! Folds: 4, Shuffle-option: True
-Done with loading dataset & split them into folds!
+Done with loading dataset & splitting them into folds!
 
 Done with loading and creating tokens for train & test files!
-Done with training HIDDEN MARKOV MODEL & calculating probabilities! Time: 117094 ms
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Done with DECODING VITERBI MODEL! Time: 188318 ms
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Done with training HIDDEN MARKOV MODEL & calculating probabilities! Time: 122516 ms
+Done with DECODING VITERBI MODEL! Time: 177679 ms
 TAG             ACCURACY                PRECISION               RECALL(TPR)             F1-SCORE                SPECIFICITY(TNR)
-PP              0.9940695               0.9758834               0.976604                0.9762436               0.9965593
-VB              0.9861522               0.9695709               0.9445614               0.9569027               0.9942373
-RB              0.988806                0.9081119               0.8804781               0.8940815               0.9949484
-OT              0.9985441               0.990149                0.9933417               0.9917427               0.9990462
-PN              0.9985072               0.9901691               0.9871192               0.9886418               0.9993095
-JJ              0.9891599               0.9091723               0.9342098               0.921521                0.9931771
-CC              0.9938262               0.9233217               0.9707445               0.9464394               0.9952004
-AT/DT           0.9939331               0.9813975               0.971067                0.9762049               0.9972943
-NN              0.9791049               0.9545829               0.9630689               0.9588071               0.9845217
-TOTAL           0.9913447               0.9558176               0.9579105               0.9567317               0.9949216
+AT/DT           0.9936323               0.9818676               0.9699612               0.9758781               0.9972571
+VB              0.9868235               0.9678887               0.9490559               0.9583798               0.9940093
+NN              0.9792646               0.9574499               0.959648                0.9585477               0.9857974
+OT              0.9982647               0.9889512               0.9917108               0.9903291               0.9989097
+JJ              0.9886581               0.9050282               0.930307                0.9174935               0.9929011
+CC              0.993647                0.9206459               0.969242                0.9443191               0.9950833
+PP              0.9937794               0.9755874               0.9758673               0.9757273               0.9964116
+PN              0.9983309               0.9863133               0.9872333               0.9867731               0.9990779
+RB              0.9886801               0.9016923               0.8843664               0.8929453               0.9945627
+TOTAL           0.9912312               0.953936                0.9574879               0.9555992               0.99489
 
-Accuracy for known words: 0.9663901
-Accuracy for unknown words: 0.8234656
-Accuracy on both: 0.9610515
+
+Accuracy for known words: 0.9671301
+Accuracy for unknown words: 0.8000373
+Accuracy on both: 0.9605403
 +
-Unknown words (count): 10134 | Procentage (%): 0.03735252
-Known words (count): 261173 | Procentage (%): 0.9626475
-Total words (count): 271307
+Unknown words (count): 10727 | Procentage (%): 0.03943764
+Known words (count): 261272 | Procentage (%): 0.9605623
+Total words (count): 271999
 
 
 [FOLD 1/4 DONE!]
 
 
 Done with loading and creating tokens for train & test files!
-Done with training HIDDEN MARKOV MODEL & calculating probabilities! Time: 121058 ms
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Done with DECODING VITERBI MODEL! Time: 174418 ms
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Done with training HIDDEN MARKOV MODEL & calculating probabilities! Time: 129720 ms
+Done with DECODING VITERBI MODEL! Time: 193383 ms
 TAG             ACCURACY                PRECISION               RECALL(TPR)             F1-SCORE                SPECIFICITY(TNR)
-OT              0.9985318               0.9903116               0.9932474               0.9917774               0.9990489
-CC              0.9936903               0.9204078               0.9691959               0.944172                0.9951173
-PN              0.998495                0.9901654               0.9880643               0.9891137               0.9992704
-VB              0.9866868               0.9685872               0.9492242               0.9588079               0.9939948
-PP              0.9937967               0.9759209               0.9747828               0.9753515               0.9965356
-AT/DT           0.9938591               0.9814852               0.970812                0.9761195               0.997281
-NN              0.9795806               0.9575064               0.9611672               0.9593334               0.9857374
-RB              0.9883606               0.8971761               0.8776888               0.8873254               0.994458
-JJ              0.9889405               0.9033735               0.9303997               0.9166874               0.9930367
-TOTAL           0.9913269               0.9538816               0.9571758               0.9554098               0.9949422
+JJ              0.9889748               0.8986033               0.9337218               0.915826                0.9927676
+NN              0.9789148               0.9570198               0.9591587               0.958088                0.9855446
+PN              0.998565                0.989179                0.9897651               0.989472                0.9992083
+VB              0.9856973               0.9644746               0.9472797               0.9557998               0.9931926
+AT/DT           0.9938341               0.9832677               0.9688943               0.976028                0.997546
+PP              0.9942085               0.9758366               0.9772308               0.9765332               0.9965965
+CC              0.993691                0.9199418               0.9697132               0.944172                0.9950869
+OT              0.9983264               0.9921102               0.9896528               0.99088         	0.9992039
+RB              0.9883142               0.8997607               0.8789713               0.8892444               0.994479
+TOTAL           0.9911695               0.9533548               0.9571542               0.955116                0.9948473
 
-Accuracy for known words: 0.9665108
-Accuracy for unknown words: 0.8145762
-Accuracy on both: 0.9609708
+Accuracy for known words: 0.9656686
+Accuracy for unknown words: 0.8187351
+Accuracy on both: 0.960263
 +
-Unknown words (count): 9934 | Procentage (%): 0.03646348
-Known words (count): 262503 | Procentage (%): 0.9635365
-Total words (count): 272437
+Unknown words (count): 10024 | Procentage (%): 0.03678991
+Known words (count): 262442 | Procentage (%): 0.9632101
+Total words (count): 272466
 
 
 [FOLD 2/4 DONE!]
 
 
 Done with loading and creating tokens for train & test files!
-Done with training HIDDEN MARKOV MODEL & calculating probabilities! Time: 128825 ms
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Done with DECODING VITERBI MODEL! Time: 221571 ms
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Done with training HIDDEN MARKOV MODEL & calculating probabilities! Time: 129408 ms
+Done with DECODING VITERBI MODEL! Time: 184587 ms
 TAG             ACCURACY                PRECISION               RECALL(TPR)             F1-SCORE                SPECIFICITY(TNR)
-NN              0.9788979               0.9566598               0.958514                0.957586                0.9856392
-JJ              0.9881529               0.8939461               0.9261603               0.9097681               0.9924261
-OT              0.9983674               0.9901803               0.9914126               0.990796                0.9990438
-PP              0.9936242               0.976216                0.9736211               0.9749168               0.996541
-AT/DT           0.9934807               0.9807095               0.9695641               0.9751049               0.9971078
-VB              0.9864835               0.9663123               0.9501231               0.9581493               0.9935566
-PN              0.9984961               0.9896098               0.9873239               0.9884655               0.9992762
-RB              0.9881087               0.898976                0.8811721               0.889985                0.9942828
-CC              0.9936499               0.9225643               0.9693983               0.9454016               0.9951079
-TOTAL           0.991029                0.9527971               0.9563655               0.9544637               0.9947757
+AT/DT           0.9938095               0.9798568               0.9717177               0.9757702               0.9970604
+NN              0.980009                0.9595579               0.9599851               0.9597715               0.9866272
+PP              0.9936583               0.9747314               0.9749026               0.974817                0.9963598
+OT              0.9986174               0.990806                0.9933615               0.9920821               0.9991195
+JJ              0.9885076               0.8958851               0.9294063               0.912338                0.992572
+CC              0.9935883               0.9177519               0.9723396               0.9442575               0.9948452
+VB              0.9868042               0.968177                0.9511682               0.9595972               0.9938332
+RB              0.9883011               0.9064935               0.8752203               0.8905825               0.9948063
+PN              0.9984662               0.9909148               0.9874089               0.9891587               0.9993095
+TOTAL           0.9913068               0.9537971               0.9572789               0.955375                0.9949481
 
-Accuracy for known words: 0.9659337
-Accuracy for unknown words: 0.8080148
-Accuracy on both: 0.9596307
+Accuracy for known words: 0.9662654
+Accuracy for unknown words: 0.827704
+Accuracy on both: 0.9608808
 +
-Unknown words (count): 10855 | Procentage (%): 0.03991337
-Known words (count): 261109 | Procentage (%): 0.9600866
-Total words (count): 271964
+Unknown words (count): 10540 | Procentage (%): 0.03886116
+Known words (count): 260682 | Procentage (%): 0.9611388
+Total words (count): 271222
 
 
 [FOLD 3/4 DONE!]
 
 
 Done with loading and creating tokens for train & test files!
-Done with training HIDDEN MARKOV MODEL & calculating probabilities! Time: 157839 ms
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Done with DECODING VITERBI MODEL! Time: 244179 ms
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Done with training HIDDEN MARKOV MODEL & calculating probabilities! Time: 119375 ms
+Done with DECODING VITERBI MODEL! Time: 183228 ms
 TAG             ACCURACY                PRECISION               RECALL(TPR)             F1-SCORE                SPECIFICITY(TNR)
-NN              0.9792249               0.9563026               0.961583                0.9589356               0.9851767
-VB              0.9867768               0.9688507               0.9475501               0.958082                0.9942197
-RB              0.9892855               0.9037516               0.8856753               0.8946221               0.9948941
-PP              0.9941883               0.9762149               0.978867                0.9775392               0.9964615
-JJ              0.9886648               0.9067838               0.9273394               0.9169465               0.9931022
-CC              0.9937966               0.9217502               0.9694974               0.9450211               0.9952106
-AT/DT           0.9938521               0.9830508               0.9709251               0.9769503               0.9974055
-OT              0.9984002               0.9915038               0.9903846               0.9909439               0.9991773
-PN              0.9983411               0.9854783               0.9880924               0.9867836               0.9990264
-TOTAL           0.9913924               0.954854                0.9577683               0.9562027               0.9949638
+RB              0.9892235               0.8989578               0.8869603               0.8929188               0.9946803
+AT/DT           0.993908                0.9821022               0.9717922               0.9769199               0.997291
+PP              0.9943328               0.9788544               0.9774616               0.9781575               0.9968498
+NN              0.9795443               0.9563243               0.9635886               0.9599428               0.9849874
+OT              0.9986663               0.991118                0.9933022               0.9922089               0.9991678
+VB              0.9864675               0.9707212               0.9441503               0.9572514               0.9945565
+JJ              0.9890757               0.9067293               0.9384755               0.9223293               0.9928326
+CC              0.9940336               0.9303511               0.9667865               0.9482188               0.9956654
+PN              0.998489                0.9884527               0.9867136               0.9875823               0.9992526
+TOTAL           0.9915268               0.9559568               0.9588035               0.9572811               0.9950315
 
-Accuracy for known words: 0.9677784
-Accuracy for unknown words: 0.8036678
-Accuracy on both: 0.9612652
+Accuracy for known words: 0.9676466
+Accuracy for unknown words: 0.8181992
+Accuracy on both: 0.9618704
 +
-Unknown words (count): 10742 | Procentage (%): 0.03968802
-Known words (count): 259919 | Procentage (%): 0.9603119
-Total words (count): 270661
+Unknown words (count): 10462 | Procentage (%): 0.03865052
+Known words (count): 260220 | Procentage (%): 0.9613495
+Total words (count): 270682
 
 
 [FOLD 4/4 DONE!]

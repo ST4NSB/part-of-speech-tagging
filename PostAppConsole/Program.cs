@@ -1,4 +1,4 @@
-﻿//#define RULE_70_30
+﻿#define RULE_70_30
 #define CROSS_VALIDATION
 
 using System;
@@ -38,8 +38,6 @@ namespace PostAppConsole
 
         static void Main(string[] args)
         {
-            string path = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.Parent.FullName + "\\";
-
 #if (RULE_70_30)
             Console.WriteLine("You chose Rule 70% - training, 30% - testing for the data-set!");
             const string BrownfolderTrain = "Brown_Corpus\\70_30\\1_Train", BrownfolderTest = "Brown_Corpus\\70_30\\2_Test";
@@ -111,7 +109,7 @@ namespace PostAppConsole
             Decoder decoder = new Decoder();
 
             sw.Reset(); sw.Start();
-            decoder.ViterbiDecoding(tagger, wordsTest, modelForward: "trigram", modelBackward: "trigram", mode: "f+b");
+            decoder.ViterbiDecoding(tagger, wordsTest, modelForward: "trigram", modelBackward: "trigram", mode: "forward");
             sw.Stop();
             tagger.EliminateAllEndOfSentenceTags(wordsTest);
             #endregion
@@ -288,6 +286,7 @@ namespace PostAppConsole
             #endregion
 
 #elif (CROSS_VALIDATION)
+            string path = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.Parent.FullName + "\\";
             const int folds = 4;
             const bool shuffle = true;
             Console.WriteLine("You chose Cross-Validation for the data-set! Folds: " + folds + ", Shuffle-option: " + shuffle);
@@ -295,7 +294,7 @@ namespace PostAppConsole
             string demoBrown = path + "demo files\\cross";
 
             CrossValidation cv = new CrossValidation(filePath: BrownFolderPath, fold: folds, shuffle: shuffle); // with randomness
-            Console.WriteLine("Done with loading dataset & split them into folds!\n");
+            Console.WriteLine("Done with loading dataset & splitting them into folds!\n");
             for(int foldNumber = 0; foldNumber < folds; foldNumber++)
             {
                 #region Load Train Files & pre-process data
@@ -328,7 +327,7 @@ namespace PostAppConsole
 
                 sw.Stop();
                 Console.WriteLine("Done with training HIDDEN MARKOV MODEL & calculating probabilities! Time: " + sw.ElapsedMilliseconds + " ms");
-                Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+                //Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
                 #endregion
 
 
@@ -341,7 +340,7 @@ namespace PostAppConsole
                 tagger.EliminateAllEndOfSentenceTags(wordsTest);
 
                 Console.WriteLine("Done with DECODING VITERBI MODEL! Time: " + sw.ElapsedMilliseconds + " ms");
-                Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
+                //Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
                 #endregion
 
                 #region Evaluations & results

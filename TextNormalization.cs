@@ -13,6 +13,15 @@ namespace NLP
         //    return (double)(((value - oldMin) * (newMax - newMin)) / (oldMax - oldMin)) + newMin;
         //}
 
+        public static double BoundProbability(double x)
+        {
+            if (x > 1.0d)
+                return 1.0d;
+            else if (x < 0.0d)
+                return 0.0d;
+            else return x;
+        }
+
         public static double MinMaxNormalization(double x, double min, double max)
         {
             return (double)(x - min) / (max - min);
