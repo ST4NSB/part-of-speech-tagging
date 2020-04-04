@@ -218,10 +218,11 @@ namespace NLP
                 proc += TextNormalization.MinMaxNormalization(occurenceAdder, 0, maxValPossible);
 
             //Console.WriteLine("adder: " + occurenceAdder);
+           
+            proc = TextNormalization.BoundProbability(proc);
+
             //Console.WriteLine("final proc: " + proc + " - current word: " + testWord + " - current tag: " + currentTag);
             //Console.WriteLine();
-
-            proc = TextNormalization.BoundProbability(proc);
 
             return proc;
         }
