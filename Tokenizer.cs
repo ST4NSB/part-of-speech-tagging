@@ -92,7 +92,6 @@ namespace NLP
         public static List<WordTag> SeparateTagFromWord(List<string> Words)
         {
             List<WordTag> wordTags = new List<WordTag>();
-            int k = 0;
             foreach (var word in Words) 
             {
                 string[] separated = word.Split('/');
@@ -107,7 +106,6 @@ namespace NLP
                 }
                 else combWord = separated[0];
                 wordTags.Add(new WordTag(combWord, separatedTag));
-                k++;
             }
             return wordTags;
         }

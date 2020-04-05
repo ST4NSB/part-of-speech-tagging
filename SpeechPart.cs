@@ -35,10 +35,7 @@ namespace NLP
             {
                 int tagIndex = GetTagIndexForConversion(w);
                 string newTag = ConvertBrownTagToHierarchicTag(tagIndex);
-                Tokenizer.WordTag newWord = new Tokenizer.WordTag();
-                newWord.word = w.word;
-                newWord.tag = newTag;
-                newWords.Add(newWord);
+                newWords.Add(new Tokenizer.WordTag(w.word, newTag));
             }
             return newWords;
         }
