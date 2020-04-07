@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace NLP
 {
@@ -33,7 +34,7 @@ namespace NLP
         }
 
 
-        public void ViterbiDecoding(HMMTagger tagger, List<Tokenizer.WordTag> testWords, string modelForward = "bigram",string modelBackward = "bigram", string mode = "forward")
+        public void ViterbiDecoding(HMMTagger tagger, List<Tokenizer.WordTag> testWords, string modelForward = "bigram", string modelBackward = "bigram", string mode = "forward")
         {
             this.UnknownWords = new HashSet<string>();
 
@@ -43,12 +44,12 @@ namespace NLP
             this.PredictedTags = new List<string>();
             this.ViterbiGraph = new List<List<ViterbiNode>>();
 
-            if(mode.Equals("forward") || mode.Equals("f+b"))
-                this.ForwardAlgorithm(tagger, testWords, modelForward, mode);
+            if (mode.Equals("forward") || mode.Equals("f+b"))
+                this.ForwardAlgorithm(tagger, testWords, modelForward);
             if (mode.Equals("backward") || mode.Equals("f+b"))
                 this.BackwardAlgorithm(tagger, testWords, modelBackward, mode);
 
-            if(mode.Equals("f+b"))
+            if (mode.Equals("f+b"))
                 BiDirectionalModelTrace();
         }
 
@@ -228,7 +229,7 @@ namespace NLP
         }
 
 
-        private void ForwardAlgorithm(HMMTagger tagger, List<Tokenizer.WordTag> testWords, string model, string mode)
+        private void ForwardAlgorithm(HMMTagger tagger, List<Tokenizer.WordTag> testWords, string model)
         {
             // left to right encoding - forward approach
             bool startPoint = true;
