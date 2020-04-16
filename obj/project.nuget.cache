@@ -1,10 +1,16 @@
 {
   "version": 2,
-  "dgSpecHash": "GQnxa9CC30JZNy4HtYD3Awj+e1jyHhpr75A5Cu/atXbx5poQcsrpn3MpzjNXyEY5bLc9vf23EE/+Qub4pgm7iQ==",
+  "dgSpecHash": "NxTyODeNOrYuvEK46lvhDluicpLQS8Lxw3Ba5orRiimMj7Kjfzd1cZQOI+8Y4ZU61Z5NQZftpTuAu2mNjXnCtw==",
   "success": true,
-  "projectFilePath": "D:\\Projects\\github\\part-of-speech-tagging\\Nlp-PosTagger.csproj",
+  "projectFilePath": "D:\\Projects\\github\\part-of-speech-tagging\\PostAppConsole.csproj",
   "expectedPackageFiles": [
-    "C:\\Users\\AdiB\\.nuget\\packages\\microsoft.netcore.platforms\\1.1.0\\microsoft.netcore.platforms.1.1.0.nupkg.sha512",
+    "C:\\Users\\AdiB\\.nuget\\packages\\json.net\\1.0.18\\json.net.1.0.18.nupkg.sha512",
+    "C:\\Users\\AdiB\\.nuget\\packages\\microsoft.netcore.app\\2.1.0\\microsoft.netcore.app.2.1.0.nupkg.sha512",
+    "C:\\Users\\AdiB\\.nuget\\packages\\microsoft.netcore.dotnetapphost\\2.1.0\\microsoft.netcore.dotnetapphost.2.1.0.nupkg.sha512",
+    "C:\\Users\\AdiB\\.nuget\\packages\\microsoft.netcore.dotnethostpolicy\\2.1.0\\microsoft.netcore.dotnethostpolicy.2.1.0.nupkg.sha512",
+    "C:\\Users\\AdiB\\.nuget\\packages\\microsoft.netcore.dotnethostresolver\\2.1.0\\microsoft.netcore.dotnethostresolver.2.1.0.nupkg.sha512",
+    "C:\\Users\\AdiB\\.nuget\\packages\\microsoft.netcore.platforms\\2.1.0\\microsoft.netcore.platforms.2.1.0.nupkg.sha512",
+    "C:\\Users\\AdiB\\.nuget\\packages\\microsoft.netcore.targets\\2.1.0\\microsoft.netcore.targets.2.1.0.nupkg.sha512",
     "C:\\Users\\AdiB\\.nuget\\packages\\netstandard.library\\2.0.3\\netstandard.library.2.0.3.nupkg.sha512",
     "C:\\Users\\AdiB\\.nuget\\packages\\newtonsoft.json\\12.0.3\\newtonsoft.json.12.0.3.nupkg.sha512"
   ],
