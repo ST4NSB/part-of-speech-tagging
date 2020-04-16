@@ -271,11 +271,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\Projects\\github\\part-of-speech-tagging\\Nlp-PosTagger.csproj",
+      "projectUniqueName": "D:\\Projects\\github\\part-of-speech-tagging\\src\\Nlp-PosTagger.csproj",
       "projectName": "Nlp-PosTagger",
-      "projectPath": "D:\\Projects\\github\\part-of-speech-tagging\\Nlp-PosTagger.csproj",
+      "projectPath": "D:\\Projects\\github\\part-of-speech-tagging\\src\\Nlp-PosTagger.csproj",
       "packagesPath": "C:\\Users\\AdiB\\.nuget\\packages\\",
-      "outputPath": "D:\\Projects\\github\\part-of-speech-tagging\\obj\\",
+      "outputPath": "D:\\Projects\\github\\part-of-speech-tagging\\src\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\AdiB\\AppData\\Roaming\\NuGet\\NuGet.Config",

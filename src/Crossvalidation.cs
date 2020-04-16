@@ -6,13 +6,28 @@ namespace NLP
 {
     public class CrossValidation
     {
+        /// <summary>
+        /// Public members to load training & test files
+        /// </summary>
         public string[] TestFile, TrainFile; // length = fold
 
+        /// <summary>
+        /// Public constructor to create a structure for evaluating data on cross validation.
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <param name="fold"></param>
+        /// <param name="shuffle"></param>
         public CrossValidation(string filePath, int fold = 10, bool shuffle = false) 
         {
             this.SetFilesForCrossValidation(filePath, fold, shuffle);
         }
 
+        /// <summary>
+        /// Private method to divide files into training & test files
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <param name="fold"></param>
+        /// <param name="shuffle"></param>
         private void SetFilesForCrossValidation(string filePath, int fold = 10, bool shuffle = false) 
         {
             List<string> files = FileReader.GetAllTextFromDirectoryAsList(filePath);
@@ -46,7 +61,12 @@ namespace NLP
             }
         }
 
-        private List<string> Shuffle(List<string> list) // Fisher–Yates shuffle
+        /// <summary>
+        /// Private method to shuffle list by Fisher-Yates algorithm (Durstenfeld's version)
+        /// </summary>
+        /// <param name="list"></param>
+        /// <returns></returns>
+        private List<string> Shuffle(List<string> list)
         {
             Random rng = new Random();
             int n = list.Count;

@@ -15,3 +15,12 @@ D:\Projects\github\part-of-speech-tagging\obj\Debug\netstandard2.0\Nlp-PosTagger
 D:\Projects\github\part-of-speech-tagging\bin\Debug\netstandard2.0\Nlp-PosTagger.deps.json
 D:\Projects\github\part-of-speech-tagging\bin\Debug\netstandard2.0\Nlp-PosTagger.dll
 D:\Projects\github\part-of-speech-tagging\bin\Debug\netstandard2.0\Nlp-PosTagger.pdb
+D:\Projects\github\part-of-speech-tagging\src\bin\Debug\netstandard2.0\Nlp-PosTagger.deps.json
+D:\Projects\github\part-of-speech-tagging\src\bin\Debug\netstandard2.0\Nlp-PosTagger.dll
+D:\Projects\github\part-of-speech-tagging\src\bin\Debug\netstandard2.0\Nlp-PosTagger.pdb
+D:\Projects\github\part-of-speech-tagging\src\obj\Debug\netstandard2.0\Nlp-PosTagger.csprojAssemblyReference.cache
+D:\Projects\github\part-of-speech-tagging\src\obj\Debug\netstandard2.0\Nlp-PosTagger.csproj.CoreCompileInputs.cache
+D:\Projects\github\part-of-speech-tagging\src\obj\Debug\netstandard2.0\Nlp-PosTagger.AssemblyInfoInputs.cache
+D:\Projects\github\part-of-speech-tagging\src\obj\Debug\netstandard2.0\Nlp-PosTagger.AssemblyInfo.cs
+D:\Projects\github\part-of-speech-tagging\src\obj\Debug\netstandard2.0\Nlp-PosTagger.dll
+D:\Projects\github\part-of-speech-tagging\src\obj\Debug\netstandard2.0\Nlp-PosTagger.pdb

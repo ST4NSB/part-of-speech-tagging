@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "D2N4+ppJtVv9qjntaso8goTIa0jL9eW3cQQTtlkEqgzxGAwQV8CvbEKzRViQJJh25OOI1p9mrIYVctlkTY+nWw==",
+  "dgSpecHash": "MsUyvVhYMH3JzGMB0lNwBAPkNlRTGSMjC1yly1cxF2Uz45V7ckw4Z3OeL9KLd/5/Uc3InMn9ESDCbR9Xmqm77Q==",
   "success": true,
-  "projectFilePath": "D:\\Projects\\github\\part-of-speech-tagging\\Nlp-PosTagger.csproj",
+  "projectFilePath": "D:\\Projects\\github\\part-of-speech-tagging\\src\\Nlp-PosTagger.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\AdiB\\.nuget\\packages\\microsoft.netcore.platforms\\1.1.0\\microsoft.netcore.platforms.1.1.0.nupkg.sha512",
     "C:\\Users\\AdiB\\.nuget\\packages\\netstandard.library\\2.0.3\\netstandard.library.2.0.3.nupkg.sha512",

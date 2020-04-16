@@ -15,6 +15,7 @@ namespace NLP
             string outputFile = File.ReadAllText(inputFile);
             return outputFile;
         }
+
         /// <summary>
         /// Static method to read all lines from inputFile and returns a List of strings.
         /// </summary>
@@ -30,6 +31,7 @@ namespace NLP
             }
             return outputFile;
         }
+
         /// <summary>
         /// Static method to read all lines from inputDir (directory) and returns a string.
         /// </summary>
@@ -45,6 +47,7 @@ namespace NLP
             }
             return outputFile;
         }
+
         /// <summary>
         /// Static method to read all lines from inputDir (directory) and returns a List of string.
         /// </summary>
@@ -61,6 +64,7 @@ namespace NLP
             }
             return outputFile;
         }
+
     }
 }
 
