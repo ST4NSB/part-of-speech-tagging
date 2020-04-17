@@ -16,6 +16,9 @@
     <Reference Include="Nlp-PosTagger">
       <HintPath>..\..\src\bin\Debug\netstandard2.0\Nlp-PosTagger.dll</HintPath>
     </Reference>
+    <Reference Include="nunit.framework">
+      <HintPath>..\nunit.framework.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

@@ -57,3 +57,4 @@ D:\Projects\github\part-of-speech-tagging\obj\Debug\netcoreapp2.1\PostAppConsole
 D:\Projects\github\part-of-speech-tagging\obj\Debug\netcoreapp2.1\PostAppConsole.dll
 D:\Projects\github\part-of-speech-tagging\obj\Debug\netcoreapp2.1\PostAppConsole.pdb
 D:\Projects\github\part-of-speech-tagging\obj\Debug\netcoreapp2.1\PostAppConsole.genruntimeconfig.cache
+D:\Projects\github\part-of-speech-tagging\bin\Debug\netcoreapp2.1\nunit.framework.dll

@@ -10,7 +10,8 @@
         "dependencies": {
           "Json.Net": "1.0.18",
           "Newtonsoft.Json": "12.0.3",
-          "Nlp-PosTagger": "1.0.0.0"
+          "Nlp-PosTagger": "0.0.0.0",
+          "nunit.framework": "3.12.0.0"
         },
         "runtime": {
           "PostAppConsole.dll": {}
@@ -32,11 +33,19 @@
           }
         }
       },
-      "Nlp-PosTagger/1.0.0.0": {
+      "Nlp-PosTagger/0.0.0.0": {
         "runtime": {
           "Nlp-PosTagger.dll": {
-            "assemblyVersion": "1.0.0.0",
-            "fileVersion": "1.0.0.0"
+            "assemblyVersion": "0.0.0.0",
+            "fileVersion": "0.0.0.0"
+          }
+        }
+      },
+      "nunit.framework/3.12.0.0": {
+        "runtime": {
+          "nunit.framework.dll": {
+            "assemblyVersion": "3.12.0.0",
+            "fileVersion": "3.12.0.0"
           }
         }
       }
@@ -62,7 +71,12 @@
       "path": "newtonsoft.json/12.0.3",
       "hashPath": "newtonsoft.json.12.0.3.nupkg.sha512"
     },
-    "Nlp-PosTagger/1.0.0.0": {
+    "Nlp-PosTagger/0.0.0.0": {
+      "type": "reference",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "nunit.framework/3.12.0.0": {
       "type": "reference",
       "serviceable": false,
       "sha512": ""

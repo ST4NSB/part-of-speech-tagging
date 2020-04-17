@@ -9,6 +9,8 @@ using System.Linq;
 using Newtonsoft.Json;
 using NLP;
 
+#pragma warning disable CS0436
+
 namespace PostAppConsole
 {
     class Program
@@ -270,19 +272,19 @@ namespace PostAppConsole
             #endregion
 
             #region Save predictions tags to excel
-            using (System.IO.StreamWriter file = new System.IO.StreamWriter(path + "statistics\\" + "trigram_bidirectional.csv"))
-            {
-                file.WriteLine("Word,Real Tag,Prediction Tag,Is in Train T/F,Predicted T/F");
-                for (int i = 0; i < wordsTest.Count; i++)
-                {
-                    bool isInTrain = true, predictedB = false;
-                    if (decoder.UnknownWords.Contains(wordsTest[i].word))
-                        isInTrain = false;
-                    if (wordsTest[i].tag == decoder.PredictedTags[i])
-                        predictedB = true;
-                    file.WriteLine("\"" + wordsTest[i].word + "\"," + wordsTest[i].tag + "," + decoder.PredictedTags[i] + "," + isInTrain + "," + predictedB);
-                }
-            }
+            //using (System.IO.StreamWriter file = new System.IO.StreamWriter(path + "statistics\\" + "trigram_bidirectional.csv"))
+            //{
+            //    file.WriteLine("Word,Real Tag,Prediction Tag,Is in Train T/F,Predicted T/F");
+            //    for (int i = 0; i < wordsTest.Count; i++)
+            //    {
+            //        bool isInTrain = true, predictedB = false;
+            //        if (decoder.UnknownWords.Contains(wordsTest[i].word))
+            //            isInTrain = false;
+            //        if (wordsTest[i].tag == decoder.PredictedTags[i])
+            //            predictedB = true;
+            //        file.WriteLine("\"" + wordsTest[i].word + "\"," + wordsTest[i].tag + "," + decoder.PredictedTags[i] + "," + isInTrain + "," + predictedB);
+            //    }
+            //}
             #endregion
 
 #elif (CROSS_VALIDATION)
