@@ -8,11 +8,11 @@ namespace NLP
 {
     public static class TextNormalization
     {
-        //public static double MinMaxNormalization(double value, double newMax, double newMin, double oldMax = 1.0d, double oldMin = 0.0d)
-        //{
-        //    return (double)(((value - oldMin) * (newMax - newMin)) / (oldMax - oldMin)) + newMin;
-        //}
-
+        /// <summary>
+        /// Public static function to bound probability between [0.0, 1.0].
+        /// </summary>
+        /// <param name="x"></param>
+        /// <returns></returns>
         public static double BoundProbability(double x)
         {
             if (x > 1.0d)
@@ -22,11 +22,25 @@ namespace NLP
             else return x;
         }
 
+        /// <summary>
+        /// Public static function that returns the new interval normalized between [min, max].
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="min"></param>
+        /// <param name="max"></param>
+        /// <returns></returns>
         public static double MinMaxNormalization(double x, double min, double max)
         {
             return (double)(x - min) / (max - min);
         }
 
+        /// <summary>
+        /// Public static function to pre-process (data cleaning, normalization) the tokenized list of words.
+        /// </summary>
+        /// <param name="words"></param>
+        /// <param name="toLowerOption"></param>
+        /// <param name="keepOnlyCapitalizedWords"></param>
+        /// <returns></returns>
         public static List<Tokenizer.WordTag> PreProcessingPipeline(List<Tokenizer.WordTag> words, bool toLowerOption = false, bool keepOnlyCapitalizedWords = false)
         {
             List<Tokenizer.WordTag> newWords = new List<Tokenizer.WordTag>();

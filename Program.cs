@@ -1,4 +1,4 @@
-﻿#define RULE_70_30
+﻿//#define RULE_70_30
 #define CROSS_VALIDATION
 
 using System;
@@ -286,14 +286,25 @@ namespace PostAppConsole
             #endregion
 
 #elif (CROSS_VALIDATION)
-            const int folds = 4;
-            const bool shuffle = true;
-            Console.WriteLine("You chose Cross-Validation for the data-set! Folds: " + folds + ", Shuffle-option: " + shuffle);
-            string BrownFolderPath = path + "dataset\\crossvalidation";
+            const int FOLDS = 4;
+            const bool SHUFFLE = true;
+            const string CVPATH = "dataset\\crossvalidation";
+            Console.WriteLine("You chose Cross-Validation for the data-set! Folds: " + FOLDS + ", Shuffle-option: " + SHUFFLE);
+            
+            string BrownFolderPath = path + CVPATH;
 
-            CrossValidation cv = new CrossValidation(filePath: BrownFolderPath, fold: folds, shuffle: shuffle); // with randomness
+            #region Part of Speech Tag Frequence Count
+            //var tx = LoadAndReadFolderFiles("dataset\\crossvalidation");
+            //var ow = Tokenizer.SeparateTagFromWord(Tokenizer.WordTokenizeCorpus(tx));
+            //var nw = SpeechPart.GetNewHierarchicTags(ow);
+            //var res = SpeechPart.SpeechPartFrequence(nw);
+            //foreach (var item in res)
+            //    Console.WriteLine(item.Key + ": " + item.Value);
+            #endregion
+
+            CrossValidation cv = new CrossValidation(filePath: BrownFolderPath, fold: FOLDS, shuffle: SHUFFLE); // with randomness
             Console.WriteLine("Done with loading dataset & splitting them into folds!\n");
-            for(int foldNumber = 0; foldNumber < folds; foldNumber++)
+            for(int foldNumber = 0; foldNumber < FOLDS; foldNumber++)
             {
             #region Load Train Files & pre-process data
                 var text = cv.TrainFile[foldNumber];
@@ -374,7 +385,7 @@ namespace PostAppConsole
                 Console.WriteLine("Total words (count): " + wordsTest.Count);
             #endregion
 
-                Console.WriteLine("\n\n[FOLD " + (foldNumber + 1) + "/" + folds + " DONE!]\n\n");
+                Console.WriteLine("\n\n[FOLD " + (foldNumber + 1) + "/" + FOLDS + " DONE!]\n\n");
             }
 
 #endif
