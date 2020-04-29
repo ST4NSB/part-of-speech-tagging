@@ -85,12 +85,12 @@ namespace NLP
             }
         }
 
-        public void CreateHiddenMarkovModel(List<Tokenizer.WordTag> uncapitalizedWords, List<Tokenizer.WordTag> capitalizedWords)
+        public void CreateHiddenMarkovModel(List<Tokenizer.WordTag> uncapitalizedWords, List<Tokenizer.WordTag> capitalizedWords, int smoothingFixes = 0)
         {
             this.N = uncapitalizedWords.Count;
 
             // > .NET 4.0 for task-ing
-            Task taskSuffixPrefixEmission = Task.Factory.StartNew(() => this.GetEmissionProbabilitiesForSuffixesAndPrefixes(uncapitalizedWords, capitalizedWords));
+            Task taskSuffixPrefixEmission = Task.Factory.StartNew(() => this.GetEmissionProbabilitiesForSuffixesAndPrefixes(uncapitalizedWords, capitalizedWords, smoothingFixes));
             Task taskEmissionWords = Task.Factory.StartNew(() => this.CalculateEmissionForWordTags(uncapitalizedWords, capitalizedWords));
             Task taskBigram = Task.Factory.StartNew(() => this.CalculateBigramOccurences(uncapitalizedWords));
             Task taskTrigram = Task.Factory.StartNew(() => this.CalculateTrigramOccurences(uncapitalizedWords));
@@ -102,7 +102,7 @@ namespace NLP
             //this.CalculateTrigramOccurences(uncapitalizedWords);
         }
 
-        private void GetEmissionProbabilitiesForSuffixesAndPrefixes(List<Tokenizer.WordTag> uncapitalizedWords, List<Tokenizer.WordTag> capitalizedWords)
+        private void GetEmissionProbabilitiesForSuffixesAndPrefixes(List<Tokenizer.WordTag> uncapitalizedWords, List<Tokenizer.WordTag> capitalizedWords, int smoothing)
         {
             // BlackList: -> prefix: neo[(0, 2) -> 0], over[(17, 45) -> 0.3777778], mega[(0, 2) -> 0]
             //                       eco[(1, 3) -> 0.3333333], dif[(1, 3) -> 0.3333333], post[post: (1, 3) -> 0.3333333],
@@ -137,7 +137,7 @@ namespace NLP
             var preffxem = new List<EmissionModel>();
 
             CalculateSuffixPrefixFrequence(uncapitalizedWords, capitalizedWords, pref, suff, capitalSuff, capitalPref, suffxem, preffxem);
-            CalculateSuffixPrefixProbabilities(capitalSuff, capitalPref, suffxem, preffxem);
+            CalculateSuffixPrefixProbabilities(capitalSuff, capitalPref, suffxem, preffxem, smoothing);
         }
 
         private void CalculateSuffixPrefixFrequence(
@@ -151,7 +151,7 @@ namespace NLP
             List<EmissionModel> preffxem)
         {
             foreach (var item in suff)
-            {
+            {   
                 var emuw = new EmissionModel();
                 var emcw = new EmissionModel();
                 emuw.Word = item;
@@ -246,7 +246,8 @@ namespace NLP
             List<EmissionModel> capitalSuff,
             List<EmissionModel> capitalPref,
             List<EmissionModel> suffxem,
-            List<EmissionModel> preffxem)
+            List<EmissionModel> preffxem,
+            int smoothing)
         {
             foreach (var sfx in capitalSuff)
             {
@@ -254,7 +255,7 @@ namespace NLP
                 Dictionary<string, double> tgfreq = new Dictionary<string, double>();
                 foreach (var tg in sfx.TagFreq)
                 {
-                    tgfreq.Add(tg.Key, (double)tg.Value / tagSum);
+                    tgfreq.Add(tg.Key, (double)(tg.Value + smoothing) / (tagSum + smoothing));
                 }
 
                 var em = new EmissionProbabilisticModel();
@@ -269,7 +270,7 @@ namespace NLP
                 Dictionary<string, double> tgfreq = new Dictionary<string, double>();
                 foreach (var tg in pfx.TagFreq)
                 {
-                    tgfreq.Add(tg.Key, (double)tg.Value / tagSum);
+                    tgfreq.Add(tg.Key, (double)(tg.Value + smoothing) / (tagSum + smoothing));
                 }
 
                 var em = new EmissionProbabilisticModel();
@@ -284,7 +285,7 @@ namespace NLP
                 Dictionary<string, double> tgfreq = new Dictionary<string, double>();
                 foreach (var tg in sfx.TagFreq)
                 {
-                    tgfreq.Add(tg.Key, (double)tg.Value / tagSum);
+                    tgfreq.Add(tg.Key, (double)(tg.Value + smoothing) / (tagSum + smoothing));
                 }
 
                 var em = new EmissionProbabilisticModel();
@@ -299,7 +300,7 @@ namespace NLP
                 Dictionary<string, double> tgfreq = new Dictionary<string, double>();
                 foreach (var tg in pfx.TagFreq)
                 {
-                    tgfreq.Add(tg.Key, (double)tg.Value / tagSum);
+                    tgfreq.Add(tg.Key, (double)(tg.Value + smoothing) / (tagSum + smoothing));
                 }
 
                 var em = new EmissionProbabilisticModel();
@@ -331,22 +332,22 @@ namespace NLP
             testWords.RemoveAll(x => x.tag == ".");
         }
 
-        public void CalculateHiddenMarkovModelProbabilitiesForTestCorpus(List<Tokenizer.WordTag> testWords, string model = "bigram")
+        public void CalculateHiddenMarkovModelProbabilitiesForTestCorpus(List<Tokenizer.WordTag> testWords, string model = "bigram", int smoothing = 0)
         {
             // emission stage
-            Task taskEmission = Task.Factory.StartNew(() => this.calculateEmissionTestCorpus(testWords));
+            Task taskEmission = Task.Factory.StartNew(() => this.calculateEmissionTestCorpus(testWords, smoothing));
 
             // transition stage
             // unigram
-            Task taskUnigram = Task.Factory.StartNew(() => this.calculateUnigramTestCorpus());
+            Task taskUnigram = Task.Factory.StartNew(() => this.calculateUnigramTestCorpus(smoothing));
 
             // bigram
-            Task taskBigram = Task.Factory.StartNew(() => this.calculateBigramTestCorpus());
+            Task taskBigram = Task.Factory.StartNew(() => this.calculateBigramTestCorpus(smoothing));
 
             
             if (model.Equals("trigram")) // trigram
             {
-                Task taskTrigram = Task.Factory.StartNew(() => this.calculateTrigramTestCorpus());
+                Task taskTrigram = Task.Factory.StartNew(() => this.calculateTrigramTestCorpus(smoothing));
                 Task.WaitAll(taskEmission, taskUnigram, taskBigram, taskTrigram);
 
                 Task taskBiInterp = Task.Factory.StartNew(() => this.DeletedInterpolationBigram());
@@ -360,7 +361,7 @@ namespace NLP
             }
         }
 
-        private void calculateEmissionTestCorpus(List<Tokenizer.WordTag> testWords)
+        private void calculateEmissionTestCorpus(List<Tokenizer.WordTag> testWords, int smoothing)
         {
             foreach (var tw in testWords)
             {
@@ -376,7 +377,7 @@ namespace NLP
                     foreach (var tf in wmFind.TagFreq)
                     {
                         int cti = this.UnigramFrequence.FirstOrDefault(x => x.Key == tf.Key).Value;
-                        float pwiti = (float)tf.Value / cti; // Emission probability: p(wi/ti) = C(ti, wi) / C(ti)
+                        double pwiti = (double)(tf.Value + smoothing) / (cti + smoothing); // Emission probability: p(wi/ti) = [C(ti, wi) + smoothing] / [C(ti) + smoothing]
                         epModel.TagFreq.Add(tf.Key, pwiti);
                     }
                     this.WordCapitalizedTagsEmissionProbabilities.Add(epModel);
@@ -396,7 +397,7 @@ namespace NLP
                     foreach (var tf in wmFind.TagFreq)
                     {
                         int cti = this.UnigramFrequence.FirstOrDefault(x => x.Key == tf.Key).Value;
-                        float pwiti = (float)tf.Value / cti; // Emission probability: p(wi/ti) = C(ti, wi) / C(ti)
+                        double pwiti = (double)(tf.Value + smoothing) / (cti + smoothing); // Emission probability: p(wi/ti) = [C(ti, wi) + smoothing] / [C(ti) + smoothing]
                         epModel.TagFreq.Add(tf.Key, pwiti);
                     }
                     this.WordTagsEmissionProbabilities.Add(epModel);
@@ -404,32 +405,32 @@ namespace NLP
             }
         }
 
-        private void calculateUnigramTestCorpus()
+        private void calculateUnigramTestCorpus(int smoothing)
         {
             foreach (var uni in this.UnigramFrequence)
             {
-                double pi = (double)uni.Value / this.N;
+                double pi = (double)(uni.Value + smoothing) / (this.N + smoothing);
                 this.UnigramProbabilities.Add(uni.Key, pi);
             }
         }
 
-        private void calculateBigramTestCorpus()
+        private void calculateBigramTestCorpus(int smoothing)
         {
             foreach (var bi in this.BigramTransitionFrequence)
             {
                 var cti = this.UnigramFrequence.FirstOrDefault(x => x.Key.Equals(bi.Key.Item1)).Value;
-                double pti = (double)bi.Value / cti; // Transition probability: p(ti|ti-1) = C(ti-1, ti) / C(ti-1)
+                double pti = (double)(bi.Value + smoothing) / (cti + smoothing); // Transition probability: p(ti|ti-1) = [C(ti-1, ti) + smoothing] / [C(ti-1) + smoothing]
                 this.BigramTransitionProbabilities.Add(bi.Key, pti);
             }
         }
 
-        private void calculateTrigramTestCorpus()
+        private void calculateTrigramTestCorpus(int smoothing)
         {
             foreach (var tri in this.TrigramTransitionFrequence)
             {
                 Tuple<string, string> tuple = new Tuple<string, string>(tri.Key.Item1, tri.Key.Item2);
                 var cti = this.BigramTransitionFrequence.FirstOrDefault(x => x.Key.Equals(tuple)).Value;
-                double pti = (double)tri.Value / cti; // Transition probability: p(ti|ti-1, ti-2) = C(ti-2, ti-1, ti) / C(ti-2, ti-1)
+                double pti = (double)(tri.Value + smoothing) / (cti + smoothing); // Transition probability: p(ti|ti-1, ti-2) = [C(ti-2, ti-1, ti) + smoothing] / [C(ti-2, ti-1) + smoothing]
                 this.TrigramTransitionProbabilities.Add(tri.Key, pti);
             }
         }

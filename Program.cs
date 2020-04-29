@@ -1,4 +1,4 @@
-﻿//#define RULE_70_30
+﻿#define RULE_70_30
 #define CROSS_VALIDATION
 
 using System;
@@ -68,10 +68,10 @@ namespace PostAppConsole
             Stopwatch sw = new Stopwatch();
 
             sw.Start();
-            tagger.CreateHiddenMarkovModel(uncapWords, capWords);
+            tagger.CreateHiddenMarkovModel(uncapWords, capWords, smoothingFixes: -1);
 
             wordsTest = tagger.EliminateDuplicateSequenceOfEndOfSentenceTags(wordsTest);
-            tagger.CalculateHiddenMarkovModelProbabilitiesForTestCorpus(wordsTest, model: "trigram");
+            tagger.CalculateHiddenMarkovModelProbabilitiesForTestCorpus(wordsTest, model: "trigram", smoothing: 0);
 
             sw.Stop();
             #endregion
