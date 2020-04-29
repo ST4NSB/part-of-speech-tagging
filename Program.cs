@@ -68,10 +68,10 @@ namespace PostAppConsole
             Stopwatch sw = new Stopwatch();
 
             sw.Start();
-            tagger.CreateHiddenMarkovModel(uncapWords, capWords, smoothingFixes: -1);
+            tagger.CreateHiddenMarkovModel(uncapWords, capWords, smoothingCoef: 1);
 
             wordsTest = tagger.EliminateDuplicateSequenceOfEndOfSentenceTags(wordsTest);
-            tagger.CalculateHiddenMarkovModelProbabilitiesForTestCorpus(wordsTest, model: "trigram", smoothing: 0);
+            tagger.CalculateHiddenMarkovModelProbabilitiesForTestCorpus(wordsTest, model: "trigram");
 
             sw.Stop();
             #endregion
