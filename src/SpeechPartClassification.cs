@@ -4,14 +4,14 @@ using System.Text;
 
 namespace NLP
 {
-    public static class SpeechPart
+    public static class SpeechPartClassification
     {
         /// <summary>
         /// Static Method to count the frequency of every individual Part of Speech in the Corpus
         /// </summary>
         /// <param name="Words"></param>
         /// <returns>A dictionary of strings and ints</returns>
-        public static Dictionary<string, int> SpeechPartFrequence(List<Tokenizer.WordTag> Words)
+        public static Dictionary<string, int> TagsFrequence(List<Tokenizer.WordTag> Words)
         {
             Dictionary<string, int> speechCount = new Dictionary<string, int>();
             foreach(var item in Words)

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace NLP
 {
-    public partial class HMMTagger
+    public partial class PartOfSpeechModel
     {
         /// <summary>
         /// Calculates emission for suffixes & prefixes.

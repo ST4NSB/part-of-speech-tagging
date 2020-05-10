@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace NLP
 {
-    public partial class HMMTagger
+    public partial class PartOfSpeechModel
     {
         /// <summary>
         /// Calculates & assigns HMM network probabilities just to the test words.
@@ -49,7 +49,7 @@ namespace NLP
                 if (!char.IsUpper(tw.word[0])) continue;
 
                 string sWord = tw.word;
-                HMMTagger.EmissionModel wmFind = WordCapitalizedTagsEmissionFrequence.Find(x => x.Word == sWord);
+                PartOfSpeechModel.EmissionModel wmFind = WordCapitalizedTagsEmissionFrequence.Find(x => x.Word == sWord);
                 EmissionProbabilisticModel wFind = WordCapitalizedTagsEmissionProbabilities.Find(x => x.Word == sWord);
                 if (wmFind != null && wFind == null)
                 {
@@ -69,7 +69,7 @@ namespace NLP
             {
                 string sWord = tw.word.ToLower();
 
-                HMMTagger.EmissionModel wmFind = WordTagsEmissionFrequence.Find(x => x.Word == sWord);
+                PartOfSpeechModel.EmissionModel wmFind = WordTagsEmissionFrequence.Find(x => x.Word == sWord);
                 EmissionProbabilisticModel wFind = WordTagsEmissionProbabilities.Find(x => x.Word == sWord);
                 if (wmFind != null && wFind == null)
                 {

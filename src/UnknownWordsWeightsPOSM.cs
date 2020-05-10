@@ -5,8 +5,14 @@ using System.Text;
 
 namespace NLP
 {
-    public partial class HMMTagger
+    public partial class PartOfSpeechModel
     {
+        /// <summary>
+        /// Calculates a procent value for the current tag assigned to the unknown word.
+        /// </summary>
+        /// <param name="testWord"></param>
+        /// <param name="currentTag"></param>
+        /// <returns></returns>
         public double GetValueWeightForUnknownWord(string testWord, string currentTag)
         {
             double proc = 0.0d;

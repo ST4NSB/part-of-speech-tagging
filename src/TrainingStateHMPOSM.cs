@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace NLP
 {
-    public partial class HMMTagger
+    public partial class PartOfSpeechModel
     {
         /// <summary>
         /// The main function to create a Hidden Markov Model Network.

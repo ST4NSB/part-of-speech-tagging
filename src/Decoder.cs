@@ -18,6 +18,9 @@ namespace NLP
 
         public Decoder() { }
         
+        /// <summary>
+        /// Viterbi structure for a node (includes value, tag, pointer to next & previous node)
+        /// </summary>
         public class ViterbiNode
         {
             public double value;
@@ -33,8 +36,15 @@ namespace NLP
             }
         }
 
-
-        public void ViterbiDecoding(HMMTagger tagger, List<Tokenizer.WordTag> testWords, string modelForward = "bigram", string modelBackward = "bigram", string mode = "forward")
+        /// <summary>
+        /// The Viterbi decoding algorithm function with input parameters for both forward & backward method.
+        /// </summary>
+        /// <param name="tagger"></param>
+        /// <param name="testWords"></param>
+        /// <param name="modelForward"></param>
+        /// <param name="modelBackward"></param>
+        /// <param name="mode"></param>
+        public void ViterbiDecoding(PartOfSpeechModel tagger, List<Tokenizer.WordTag> testWords, string modelForward = "bigram", string modelBackward = "bigram", string mode = "forward")
         {
             this.UnknownWords = new HashSet<string>();
 
@@ -55,8 +65,13 @@ namespace NLP
             TextNormalization.EliminateAllEndOfSentenceTags(ref testWords);
         }
 
-
-        private void ForwardAlgorithm(HMMTagger tagger, List<Tokenizer.WordTag> testWords, string model)
+        /// <summary>
+        /// Forward method for the Viterbi decoding algorithm.
+        /// </summary>
+        /// <param name="tagger"></param>
+        /// <param name="testWords"></param>
+        /// <param name="model"></param>
+        private void ForwardAlgorithm(PartOfSpeechModel tagger, List<Tokenizer.WordTag> testWords, string model)
         {
             // left to right encoding - forward approach
             bool startPoint = true;
@@ -71,7 +86,7 @@ namespace NLP
                     continue;
                 }
 
-                HMMTagger.EmissionProbabilisticModel foundWord = tagger.WordCapitalizedTagsEmissionProbabilities.Find(x => x.Word == testWords[i].word);
+                PartOfSpeechModel.EmissionProbabilisticModel foundWord = tagger.WordCapitalizedTagsEmissionProbabilities.Find(x => x.Word == testWords[i].word);
                 if (foundWord == null)
                     foundWord = tagger.WordTagsEmissionProbabilities.Find(x => x.Word == testWords[i].word.ToLower());
 
@@ -270,7 +285,14 @@ namespace NLP
             }
         }
 
-        private void BackwardAlgorithm(HMMTagger tagger, List<Tokenizer.WordTag> testWords, string model, string mode)
+        /// <summary>
+        /// Backward method for the Viterbi decoding algorithm.
+        /// </summary>
+        /// <param name="tagger"></param>
+        /// <param name="testWords"></param>
+        /// <param name="model"></param>
+        /// <param name="mode"></param>
+        private void BackwardAlgorithm(PartOfSpeechModel tagger, List<Tokenizer.WordTag> testWords, string model, string mode)
         {
             // right to left encoding - backward approach
             bool startPoint = true;
@@ -291,7 +313,7 @@ namespace NLP
                     continue;
                 }
 
-                HMMTagger.EmissionProbabilisticModel foundWord = tagger.WordCapitalizedTagsEmissionProbabilities.Find(x => x.Word == testWords[i].word);
+                PartOfSpeechModel.EmissionProbabilisticModel foundWord = tagger.WordCapitalizedTagsEmissionProbabilities.Find(x => x.Word == testWords[i].word);
                 if (foundWord == null)
                     foundWord = tagger.WordTagsEmissionProbabilities.Find(x => x.Word == testWords[i].word.ToLower());
 
@@ -508,6 +530,10 @@ namespace NLP
             }
         }
 
+        /// <summary>
+        /// Calculates prediction tags by backtracing the Viterbi Graph.
+        /// </summary>
+        /// <param name="method"></param>
         private void Backtrace(string method)
         {
             ViterbiNode lastElement = this.ViterbiGraph[this.ViterbiGraph.Count - 1][0];
@@ -534,6 +560,9 @@ namespace NLP
             this.ViterbiGraph = new List<List<ViterbiNode>>(); // can be deleted, also saves ALL forward states and backwards states
         }
 
+        /// <summary>
+        /// Bidirectional (both forward & backward) method for the Viterbi decoding algorithm.
+        /// </summary>
         private void BiDirectionalModelTrace()
         {
             this.PredictedTags = new List<string>();

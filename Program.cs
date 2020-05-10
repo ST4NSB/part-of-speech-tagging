@@ -48,7 +48,7 @@ namespace PostAppConsole
             #region Load Train Files & pre-process data
             var text = LoadAndReadFolderFiles(BrownfolderTrain);
             var oldWords = Tokenizer.SeparateTagFromWord(Tokenizer.TokenizePennTreebank(text));
-            var words = SpeechPart.GetNewHierarchicTags(oldWords);
+            var words = SpeechPartClassification.GetNewHierarchicTags(oldWords);
             var capWords = TextNormalization.PreProcessingPipeline(words, toLowerOption: false, keepOnlyCapitalizedWords: true);
             var uncapWords = TextNormalization.PreProcessingPipeline(words, toLowerOption: true, keepOnlyCapitalizedWords: false);
             #endregion
@@ -56,7 +56,7 @@ namespace PostAppConsole
             #region Load Test Files & pre-process data
             var textTest = LoadAndReadFolderFiles(BrownfolderTest);
             var oldWordsTest = Tokenizer.SeparateTagFromWord(Tokenizer.TokenizePennTreebank(textTest));
-            var wordsTest = SpeechPart.GetNewHierarchicTags(oldWordsTest);
+            var wordsTest = SpeechPartClassification.GetNewHierarchicTags(oldWordsTest);
             wordsTest = TextNormalization.PreProcessingPipeline(wordsTest);
             wordsTest = TextNormalization.EliminateDuplicateSequenceOfEndOfSentenceTags(wordsTest);
             #endregion
@@ -64,7 +64,7 @@ namespace PostAppConsole
             Console.WriteLine("Done with loading and creating tokens for train & test files!");
 
             #region Hidden Markov Model Training
-            HMMTagger tagger = new HMMTagger();
+            PartOfSpeechModel tagger = new PartOfSpeechModel();
 
             Stopwatch sw = new Stopwatch();
             sw.Start();
@@ -101,7 +101,7 @@ namespace PostAppConsole
             //Console.WriteLine("Done writing models on filesystem!");
             #endregion
 
-            Console.WriteLine("Done with training HIDDEN MARKOV MODEL & calculating probabilities! Time: " + sw.ElapsedMilliseconds + " ms");
+            Console.WriteLine("Done with training POS MODEL & calculating probabilities! Time: " + sw.ElapsedMilliseconds + " ms");
             Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
 
             #region Decoding Viterbi Model
@@ -294,8 +294,8 @@ namespace PostAppConsole
             #region Part of Speech Tag Frequence Count
             //var tx = LoadAndReadFolderFiles("dataset\\crossvalidation");
             //var ow = Tokenizer.SeparateTagFromWord(Tokenizer.WordTokenizeCorpus(tx));
-            //var nw = SpeechPart.GetNewHierarchicTags(ow);
-            //var res = SpeechPart.SpeechPartFrequence(nw);
+            //var nw = SpeechPartClassification.GetNewHierarchicTags(ow);
+            //var res = SpeechPartClassification.SpeechPartFrequence(nw);
             //foreach (var item in res)
             //    Console.WriteLine(item.Key + ": " + item.Value);
             #endregion
@@ -307,7 +307,7 @@ namespace PostAppConsole
             #region Load Train Files & pre-process data
                 var text = cv.TrainFile[foldNumber];
                 var oldWords = Tokenizer.SeparateTagFromWord(Tokenizer.TokenizePennTreebank(text));
-                var words = SpeechPart.GetNewHierarchicTags(oldWords);
+                var words = SpeechPartClassification.GetNewHierarchicTags(oldWords);
                 var capWords = TextNormalization.PreProcessingPipeline(words, toLowerOption: false, keepOnlyCapitalizedWords: true);
                 var uncapWords = TextNormalization.PreProcessingPipeline(words, toLowerOption: true, keepOnlyCapitalizedWords: false);
             #endregion
@@ -323,7 +323,7 @@ namespace PostAppConsole
                 Console.WriteLine("Done with loading and creating tokens for train & test files!");
 
             #region Hidden Markov Model Training
-                HMMTagger tagger = new HMMTagger();
+                PartOfSpeechModel tagger = new PartOfSpeechModel();
 
                 Stopwatch sw = new Stopwatch();
 
@@ -333,7 +333,7 @@ namespace PostAppConsole
                 tagger.CalculateHiddenMarkovModelProbabilitiesForTestCorpus(wordsTest, model: "trigram");
 
                 sw.Stop();
-                Console.WriteLine("Done with training HIDDEN MARKOV MODEL & calculating probabilities! Time: " + sw.ElapsedMilliseconds + " ms");
+                Console.WriteLine("Done with training POS MODEL & calculating probabilities! Time: " + sw.ElapsedMilliseconds + " ms");
                 //Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
             #endregion
 

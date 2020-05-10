@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace NLP
 {
-    public partial class HMMTagger
+    public partial class PartOfSpeechModel
     {
         private int N; // nr of tokens
         public List<EmissionModel> WordCapitalizedTagsEmissionFrequence;
@@ -26,9 +26,9 @@ namespace NLP
         public double BgramLambda1, BgramLambda2, TgramLambda1, TgramLambda2, TgramLambda3;
 
         /// <summary>
-        /// Public constructor to initialize the HMM tagger.
+        /// Public constructor to initialize the POSM.
         /// </summary>
-        public HMMTagger()
+        public PartOfSpeechModel()
         {
             this.WordCapitalizedTagsEmissionProbabilities = new List<EmissionProbabilisticModel>();
             this.WordTagsEmissionProbabilities = new List<EmissionProbabilisticModel>();
@@ -43,7 +43,7 @@ namespace NLP
         }
 
         /// <summary>
-        /// Public constructor to initialize the HMM tagger with trained vectors.
+        /// Public constructor to initialize the POSM with trained vectors.
         /// </summary>
         /// <param name="WordTagsEmissionProbabilities"></param>
         /// <param name="WordCapitalizedTagsEmissionProbabilities"></param>
@@ -54,7 +54,7 @@ namespace NLP
         /// <param name="PrefixEmissionProbabilities"></param>
         /// <param name="SuffixCapitalizedWordEmissionProbabilities"></param>
         /// <param name="PrefixCapitalizedWordEmissionProbabilities"></param>
-        public HMMTagger(
+        public PartOfSpeechModel(
             List<EmissionProbabilisticModel> WordTagsEmissionProbabilities,
             List<EmissionProbabilisticModel> WordCapitalizedTagsEmissionProbabilities,
             Dictionary<string, double> UnigramProbabilities,
