@@ -47,7 +47,7 @@ namespace PostAppConsole
 
             #region Load Train Files & pre-process data
             var text = LoadAndReadFolderFiles(BrownfolderTrain);
-            var oldWords = Tokenizer.SeparateTagFromWord(Tokenizer.WordTokenizeCorpus(text));
+            var oldWords = Tokenizer.SeparateTagFromWord(Tokenizer.TokenizePennTreebank(text));
             var words = SpeechPart.GetNewHierarchicTags(oldWords);
             var capWords = TextNormalization.PreProcessingPipeline(words, toLowerOption: false, keepOnlyCapitalizedWords: true);
             var uncapWords = TextNormalization.PreProcessingPipeline(words, toLowerOption: true, keepOnlyCapitalizedWords: false);
@@ -55,9 +55,10 @@ namespace PostAppConsole
 
             #region Load Test Files & pre-process data
             var textTest = LoadAndReadFolderFiles(BrownfolderTest);
-            var oldWordsTest = Tokenizer.SeparateTagFromWord(Tokenizer.WordTokenizeCorpus(textTest));
+            var oldWordsTest = Tokenizer.SeparateTagFromWord(Tokenizer.TokenizePennTreebank(textTest));
             var wordsTest = SpeechPart.GetNewHierarchicTags(oldWordsTest);
             wordsTest = TextNormalization.PreProcessingPipeline(wordsTest);
+            wordsTest = TextNormalization.EliminateDuplicateSequenceOfEndOfSentenceTags(wordsTest);
             #endregion
 
             Console.WriteLine("Done with loading and creating tokens for train & test files!");
@@ -66,13 +67,9 @@ namespace PostAppConsole
             HMMTagger tagger = new HMMTagger();
 
             Stopwatch sw = new Stopwatch();
-
             sw.Start();
             tagger.CreateHiddenMarkovModel(uncapWords, capWords, smoothingCoef: 1);
-
-            wordsTest = tagger.EliminateDuplicateSequenceOfEndOfSentenceTags(wordsTest);
             tagger.CalculateHiddenMarkovModelProbabilitiesForTestCorpus(wordsTest, model: "trigram");
-
             sw.Stop();
             #endregion
 
@@ -113,7 +110,6 @@ namespace PostAppConsole
             sw.Reset(); sw.Start();
             decoder.ViterbiDecoding(tagger, wordsTest, modelForward: "trigram", modelBackward: "trigram", mode: "f+b");
             sw.Stop();
-            tagger.EliminateAllEndOfSentenceTags(wordsTest);
             #endregion
 
             Console.WriteLine("Done with DECODING VITERBI MODEL! Time: " + sw.ElapsedMilliseconds + " ms");
@@ -310,7 +306,7 @@ namespace PostAppConsole
             {
             #region Load Train Files & pre-process data
                 var text = cv.TrainFile[foldNumber];
-                var oldWords = Tokenizer.SeparateTagFromWord(Tokenizer.WordTokenizeCorpus(text));
+                var oldWords = Tokenizer.SeparateTagFromWord(Tokenizer.TokenizePennTreebank(text));
                 var words = SpeechPart.GetNewHierarchicTags(oldWords);
                 var capWords = TextNormalization.PreProcessingPipeline(words, toLowerOption: false, keepOnlyCapitalizedWords: true);
                 var uncapWords = TextNormalization.PreProcessingPipeline(words, toLowerOption: true, keepOnlyCapitalizedWords: false);
@@ -318,9 +314,10 @@ namespace PostAppConsole
 
             #region Load Test Files & pre-process data
                 var textTest = cv.TestFile[foldNumber];
-                var oldWordsTest = Tokenizer.SeparateTagFromWord(Tokenizer.WordTokenizeCorpus(textTest));
+                var oldWordsTest = Tokenizer.SeparateTagFromWord(Tokenizer.TokenizePennTreebank(textTest));
                 var wordsTest = SpeechPart.GetNewHierarchicTags(oldWordsTest);
                 wordsTest = TextNormalization.PreProcessingPipeline(wordsTest);
+                wordsTest = TextNormalization.EliminateDuplicateSequenceOfEndOfSentenceTags(wordsTest);
             #endregion
 
                 Console.WriteLine("Done with loading and creating tokens for train & test files!");
@@ -333,7 +330,6 @@ namespace PostAppConsole
                 sw.Start();
                 tagger.CreateHiddenMarkovModel(uncapWords, capWords);
 
-                wordsTest = tagger.EliminateDuplicateSequenceOfEndOfSentenceTags(wordsTest);
                 tagger.CalculateHiddenMarkovModelProbabilitiesForTestCorpus(wordsTest, model: "trigram");
 
                 sw.Stop();
@@ -348,7 +344,6 @@ namespace PostAppConsole
                 sw.Reset(); sw.Start();
                 decoder.ViterbiDecoding(tagger, wordsTest, modelForward: "trigram", modelBackward: "trigram", mode: "f+b");
                 sw.Stop();
-                tagger.EliminateAllEndOfSentenceTags(wordsTest);
 
                 Console.WriteLine("Done with DECODING VITERBI MODEL! Time: " + sw.ElapsedMilliseconds + " ms");
                 //Console.WriteLine("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");

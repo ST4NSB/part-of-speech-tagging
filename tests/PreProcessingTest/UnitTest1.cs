@@ -40,7 +40,7 @@ namespace PreProcessingTest
         public void SimpleWordTokenizeCorpusTest()
         {
             List<string> expected = simpleListOfWords;
-            List<string> res = Tokenizer.WordTokenizeCorpus(simpleInput);
+            List<string> res = Tokenizer.TokenizePennTreebank(simpleInput);
             Assert.AreEqual(expected, res);
         }
 
@@ -48,7 +48,7 @@ namespace PreProcessingTest
         public void ComplicatedWordTokenizeCorpusTest()
         {
             List<string> expected = complicatedListOfWords;
-            List<string> res = Tokenizer.WordTokenizeCorpus(complicatedInput);
+            List<string> res = Tokenizer.TokenizePennTreebank(complicatedInput);
             Assert.AreEqual(expected, res);
         }
 
@@ -485,6 +485,76 @@ namespace PreProcessingTest
             };
             List<Tokenizer.WordTag> res = TextNormalization.PreProcessingPipeline(inputSw, keepOnlyCapitalizedWords: true);
             Assert.AreEqual(expected, res);
+        }
+
+        [Test]
+        public void EliminateDuplicatesEOSTest()
+        {
+            List<Tokenizer.WordTag> inputSw = new List<Tokenizer.WordTag>()
+                {
+                    new Tokenizer.WordTag("Hello", "nn"),
+                    new Tokenizer.WordTag(".", "."),
+                    new Tokenizer.WordTag(".", "."),
+                    new Tokenizer.WordTag(".", "."),
+                    new Tokenizer.WordTag("Hello", "nn"),
+                    new Tokenizer.WordTag("sup", "nn"),
+                    new Tokenizer.WordTag("?", "."),
+                    new Tokenizer.WordTag("?", "."),
+                    new Tokenizer.WordTag("!", "."),
+                    new Tokenizer.WordTag("!", "."),
+                    new Tokenizer.WordTag("test", "nn"),
+                    new Tokenizer.WordTag("!", "."),
+                    new Tokenizer.WordTag(".", "."),
+                    new Tokenizer.WordTag("\\", "."),
+                    new Tokenizer.WordTag("/", "."),
+                    new Tokenizer.WordTag("~", "."),
+                    new Tokenizer.WordTag("?", "."),
+                    new Tokenizer.WordTag(".", "."),
+                };
+
+            List<Tokenizer.WordTag> expected = new List<Tokenizer.WordTag>()
+                {
+                    new Tokenizer.WordTag("Hello", "nn"),
+                    new Tokenizer.WordTag(".", "."),
+                    new Tokenizer.WordTag("Hello", "nn"),
+                    new Tokenizer.WordTag("sup", "nn"),
+                    new Tokenizer.WordTag("?", "."),
+                    new Tokenizer.WordTag("test", "nn"),
+                    new Tokenizer.WordTag("!", "."),
+                };
+            var result = TextNormalization.EliminateDuplicateSequenceOfEndOfSentenceTags(inputSw);
+            Assert.AreEqual(expected, result);
+        }
+
+        [Test]
+        public void EliminateAllEOSTest()
+        {
+            List<Tokenizer.WordTag> inputSw = new List<Tokenizer.WordTag>()
+                {
+                    new Tokenizer.WordTag("Hello", "nn"),
+                    new Tokenizer.WordTag(".", "."),
+                    new Tokenizer.WordTag(".", "."),
+                    new Tokenizer.WordTag("What", "nn"),
+                    new Tokenizer.WordTag("is", "nn"),
+                    new Tokenizer.WordTag("this", "nn"),
+                    new Tokenizer.WordTag("?", "."),
+                    new Tokenizer.WordTag("good", "nn"),
+                    new Tokenizer.WordTag("stuff", "nn"),
+                    new Tokenizer.WordTag(".", "."),
+                    new Tokenizer.WordTag(".", "."),
+                };
+
+            List<Tokenizer.WordTag> expected = new List<Tokenizer.WordTag>()
+                {
+                    new Tokenizer.WordTag("Hello", "nn"),
+                    new Tokenizer.WordTag("What", "nn"),
+                    new Tokenizer.WordTag("is", "nn"),
+                    new Tokenizer.WordTag("this", "nn"),
+                    new Tokenizer.WordTag("good", "nn"),
+                    new Tokenizer.WordTag("stuff", "nn"),
+                };
+            TextNormalization.EliminateAllEndOfSentenceTags(ref inputSw);
+            Assert.AreEqual(expected, inputSw);
         }
     }
 }

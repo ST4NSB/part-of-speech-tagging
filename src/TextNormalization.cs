@@ -60,6 +60,37 @@ namespace NLP
             return newWords;
         }
 
+        /// <summary>
+        /// Eliminates duplicates end of sentence punctuation (e.g. "I'm good ...." -> "I'm good .").
+        /// </summary>
+        /// <param name="testWords"></param>
+        /// <returns></returns>
+        public static List<Tokenizer.WordTag> EliminateDuplicateSequenceOfEndOfSentenceTags(List<Tokenizer.WordTag> testWords)
+        {
+            var results = new List<Tokenizer.WordTag>();
+            foreach (var tw in testWords)
+            {
+                if (results.Count == 0)
+                    results.Add(tw);
+                else
+                {
+                    if (results.Last().tag == "." && tw.tag == ".")
+                        continue;
+                    results.Add(tw);
+                }
+            }
+            return results;
+        }
+
+        /// <summary>
+        /// Eliminates all end of sentence punctuation (the tagger doesn't need to predict EOS tags).
+        /// </summary>
+        /// <param name="testWords"></param>
+        public static void EliminateAllEndOfSentenceTags(ref List<Tokenizer.WordTag> testWords)
+        {
+            testWords.RemoveAll(x => x.tag == ".");
+        }
+
         private static bool IsStopWord(string word)
         {
             string[] stopWords = { "(", ")", "[", "]", "{", "}" };
