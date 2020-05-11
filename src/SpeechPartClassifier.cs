@@ -4,7 +4,7 @@ using System.Text;
 
 namespace NLP
 {
-    public static class SpeechPartClassification
+    public static class SpeechPartClassifier
     {
         /// <summary>
         /// Static Method to count the frequency of every individual Part of Speech in the Corpus

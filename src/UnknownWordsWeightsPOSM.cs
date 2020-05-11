@@ -16,9 +16,9 @@ namespace NLP
         public double GetValueWeightForUnknownWord(string testWord, string currentTag)
         {
             double proc = 0.0d;
-            const double maxVal = 2.5d, minVal = 1.5d; // 2.5 , 1.5
+            const double bestValueWeight = 2.5d, worstValueWeight = 1.5d; // 2.5 , 1.5
             const double zeroProbabilityDifferenceToMinProbability = 0.01d; // 0.01d / 10^-2
-
+ 
             bool testWordIsCapitalized = false;
             if (char.IsUpper(testWord[0]))
                 testWordIsCapitalized = true;
@@ -139,44 +139,46 @@ namespace NLP
             double sum = (double)preffixVal + suffixVal;
             double minSum = (double)(minPrefix + minSuffix);
 
+            const double higherWordFixBound = 2.0d;
             if (sum == 0.0d)
             {
-                double minProbabilityForZero = TextNormalization.MinMaxNormalization(minSum, 0.0d, 2.0d) * zeroProbabilityDifferenceToMinProbability;
+                double minProbabilityForZero = TextNormalization.MinMaxNormalization(minSum, 0.0d, higherWordFixBound) * zeroProbabilityDifferenceToMinProbability; // 2.0d
                 proc += minProbabilityForZero;
             }
             else
-                proc += (double)TextNormalization.MinMaxNormalization(sum, 0.0d, 2.0d);
+                proc += (double)TextNormalization.MinMaxNormalization(sum, 0.0d, higherWordFixBound); // 2.0d
 
 
-            const double maxValPossible = maxVal, minValPossible = minVal;
+            
             double occurenceAdder = 0.0d;
+            const double higherAdderBound = bestValueWeight, lowerAdderBound = worstValueWeight;
 
             if (testWordIsCapitalized && currentTag == "NN")
-                occurenceAdder += (double)maxVal; // max value to be a NN
+                occurenceAdder += (double)bestValueWeight / 1.15; // max value to be a NN
             if ((lowerWord.EndsWith("\'s") || lowerWord.EndsWith("s\'") || lowerWord.EndsWith("s")) && currentTag == "NN")
-                occurenceAdder += (double)maxVal;
+                occurenceAdder += (double)bestValueWeight;
             if (lowerWord.Contains(".") && currentTag == "NN")
-                occurenceAdder += (double)minVal / 2;
+                occurenceAdder += (double)worstValueWeight / 2;
             if ((lowerWord.Contains("-") || lowerWord.Contains("/")) && currentTag == "NN")
-                occurenceAdder += (double)minVal / 2;// NN
+                occurenceAdder += (double)worstValueWeight / 2;// NN
             if ((lowerWord.Contains("-") || lowerWord.Contains("/")) && currentTag == "JJ")
-                occurenceAdder += (double)minVal / 2; // JJ
+                occurenceAdder += (double)worstValueWeight / 2; // JJ
             if ((lowerWord.Contains("-") && lowerWord.Count(x => x == '-') > 2) && currentTag == "OT")
-                occurenceAdder += (double)minVal / 2; // OT (e.g.: At-the-central-library)
+                occurenceAdder += (double)worstValueWeight / 2; // OT (e.g.: At-the-central-library)
             if (lowerWord.Contains("/") && currentTag == "OT")
-                occurenceAdder += (double)minVal / 2; // OT
+                occurenceAdder += (double)worstValueWeight / 2; // OT
             if (lowerWord.EndsWith("\'t") && currentTag == "VB")
-                occurenceAdder += (double)maxVal;
+                occurenceAdder += (double)bestValueWeight;
             if ((lowerWord.EndsWith("\'ve") || lowerWord.EndsWith("\'ll")) && currentTag == "PN")
-                occurenceAdder += (double)maxVal;
+                occurenceAdder += (double)bestValueWeight;
 
             if (occurenceAdder == 0.0d)
             {
-                double minProbabilityForZero = TextNormalization.MinMaxNormalization(minValPossible, 0, maxValPossible) * zeroProbabilityDifferenceToMinProbability;
+                double minProbabilityForZero = TextNormalization.MinMaxNormalization(lowerAdderBound, 0, higherAdderBound) * zeroProbabilityDifferenceToMinProbability;
                 proc += minProbabilityForZero;
             }
             else
-                proc += TextNormalization.MinMaxNormalization(occurenceAdder, 0, maxValPossible);
+                proc += TextNormalization.MinMaxNormalization(occurenceAdder, 0, higherAdderBound);
 
             //Console.WriteLine("adder: " + occurenceAdder);
 

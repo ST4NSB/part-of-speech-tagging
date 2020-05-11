@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
 namespace NLP
 {
@@ -9,18 +7,10 @@ namespace NLP
         HashSet<string> ClassTags;
         List<List<float>> finalMatrix;
 
-        //public List<List<List<float>>> MatrixEvaluationHistory;
-        //public List<float> HitRateHistory;
-        //public List<HashSet<string>> unknownWordsHistory;
-
-        public Evaluation()
-        {
-
-        }
-
+        public Evaluation() {}
 
         // k+u - known + unknown words
-        public float GetHitRateAccuracy(List<Tokenizer.WordTag> testData, List<string> predictedTags, HashSet<string> unknownWords, string evalMode = "k+u")
+        public float GetNaiveAccuracy(List<Tokenizer.WordTag> testData, List<string> predictedTags, HashSet<string> unknownWords, string evalMode = "k+u")
         {
             int wordsHit = 0;
             int nrOfWords = 0;
@@ -45,8 +35,8 @@ namespace NLP
                 nrOfWords++;
             }
 
-            float hitRate = (float)wordsHit / nrOfWords;
-            return hitRate;
+            float accuracy = (float)wordsHit / nrOfWords;
+            return accuracy;
         }
 
         public void CreateSupervizedEvaluationsMatrix(List<Tokenizer.WordTag> testData, List<string> predictedTags, HashSet<string> unknownWords, string evalMode = "k+u", int fbeta = 1)

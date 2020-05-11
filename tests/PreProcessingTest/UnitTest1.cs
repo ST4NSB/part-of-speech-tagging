@@ -147,7 +147,7 @@ namespace PreProcessingTest
                 {".", 1},
             };
 
-            Dictionary<string, int> res = SpeechPartClassification.TagsFrequence(input);
+            Dictionary<string, int> res = SpeechPartClassifier.TagsFrequence(input);
             Assert.AreEqual(expected, res);
         }
 
@@ -197,7 +197,7 @@ namespace PreProcessingTest
                 {"OT", 2},
             };
 
-            Dictionary<string, int> res = SpeechPartClassification.TagsFrequence(input);
+            Dictionary<string, int> res = SpeechPartClassifier.TagsFrequence(input);
             Assert.AreEqual(expected, res);
         }
 
@@ -225,7 +225,7 @@ namespace PreProcessingTest
                 {"NN", 5},
             };
 
-            Dictionary<string, int> res = SpeechPartClassification.TagsFrequence(input);
+            Dictionary<string, int> res = SpeechPartClassifier.TagsFrequence(input);
             Assert.AreEqual(expected, res);
         }
 
@@ -242,7 +242,7 @@ namespace PreProcessingTest
                 new Tokenizer.WordTag("test", "PN"), new Tokenizer.WordTag("test", "VB"),
             };
 
-            List<Tokenizer.WordTag> res = SpeechPartClassification.GetNewHierarchicTags(input);
+            List<Tokenizer.WordTag> res = SpeechPartClassifier.GetNewHierarchicTags(input);
             Assert.AreEqual(expected, res);
         }
 
@@ -329,7 +329,7 @@ namespace PreProcessingTest
                 new Tokenizer.WordTag("test", "."),
             };
 
-            List<Tokenizer.WordTag> res = SpeechPartClassification.GetNewHierarchicTags(input);
+            List<Tokenizer.WordTag> res = SpeechPartClassifier.GetNewHierarchicTags(input);
             Assert.AreEqual(expected, res);
         }
 
@@ -356,7 +356,7 @@ namespace PreProcessingTest
                 new Tokenizer.WordTag("test", "OT"), 
             };
 
-            List<Tokenizer.WordTag> res = SpeechPartClassification.GetNewHierarchicTags(input);
+            List<Tokenizer.WordTag> res = SpeechPartClassifier.GetNewHierarchicTags(input);
             Assert.AreEqual(expected, res);
         }
 
@@ -381,7 +381,7 @@ namespace PreProcessingTest
                 new Tokenizer.WordTag("test", "VB"),
             };
 
-            List<Tokenizer.WordTag> res = SpeechPartClassification.GetNewHierarchicTags(input);
+            List<Tokenizer.WordTag> res = SpeechPartClassifier.GetNewHierarchicTags(input);
             Assert.AreEqual(expected, res);
         }
     }

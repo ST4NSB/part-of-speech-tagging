@@ -557,7 +557,7 @@ namespace NLP
                 BackwardHistory.Insert(0, lastElement);
             }
             
-            this.ViterbiGraph = new List<List<ViterbiNode>>(); // can be deleted, also saves ALL forward states and backwards states
+            //this.ViterbiGraph = new List<List<ViterbiNode>>(); // can be deleted, also saves ALL forward states and backwards states
         }
 
         /// <summary>
@@ -565,12 +565,15 @@ namespace NLP
         /// </summary>
         private void BiDirectionalModelTrace()
         {
+            int backward = 0;
+            int forward = 0;
             this.PredictedTags = new List<string>();
             for(int i = 0; i < BackwardHistory.Count; i++)
             {
                 if(BackwardHistory[i].value > ForwardHistory[i].value)
                 {
                     //Console.WriteLine("backward!!!");
+                    backward++;
                     List<string> tagsViterbi = new List<string>();
                     while (true)
                     {
@@ -584,6 +587,7 @@ namespace NLP
                 }
                 else
                 {
+                    forward++;
                     //Console.WriteLine("forward!!!");
                     List<string> tagsViterbi = new List<string>();
                     while (true)
@@ -597,6 +601,9 @@ namespace NLP
                     this.PredictedTags.AddRange(tagsViterbi);
                 }
             }
+
+            Console.WriteLine("Forward method Probability: " + (float)forward / (forward + backward));
+            Console.WriteLine("Backward method Probability: " + (float)backward / (forward + backward));
         }
 
 

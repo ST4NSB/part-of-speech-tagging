@@ -88,6 +88,11 @@ namespace NLP
             {
                 this.TagFreq = new Dictionary<string, int>();
             }
+            public EmissionModel(string Word, Dictionary<string, int> TagFreq)
+            {
+                this.Word = Word;
+                this.TagFreq = TagFreq;
+            }
         }
 
         /// <summary>
@@ -100,6 +105,11 @@ namespace NLP
             public EmissionProbabilisticModel()
             {
                 this.TagFreq = new Dictionary<string, double>();
+            }
+            public EmissionProbabilisticModel(string Word, Dictionary<string, double> TagFreq)
+            {
+                this.Word = Word;
+                this.TagFreq = TagFreq;
             }
         }
 

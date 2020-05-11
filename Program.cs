@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
 using NLP;
+using NUnit.Framework.Constraints;
 
 #pragma warning disable CS0436
 
@@ -41,6 +42,7 @@ namespace PostAppConsole
         static void Main(string[] args)
         {
             string path = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.FullName + "\\";
+
 #if (RULE_70_30)
             Console.WriteLine("You chose Rule 70% - training, 30% - testing for the data-set!");
             const string BrownfolderTrain = "dataset\\70_30\\train", BrownfolderTest = "dataset\\70_30\\test";
@@ -48,7 +50,7 @@ namespace PostAppConsole
             #region Load Train Files & pre-process data
             var text = LoadAndReadFolderFiles(BrownfolderTrain);
             var oldWords = Tokenizer.SeparateTagFromWord(Tokenizer.TokenizePennTreebank(text));
-            var words = SpeechPartClassification.GetNewHierarchicTags(oldWords);
+            var words = SpeechPartClassifier.GetNewHierarchicTags(oldWords);
             var capWords = TextNormalization.PreProcessingPipeline(words, toLowerOption: false, keepOnlyCapitalizedWords: true);
             var uncapWords = TextNormalization.PreProcessingPipeline(words, toLowerOption: true, keepOnlyCapitalizedWords: false);
             #endregion
@@ -56,14 +58,14 @@ namespace PostAppConsole
             #region Load Test Files & pre-process data
             var textTest = LoadAndReadFolderFiles(BrownfolderTest);
             var oldWordsTest = Tokenizer.SeparateTagFromWord(Tokenizer.TokenizePennTreebank(textTest));
-            var wordsTest = SpeechPartClassification.GetNewHierarchicTags(oldWordsTest);
+            var wordsTest = SpeechPartClassifier.GetNewHierarchicTags(oldWordsTest);
             wordsTest = TextNormalization.PreProcessingPipeline(wordsTest);
             wordsTest = TextNormalization.EliminateDuplicateSequenceOfEndOfSentenceTags(wordsTest);
             #endregion
 
             Console.WriteLine("Done with loading and creating tokens for train & test files!");
 
-            #region Hidden Markov Model Training
+            #region Part of Speech Model Training
             PartOfSpeechModel tagger = new PartOfSpeechModel();
 
             Stopwatch sw = new Stopwatch();
@@ -186,9 +188,9 @@ namespace PostAppConsole
                 Console.WriteLine();
             }
 
-            Console.WriteLine("\nAccuracy for known words: " + eval.GetHitRateAccuracy(wordsTest, decoder.PredictedTags, decoder.UnknownWords, evalMode: "k"));
-            Console.WriteLine("Accuracy for unknown words: " + eval.GetHitRateAccuracy(wordsTest, decoder.PredictedTags, decoder.UnknownWords, evalMode: "u"));
-            Console.WriteLine("Accuracy on both: " + eval.GetHitRateAccuracy(wordsTest, decoder.PredictedTags, decoder.UnknownWords, evalMode: "k+u"));
+            Console.WriteLine("\nAccuracy for known words: " + eval.GetNaiveAccuracy(wordsTest, decoder.PredictedTags, decoder.UnknownWords, evalMode: "k"));
+            Console.WriteLine("Accuracy for unknown words: " + eval.GetNaiveAccuracy(wordsTest, decoder.PredictedTags, decoder.UnknownWords, evalMode: "u"));
+            Console.WriteLine("Accuracy on both: " + eval.GetNaiveAccuracy(wordsTest, decoder.PredictedTags, decoder.UnknownWords, evalMode: "k+u"));
             #endregion
 
             Console.WriteLine("+");
@@ -361,9 +363,9 @@ namespace PostAppConsole
                     Console.WriteLine();
                 }
 
-                Console.WriteLine("\nAccuracy for known words: " + eval.GetHitRateAccuracy(wordsTest, decoder.PredictedTags, decoder.UnknownWords, evalMode: "k"));
-                Console.WriteLine("Accuracy for unknown words: " + eval.GetHitRateAccuracy(wordsTest, decoder.PredictedTags, decoder.UnknownWords, evalMode: "u"));
-                Console.WriteLine("Accuracy on both: " + eval.GetHitRateAccuracy(wordsTest, decoder.PredictedTags, decoder.UnknownWords, evalMode: "k+u"));
+                Console.WriteLine("\nAccuracy for known words: " + eval.GetNaiveAccuracy(wordsTest, decoder.PredictedTags, decoder.UnknownWords, evalMode: "k"));
+                Console.WriteLine("Accuracy for unknown words: " + eval.GetNaiveAccuracy(wordsTest, decoder.PredictedTags, decoder.UnknownWords, evalMode: "u"));
+                Console.WriteLine("Accuracy on both: " + eval.GetNaiveAccuracy(wordsTest, decoder.PredictedTags, decoder.UnknownWords, evalMode: "k+u"));
             #endregion
 
                 Console.WriteLine("+");

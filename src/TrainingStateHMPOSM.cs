@@ -24,11 +24,6 @@ namespace NLP
             Task taskBigram = Task.Factory.StartNew(() => this.CalculateBigramOccurences(uncapitalizedWords));
             Task taskTrigram = Task.Factory.StartNew(() => this.CalculateTrigramOccurences(uncapitalizedWords));
             Task.WaitAll(taskSuffixPrefixEmission, taskEmissionWords, taskBigram, taskTrigram);
-
-            //this.GetEmissionProbabilitiesForSuffixesAndPrefixes(uncapitalizedWords, capitalizedWords);
-            //this.CalculateEmissionForWordTags(uncapitalizedWords, capitalizedWords);
-            //this.CalculateBigramOccurences(uncapitalizedWords);
-            //this.CalculateTrigramOccurences(uncapitalizedWords);
         }
 
         private void CalculateEmissionForWordTags(List<Tokenizer.WordTag> uncapitalizedWords, List<Tokenizer.WordTag> capitalizedWords)
