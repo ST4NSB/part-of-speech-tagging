@@ -62,7 +62,7 @@ namespace NLP
             if (mode.Equals("f+b"))
                 this.BiDirectionalModelTrace();
 
-            TextNormalization.EliminateAllEndOfSentenceTags(ref testWords);
+            TextPreprocessing.Cleaning.EliminateAllEndOfSentenceTags(ref testWords);
         }
 
         /// <summary>

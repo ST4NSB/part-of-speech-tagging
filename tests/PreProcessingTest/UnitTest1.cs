@@ -395,18 +395,18 @@ namespace PreProcessingTest
             double t = 2.0d, z = 1.00000000001;
             double n = 0.483d;
 
-            Assert.AreEqual(0.0d, TextNormalization.BoundProbability(x));
-            Assert.AreEqual(0.0d, TextNormalization.BoundProbability(y));
-            Assert.AreEqual(1.0d, TextNormalization.BoundProbability(t));
-            Assert.AreEqual(1.0d, TextNormalization.BoundProbability(z));
-            Assert.AreEqual(0.483d, TextNormalization.BoundProbability(n));
+            Assert.AreEqual(0.0d, TextPreprocessing.Normalization.BoundProbability(x));
+            Assert.AreEqual(0.0d, TextPreprocessing.Normalization.BoundProbability(y));
+            Assert.AreEqual(1.0d, TextPreprocessing.Normalization.BoundProbability(t));
+            Assert.AreEqual(1.0d, TextPreprocessing.Normalization.BoundProbability(z));
+            Assert.AreEqual(0.483d, TextPreprocessing.Normalization.BoundProbability(n));
         }
 
         [Test]
         public void MinMaxNormalization()
         {
-            Assert.AreEqual(4.0d, TextNormalization.MinMaxNormalization(x: 5.0d, min: 1.0d, max: 2.0d));
-            Assert.AreEqual(3.0d, TextNormalization.MinMaxNormalization(x: 20.0d, min: 5.0d, max: 10.0d));
+            Assert.AreEqual(4.0d, TextPreprocessing.Normalization.MinMaxNormalization(x: 5.0d, min: 1.0d, max: 2.0d));
+            Assert.AreEqual(3.0d, TextPreprocessing.Normalization.MinMaxNormalization(x: 20.0d, min: 5.0d, max: 10.0d));
         }
 
         [Test]
@@ -419,7 +419,7 @@ namespace PreProcessingTest
                 };
 
             List<Tokenizer.WordTag> expected = new List<Tokenizer.WordTag>();
-            List<Tokenizer.WordTag> res = TextNormalization.PreProcessingPipeline(inputSw);
+            List<Tokenizer.WordTag> res = TextPreprocessing.PreProcessingPipeline(inputSw);
             Assert.AreEqual(expected, res);
         }
 
@@ -439,7 +439,7 @@ namespace PreProcessingTest
                 new Tokenizer.WordTag("abc", "cd"), new Tokenizer.WordTag("def", "cd"), new Tokenizer.WordTag("defg", "cd"),
                 new Tokenizer.WordTag("abc", "cd"), new Tokenizer.WordTag("ABC", "cd")
             };
-            List<Tokenizer.WordTag> res = TextNormalization.PreProcessingPipeline(inputSw);
+            List<Tokenizer.WordTag> res = TextPreprocessing.PreProcessingPipeline(inputSw);
             Assert.AreEqual(expected, res);
         }
 
@@ -463,7 +463,7 @@ namespace PreProcessingTest
                     new Tokenizer.WordTag("hello", "nn"),
                     new Tokenizer.WordTag("hello", "nn"),
             };
-            List<Tokenizer.WordTag> res = TextNormalization.PreProcessingPipeline(inputSw, toLowerOption: true);
+            List<Tokenizer.WordTag> res = TextPreprocessing.PreProcessingPipeline(inputSw, toLowerOption: true);
             Assert.AreEqual(expected, res);
         }
 
@@ -483,7 +483,7 @@ namespace PreProcessingTest
                     new Tokenizer.WordTag("Hello", "nn"),
                     new Tokenizer.WordTag("HELLO", "nn"),
             };
-            List<Tokenizer.WordTag> res = TextNormalization.PreProcessingPipeline(inputSw, keepOnlyCapitalizedWords: true);
+            List<Tokenizer.WordTag> res = TextPreprocessing.PreProcessingPipeline(inputSw, keepOnlyCapitalizedWords: true);
             Assert.AreEqual(expected, res);
         }
 
@@ -522,7 +522,7 @@ namespace PreProcessingTest
                     new Tokenizer.WordTag("test", "nn"),
                     new Tokenizer.WordTag("!", "."),
                 };
-            var result = TextNormalization.EliminateDuplicateSequenceOfEndOfSentenceTags(inputSw);
+            var result = TextPreprocessing.Cleaning.EliminateDuplicateSequenceOfEndOfSentenceTags(inputSw);
             Assert.AreEqual(expected, result);
         }
 
@@ -553,7 +553,7 @@ namespace PreProcessingTest
                     new Tokenizer.WordTag("good", "nn"),
                     new Tokenizer.WordTag("stuff", "nn"),
                 };
-            TextNormalization.EliminateAllEndOfSentenceTags(ref inputSw);
+            TextPreprocessing.Cleaning.EliminateAllEndOfSentenceTags(ref inputSw);
             Assert.AreEqual(expected, inputSw);
         }
     }

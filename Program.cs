@@ -51,16 +51,16 @@ namespace PostAppConsole
             var text = LoadAndReadFolderFiles(BrownfolderTrain);
             var oldWords = Tokenizer.SeparateTagFromWord(Tokenizer.TokenizePennTreebank(text));
             var words = SpeechPartClassifier.GetNewHierarchicTags(oldWords);
-            var capWords = TextNormalization.PreProcessingPipeline(words, toLowerOption: false, keepOnlyCapitalizedWords: true);
-            var uncapWords = TextNormalization.PreProcessingPipeline(words, toLowerOption: true, keepOnlyCapitalizedWords: false);
+            var capWords = TextPreprocessing.PreProcessingPipeline(words, toLowerOption: false, keepOnlyCapitalizedWords: true);
+            var uncapWords = TextPreprocessing.PreProcessingPipeline(words, toLowerOption: true, keepOnlyCapitalizedWords: false);
             #endregion
 
             #region Load Test Files & pre-process data
             var textTest = LoadAndReadFolderFiles(BrownfolderTest);
             var oldWordsTest = Tokenizer.SeparateTagFromWord(Tokenizer.TokenizePennTreebank(textTest));
             var wordsTest = SpeechPartClassifier.GetNewHierarchicTags(oldWordsTest);
-            wordsTest = TextNormalization.PreProcessingPipeline(wordsTest);
-            wordsTest = TextNormalization.EliminateDuplicateSequenceOfEndOfSentenceTags(wordsTest);
+            wordsTest = TextPreprocessing.PreProcessingPipeline(wordsTest);
+            wordsTest = TextPreprocessing.Cleaning.EliminateDuplicateSequenceOfEndOfSentenceTags(wordsTest);
             #endregion
 
             Console.WriteLine("Done with loading and creating tokens for train & test files!");

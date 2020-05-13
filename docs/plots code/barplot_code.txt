@@ -1,0 +1,29 @@
+import matplotlib.pyplot as plt
+from matplotlib import cm
+import numpy as np
+import matplotlib as mlp
+import random
+
+# data
+labels=['Noun (NN)', 'Verb (VB)', 'Article/Determiner (AT/DT)', 'Preposition (PP)', 'Others (OT)', 
+        'Adjective (JJ)', 'Pronoun (PN)', 'End of Sentence (.)', 'Conjuction (CC)', 'Adverb (RB)']
+freq = [273608, 176081, 142123, 137735, 108766, 72125, 71421, 61254, 60551, 57528]
+labels.reverse()
+freq.reverse()
+y_pos = np.arange(len(labels))
+plt.style.use('default')
+fig, ax = plt.subplots(figsize=(16, 10))
+
+
+wedges = ax.barh(y_pos, freq, edgecolor="none", height=0.65)
+ax.set_axisbelow(True)
+ax.yaxis.grid(color='gray', linestyle='dashed')
+ax.xaxis.grid(color='gray', linestyle='dashed')
+for i, v in enumerate(freq):
+    ax.text(v,i, str(v), color='#1f77b4', fontweight='bold', fontsize=10.4)
+
+plt.xlabel("Tag frequency")
+plt.ylabel("Tag name")
+plt.title("Part of Speech | Tag Frequency | Horizontal barplot")
+plt.yticks(y_pos, labels)
+plt.show()

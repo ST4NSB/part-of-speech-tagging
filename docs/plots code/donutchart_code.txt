@@ -1,0 +1,57 @@
+import matplotlib.pyplot as plt
+from matplotlib import cm
+import numpy as np
+import matplotlib as mlp
+import random
+
+# data
+labels=['Noun (NN)', 'Verb (VB)', 'Article/Determiner (AT/DT)', 'Preposition (PP)', 'Others (OT)', 
+        'Adjective (JJ)', 'Pronoun (PN)', 'End of Sentence (.)', 'Conjuction (CC)', 'Adverb (RB)']
+freq = [273608, 176081, 142123, 137735, 108766, 72125, 71421, 61254, 60551, 57528]
+sum_freq = sum(freq)
+prob = [labels[i] + ": " + str(round(freq[i]/sum_freq * 100, 2)) + str('%') for i in range(len(freq))]
+prob2 =  [round(i/sum_freq * 100, 2) for i in freq]
+print(prob2)
+print(sum(prob2))
+#explode = (0.0, 0, 0, 0, 0, 0, 0, 0, 0, 0) # 0.035
+explode = [0.0135 for i in range(len(labels))] # 0.015
+
+# colors
+style = 'default'
+mlp.style.use(style)
+#colors = ["#770813", "#ffbc03","#ffdc00", "#007ed7", "#94b9d4", 
+#          "#377b2b", "#79dc78", "#8b85cb", "#bc5090", "#085269"]
+#random.shuffle(colors)
+colors2 = ["#3d0da5", "#5034bc", "#6146d9", "#7354f4", "#7e73f5", 
+           "#7D99ed", "#70c2df", "#74d3dc", "#9edfe5", "#c2ebed"]
+
+mlp.rcParams['axes.prop_cycle'] = mlp.cycler(color=colors2)
+
+
+# figure
+fig, ax = plt.subplots(figsize=(14, 7), subplot_kw=dict(aspect="equal"))
+wedges, autotexts = ax.pie(freq, explode=explode, radius=1, textprops=dict(color="w"), wedgeprops=dict(width=0.5), startangle=-270)
+#legend = plt.legend(wedges, labels, fancybox=True, title="Part of Speech Tags", loc="center", prop={'size':10}, frameon=False, bbox_to_anchor=(0.04,0,1,1)) #, bbox_to_anchor=(1.1,0,0.5,1)
+#egend._legend_box.align = "left"
+plt.setp(autotexts, size=9.4, weight="bold")
+
+bbox_props = dict(boxstyle="round,pad=0.4", fc="w", ec="k", lw=0.35)
+kw = dict(arrowprops=dict(arrowstyle="-"), bbox=bbox_props, zorder=0, va="center")
+
+for i, p in enumerate(wedges):
+    ang = (p.theta2 - p.theta1)/2. + p.theta1
+    y = np.sin(np.deg2rad(ang))
+    x = np.cos(np.deg2rad(ang))
+    horizontalalignment = {-1: "right", 1: "left"}[int(np.sign(x))]
+    connectionstyle = "angle,angleA=0,angleB={}".format(ang)
+    kw["arrowprops"].update({"connectionstyle": connectionstyle})
+    valx = 1.14
+    valy = 1.15
+    if i == 9:
+        valx = 0.5
+        valy = 1.17
+    ax.annotate(prob[i], xy=(x, y), xytext=(valx*np.sign(x), valy*y),
+                horizontalalignment=horizontalalignment, **kw)
+
+ax.set_title("Part of Speech | Tag frequency distribution | Donut chart")
+plt.show()

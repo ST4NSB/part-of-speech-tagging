@@ -142,11 +142,11 @@ namespace NLP
             const double higherWordFixBound = 2.0d;
             if (sum == 0.0d)
             {
-                double minProbabilityForZero = TextNormalization.MinMaxNormalization(minSum, 0.0d, higherWordFixBound) * zeroProbabilityDifferenceToMinProbability; // 2.0d
+                double minProbabilityForZero = TextPreprocessing.Normalization.MinMaxNormalization(minSum, 0.0d, higherWordFixBound) * zeroProbabilityDifferenceToMinProbability; // 2.0d
                 proc += minProbabilityForZero;
             }
             else
-                proc += (double)TextNormalization.MinMaxNormalization(sum, 0.0d, higherWordFixBound); // 2.0d
+                proc += (double)TextPreprocessing.Normalization.MinMaxNormalization(sum, 0.0d, higherWordFixBound); // 2.0d
 
 
             
@@ -174,15 +174,15 @@ namespace NLP
 
             if (occurenceAdder == 0.0d)
             {
-                double minProbabilityForZero = TextNormalization.MinMaxNormalization(lowerAdderBound, 0, higherAdderBound) * zeroProbabilityDifferenceToMinProbability;
+                double minProbabilityForZero = TextPreprocessing.Normalization.MinMaxNormalization(lowerAdderBound, 0, higherAdderBound) * zeroProbabilityDifferenceToMinProbability;
                 proc += minProbabilityForZero;
             }
             else
-                proc += TextNormalization.MinMaxNormalization(occurenceAdder, 0, higherAdderBound);
+                proc += TextPreprocessing.Normalization.MinMaxNormalization(occurenceAdder, 0, higherAdderBound);
 
             //Console.WriteLine("adder: " + occurenceAdder);
 
-            proc = TextNormalization.BoundProbability(proc);
+            proc = TextPreprocessing.Normalization.BoundProbability(proc);
 
             //Console.WriteLine("final proc: " + proc + " - current word: " + testWord + " - current tag: " + currentTag);
             //Console.WriteLine();
