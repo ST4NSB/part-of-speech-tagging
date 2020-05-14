@@ -1,0 +1,66 @@
+You chose Cross-Validation for the data-set! Folds: 2, Shuffle-option: True
+Done with loading dataset & splitting them into folds!
+
+Done with loading and creating tokens for train & test files!
+Done with training POS MODEL & calculating probabilities! Time: 107654 ms
+Forward method Probability: 0.1460217
+Backward method Probability: 0.8539783
+Done with DECODING VITERBI MODEL! Time: 418961 ms
+TAG             ACCURACY                PRECISION               RECALL(TPR)             F1-SCORE                SPECIFICITY(TNR)
+AT/DT           0.9938368               0.9817107               0.9712694               0.9764622               0.9972574
+JJ              0.988066                0.8983083               0.9244654               0.9111991               0.9925771
+CC              0.993754                0.9246863               0.9683099               0.9459955               0.9952775
+NN              0.9778358               0.9524507               0.9591708               0.9557989               0.9840522
+PP              0.9939677               0.9745353               0.9779757               0.9762524               0.9962896
+VB              0.9850674               0.9651442               0.9423407               0.9536061               0.9933794
+RB              0.9882631               0.90446         0.874174                0.8890591               0.9947498
+
+OT              0.9985209               0.9901924               0.9929957               0.991592                0.9990529
+PN              0.9984159               0.9877558               0.9876994               0.9877276               0.9991553
+TOTAL           0.9908586               0.9532493               0.9553779               0.954188                0.9946435
+
+Accuracy for known words: 0.9656959
+Accuracy for unknown words: 0.8136427
+Accuracy on both: 0.9588638
++
+Unknown words (count): 24394 | Procentage (%): 0.04493244
+Known words (count): 518510 | Procentage (%): 0.9550676
+Total words (count): 542904
+
+
+[FOLD 1/2 DONE!]
+
+
+Done with loading and creating tokens for train & test files!
+Done with training POS MODEL & calculating probabilities! Time: 101144 ms
+Forward method Probability: 0.1484965
+Backward method Probability: 0.8515035
+Done with DECODING VITERBI MODEL! Time: 419612 ms
+TAG             ACCURACY                PRECISION               RECALL(TPR)             F1-SCORE                SPECIFICITY(TNR)
+AT/DT           0.9936095               0.9804923               0.9701554               0.9752965               0.9971151
+NN              0.9777778               0.9556676               0.9562047               0.9559361               0.9850491
+PP              0.9936886               0.9751092               0.9751092               0.9751092               0.9963862
+CC              0.9935433               0.9165087               0.9710164               0.9429756               0.9948539
+JJ              0.9878483               0.8976817               0.9224193               0.9098823               0.9925097
+VB              0.9860985               0.9650312               0.9481777               0.9565302               0.9933918
+RB              0.9887371               0.8989648               0.8831256               0.8909749               0.9945433
+OT              0.9984967               0.9921365               0.9910116               0.9915738               0.9992303
+PN              0.9983771               0.988147                0.9876038               0.9878753               0.99915
+
+TOTAL           0.9909085               0.9521933               0.9560916               0.9540171               0.9946921
+
+Accuracy for known words: 0.9667619
+Accuracy for unknown words: 0.8121873
+Accuracy on both: 0.9590884
++
+Unknown words (count): 26979 | Procentage (%): 0.04964257
+Known words (count): 516486 | Procentage (%): 0.9503574
+Total words (count): 543465
+
+
+[FOLD 2/2 DONE!]
+
+
+
+C:\Program Files\dotnet\dotnet.exe (process 16744) exited with code 0.
+Press any key to close this window . . .

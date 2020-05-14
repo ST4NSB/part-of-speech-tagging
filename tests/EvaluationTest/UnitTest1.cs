@@ -9,13 +9,13 @@ namespace EvaluationTest
         Evaluation eval;
         List<Tokenizer.WordTag> realtarget = new List<Tokenizer.WordTag>()
             {
-                new Tokenizer.WordTag("", "A"),
+                new Tokenizer.WordTag("u1", "A"),
                 new Tokenizer.WordTag("", "A"),
                 new Tokenizer.WordTag("u1", "B"),
                 new Tokenizer.WordTag("", "C"),
                 new Tokenizer.WordTag("", "B"),
                 new Tokenizer.WordTag("u2", "A"),
-                new Tokenizer.WordTag("", "B"),
+                new Tokenizer.WordTag("u2", "B"),
                 new Tokenizer.WordTag("", "A"),
                 new Tokenizer.WordTag("", "C"),
                 new Tokenizer.WordTag("u3", "B"),
@@ -69,12 +69,12 @@ namespace EvaluationTest
         [Test]
         public void GetUnknownWordsNaiveAccuracyTest()
         {
-            HashSet<string> unkwords = new HashSet<string>() { "u1", "u2", "u3", "u4" };
+            HashSet<string> unkwords = new HashSet<string>() {"u1" ,"u2", "u3", "u4" };
             float resUnk = eval.GetNaiveAccuracy(realtarget, predictedtarget, unkwords, evalMode: "u");
             float resK = eval.GetNaiveAccuracy(realtarget, predictedtarget, unkwords, evalMode: "k");
 
-            float expUnk = 2f / 4;
-            float expK = 8f / 10;
+            float expUnk = 3f / 6;
+            float expK = 7f / 8;
 
             Assert.AreEqual(expUnk, resUnk);
             Assert.AreEqual(expK, resK);

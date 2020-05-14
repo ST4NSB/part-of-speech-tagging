@@ -1,4 +1,4 @@
-﻿#define RULE_70_30
+﻿//#define RULE_70_30
 #define CROSS_VALIDATION
 
 using System;
@@ -197,17 +197,27 @@ namespace PostAppConsole
 
             #region Count known&unknown words
             int unkwordscount = 0, knownwordscount = 0;
-            foreach(var item in wordsTest)
+            foreach (var item in wordsTest)
             {
                 if (decoder.UnknownWords.Contains(item.word))
                     unkwordscount++;
                 else knownwordscount++;
             }
 
-            Console.WriteLine("Unknown words (count): " + unkwordscount + " | Procentage (%): " + (float)unkwordscount/wordsTest.Count);
-            Console.WriteLine("Known words (count): " + knownwordscount + " | Procentage (%): " + (float)knownwordscount/wordsTest.Count);
+            Console.WriteLine("Unknown words (count): " + unkwordscount + " | Procentage (%): " + (float)unkwordscount / wordsTest.Count);
+            Console.WriteLine("Known words (count): " + knownwordscount + " | Procentage (%): " + (float)knownwordscount / wordsTest.Count);
             Console.WriteLine("Total words (count): " + wordsTest.Count);
             #endregion
+
+
+            //using (System.IO.StreamWriter file = new System.IO.StreamWriter(path + "statistics\\" + "unknown_words.csv"))
+            //{
+            //    file.WriteLine("Unknown Words");
+            //    foreach(var item in decoder.UnknownWords)
+            //    {
+            //        file.WriteLine("\"" + item + "\"");
+            //    }
+            //}
 
             #region Suffix & Prefix hitrate
             //List<string> suffixStr = new List<string>();
@@ -286,7 +296,7 @@ namespace PostAppConsole
             #endregion
 
 #elif (CROSS_VALIDATION)
-            const int FOLDS = 4;
+            const int FOLDS = 2;
             const bool SHUFFLE = true;
             const string CVPATH = "dataset\\crossvalidation";
             Console.WriteLine("You chose Cross-Validation for the data-set! Folds: " + FOLDS + ", Shuffle-option: " + SHUFFLE);
@@ -309,17 +319,17 @@ namespace PostAppConsole
             #region Load Train Files & pre-process data
                 var text = cv.TrainFile[foldNumber];
                 var oldWords = Tokenizer.SeparateTagFromWord(Tokenizer.TokenizePennTreebank(text));
-                var words = SpeechPartClassification.GetNewHierarchicTags(oldWords);
-                var capWords = TextNormalization.PreProcessingPipeline(words, toLowerOption: false, keepOnlyCapitalizedWords: true);
-                var uncapWords = TextNormalization.PreProcessingPipeline(words, toLowerOption: true, keepOnlyCapitalizedWords: false);
+                var words = SpeechPartClassifier.GetNewHierarchicTags(oldWords);
+                var capWords = TextPreprocessing.PreProcessingPipeline(words, toLowerOption: false, keepOnlyCapitalizedWords: true);
+                var uncapWords = TextPreprocessing.PreProcessingPipeline(words, toLowerOption: true, keepOnlyCapitalizedWords: false);
             #endregion
 
             #region Load Test Files & pre-process data
                 var textTest = cv.TestFile[foldNumber];
                 var oldWordsTest = Tokenizer.SeparateTagFromWord(Tokenizer.TokenizePennTreebank(textTest));
-                var wordsTest = SpeechPart.GetNewHierarchicTags(oldWordsTest);
-                wordsTest = TextNormalization.PreProcessingPipeline(wordsTest);
-                wordsTest = TextNormalization.EliminateDuplicateSequenceOfEndOfSentenceTags(wordsTest);
+                var wordsTest = SpeechPartClassifier.GetNewHierarchicTags(oldWordsTest);
+                wordsTest = TextPreprocessing.PreProcessingPipeline(wordsTest);
+                wordsTest = TextPreprocessing.Cleaning.EliminateDuplicateSequenceOfEndOfSentenceTags(wordsTest);
             #endregion
 
                 Console.WriteLine("Done with loading and creating tokens for train & test files!");
