@@ -1,4 +1,4 @@
-﻿//#define RULE_70_30
+﻿#define RULE_70_30
 #define CROSS_VALIDATION
 
 using System;
@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net.Http.Headers;
 using Newtonsoft.Json;
 using NLP;
 using NUnit.Framework.Constraints;

@@ -90,7 +90,7 @@ namespace NLP
         {
             foreach (var uni in this.UnigramFrequence)
             {
-                double pi = (double)uni.Value / this.N;
+                double pi = (double)(uni.Value - 1)  / (this.N - 1);
                 this.UnigramProbabilities.Add(uni.Key, pi);
             }
         }
@@ -100,7 +100,7 @@ namespace NLP
             foreach (var bi in this.BigramTransitionFrequence)
             {
                 var cti = this.UnigramFrequence.FirstOrDefault(x => x.Key.Equals(bi.Key.Item1)).Value;
-                double pti = (double)bi.Value / cti; // Transition probability: p(ti|ti-1) = C(ti-1, ti) / C(ti-1)
+                double pti = (double)(bi.Value - 1) / (cti - 1); // Transition probability: p(ti|ti-1) = C(ti-1, ti) / C(ti-1)
                 this.BigramTransitionProbabilities.Add(bi.Key, pti);
             }
         }
@@ -111,7 +111,7 @@ namespace NLP
             {
                 Tuple<string, string> tuple = new Tuple<string, string>(tri.Key.Item1, tri.Key.Item2);
                 var cti = this.BigramTransitionFrequence.FirstOrDefault(x => x.Key.Equals(tuple)).Value;
-                double pti = (double)tri.Value / cti; // Transition probability: p(ti|ti-1, ti-2) = C(ti-2, ti-1, ti) / C(ti-2, ti-1)
+                double pti = (double)(tri.Value - 1) / (cti - 1); // Transition probability: p(ti|ti-1, ti-2) = C(ti-2, ti-1, ti) / C(ti-2, ti-1)
                 this.TrigramTransitionProbabilities.Add(tri.Key, pti);
             }
         }
