@@ -18,7 +18,7 @@ namespace NLP
             double proc = 0.0d;
             const double bestValueWeight = 2.5d, worstValueWeight = 1.5d; // 2.5 , 1.5
             const double zeroProbabilityDifferenceToMinProbability = 0.01d; // 0.01d / 10^-2
- 
+
             bool testWordIsCapitalized = false;
             if (char.IsUpper(testWord[0]))
                 testWordIsCapitalized = true;
@@ -149,7 +149,7 @@ namespace NLP
                 proc += (double)TextPreprocessing.Normalization.MinMaxNormalization(sum, 0.0d, higherWordFixBound); // 2.0d
 
 
-            
+
             double occurenceAdder = 0.0d;
             const double higherAdderBound = bestValueWeight, lowerAdderBound = worstValueWeight;
 
