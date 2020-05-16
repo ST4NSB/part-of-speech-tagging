@@ -129,6 +129,7 @@ namespace NLP
                 if (string.IsNullOrEmpty(tsw)) continue;
                 if (toLowerOption)
                     tsw = Normalization.ToLowerCaseNormalization(tsw);
+                
                 if(keepOnlyCapitalizedWords)
                     if (!char.IsUpper(tsw[0]))
                         continue;

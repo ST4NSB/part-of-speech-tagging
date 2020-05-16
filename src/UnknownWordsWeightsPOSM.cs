@@ -146,7 +146,9 @@ namespace NLP
                 proc += minProbabilityForZero;
             }
             else
+            {
                 proc += (double)TextPreprocessing.Normalization.MinMaxNormalization(sum, 0.0d, higherWordFixBound); // 2.0d
+            }
 
 
 
