@@ -13,7 +13,6 @@ namespace NLP
 
         public List<List<ViterbiNode>> ViterbiGraph;
         private List<ViterbiNode> ForwardHistory, BackwardHistory;
-        private const double CapitalizationConstForKnownWords = 2.0d;
         public HashSet<string> UnknownWords;
 
         public Decoder() { }
@@ -137,11 +136,7 @@ namespace NLP
 
                             double biTrans = (double)(uniVal * tagger.BgramLambda1) + (biTransition * tagger.BgramLambda2);
 
-                            double capitalization = 1.0d;
-                            if (wt.Key == "NN" && char.IsUpper(testWords[i].word[0]))
-                                capitalization += CapitalizationConstForKnownWords;
-
-                            double product = (double)emissionFreqValue * biTrans * capitalization; 
+                            double product = (double)emissionFreqValue * biTrans; 
                             ViterbiNode node = new ViterbiNode(product, wt.Key);
                             vList.Add(node);
                         }
@@ -246,11 +241,7 @@ namespace NLP
 
                                     double triTransition = (double)(tagger.TgramLambda3 * triVal) + (tagger.TgramLambda2 * biVal) + (tagger.TgramLambda1 * uniVal);
 
-                                    double capitalization = 1.0d;
-                                    if (tf.Key == "NN" && char.IsUpper(testWords[i].word[0]))
-                                        capitalization += CapitalizationConstForKnownWords;
-
-                                    double product = (double)vn.value * triTransition * tf.Value * capitalization;
+                                    double product = (double)vn.value * triTransition * tf.Value;
                                     if(product >= vGoodNode.value)
                                     {
                                         vGoodNode = new ViterbiNode(product, tf.Key, PrevNode: vn);
@@ -265,11 +256,7 @@ namespace NLP
 
                                     double biTrans = (double)(uniVal * tagger.BgramLambda1) + (biTransition * tagger.BgramLambda2);
 
-                                    double capitalization = 1.0d;
-                                    if (tf.Key == "NN" && char.IsUpper(testWords[i].word[0]))
-                                        capitalization += CapitalizationConstForKnownWords;
-
-                                    double product = (double)vn.value * biTrans * tf.Value * capitalization;
+                                    double product = (double)vn.value * biTrans * tf.Value;
                                     if (product >= vGoodNode.value)
                                     {
                                         vGoodNode = new ViterbiNode(product, tf.Key, PrevNode: vn);
@@ -363,11 +350,7 @@ namespace NLP
 
                             double biTrans = (double)(uniVal * tagger.BgramLambda1) + (biTransition * tagger.BgramLambda2);
 
-                            double capitalization = 1.0d;
-                            if (wt.Key == "NN" && char.IsUpper(testWords[i].word[0]))
-                                capitalization += CapitalizationConstForKnownWords;
-
-                            double product = (double)emissionFreqValue * biTrans * capitalization;
+                            double product = (double)emissionFreqValue * biTrans;
                             ViterbiNode node = new ViterbiNode(product, wt.Key);
                             vList.Add(node);
                         }
@@ -471,11 +454,7 @@ namespace NLP
 
                                     double triTransition = (double)(tagger.TgramLambda3 * triVal) + (tagger.TgramLambda2 * biVal) + (tagger.TgramLambda1 * uniVal);
 
-                                    double capitalization = 1.0d;
-                                    if (tf.Key == "NN" && char.IsUpper(testWords[i].word[0]))
-                                        capitalization += CapitalizationConstForKnownWords;
-
-                                    double product = (double)vn.value * triTransition * tf.Value * capitalization;
+                                    double product = (double)vn.value * triTransition * tf.Value;
 
                                     if (product >= vGoodNode.value)
                                     {
@@ -491,11 +470,7 @@ namespace NLP
 
                                     double biTrans = (double)(uniVal * tagger.BgramLambda1) + (biTransition * tagger.BgramLambda2);
 
-                                    double capitalization = 1.0d;
-                                    if (tf.Key == "NN" && char.IsUpper(testWords[i].word[0]))
-                                        capitalization += CapitalizationConstForKnownWords;
-
-                                    double product = (double)vn.value * biTrans * tf.Value * capitalization;
+                                    double product = (double)vn.value * biTrans * tf.Value;
                                     if (product >= vGoodNode.value)
                                     {
                                         vGoodNode = new ViterbiNode(product, tf.Key, NextNode: vn);
@@ -567,6 +542,7 @@ namespace NLP
         {
             int backward = 0;
             int forward = 0;
+            int bidir = 0;
             this.PredictedTags = new List<string>();
             for(int i = 0; i < BackwardHistory.Count; i++)
             {
@@ -587,7 +563,9 @@ namespace NLP
                 }
                 else
                 {
-                    forward++;
+                    if (BackwardHistory[i].value == ForwardHistory[i].value)
+                        bidir++;
+                    else forward++;
                     //Console.WriteLine("forward!!!");
                     List<string> tagsViterbi = new List<string>();
                     while (true)
@@ -602,8 +580,9 @@ namespace NLP
                 }
             }
 
-            Console.WriteLine("Forward method Probability: " + (float)forward / (forward + backward));
-            Console.WriteLine("Backward method Probability: " + (float)backward / (forward + backward));
+            Console.WriteLine("Bidirectional method Probability: " + (float)bidir / (forward + backward + bidir));
+            Console.WriteLine("Forward method Probability: " + (float)forward / (forward + backward + bidir));
+            Console.WriteLine("Backward method Probability: " + (float)backward / (forward + backward + bidir));
         }
 
 
