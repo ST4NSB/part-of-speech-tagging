@@ -284,7 +284,7 @@ namespace NLP
             // right to left encoding - backward approach
             bool startPoint = true;
             int triPoz = -1;
-            for (int i = testWords.Count - 2; i >= -1; i--)
+            for (int i = testWords.Count - 2; i >= -1; i--) // count - 2 is to start from the first word != "."
             {
                 triPoz++;
                 if (i == -1) // we first check to see if we got to index -1
