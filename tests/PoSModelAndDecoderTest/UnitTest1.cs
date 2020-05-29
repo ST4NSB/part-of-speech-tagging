@@ -507,6 +507,11 @@ namespace PartOfSpeechModelTest
             Console.WriteLine("provoked (JJ): " + tagger.GetValueWeightForUnknownWord("provoked", "JJ"));
             Console.WriteLine("provoked (VB): " + tagger.GetValueWeightForUnknownWord("provoked", "VB"));
             Console.WriteLine("provoked (RB): " + tagger.GetValueWeightForUnknownWord("provoked", "RB"));
+            Console.WriteLine();
+            Console.WriteLine("Oh-the-pain-of-it (NN): " + tagger.GetValueWeightForUnknownWord("Oh-the-pain-of-it", "NN"));
+            Console.WriteLine("Oh-the-pain-of-it (OT): " + tagger.GetValueWeightForUnknownWord("Oh-the-pain-of-it", "OT"));
+            Console.WriteLine("Oh-the-pain-of-it (RB): " + tagger.GetValueWeightForUnknownWord("Oh-the-pain-of-it", "RB"));
+            Console.WriteLine("oh-the-pain-of-it (NN): " + tagger.GetValueWeightForUnknownWord("oh-the-pain-of-it", "NN"));
             Assert.Pass();
         }
     }

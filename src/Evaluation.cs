@@ -159,8 +159,8 @@ namespace NLP
                 totalAccuracy.ToString(),
                 totalPrecision.ToString(),
                 totalRecall.ToString(),
-                totalFmeasure.ToString(),
-                totalSpecificity.ToString()
+                totalSpecificity.ToString(),
+                totalFmeasure.ToString()
             });
 
             return matrix;
