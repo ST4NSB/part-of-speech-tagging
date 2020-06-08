@@ -6,7 +6,7 @@ namespace NLP
     public class Evaluation
     {
         HashSet<string> ClassTags;
-        List<List<float>> finalMatrix;
+        List<List<double>> finalMatrix;
 
         public Evaluation() {}
 
@@ -43,7 +43,7 @@ namespace NLP
         public void CreateSupervizedEvaluationsMatrix(List<Tokenizer.WordTag> testData, List<string> predictedTags, HashSet<string> unknownWords, string evalMode = "k+u", int fbeta = 1)
         {
             ClassTags = new HashSet<string>();
-            finalMatrix = new List<List<float>>();
+            finalMatrix = new List<List<double>>();
 
             foreach (var item in testData)
                 this.ClassTags.Add(item.tag);
@@ -95,7 +95,8 @@ namespace NLP
                 float specificity = (float)tn / (tn + fp); // true negative rate
                 if (float.IsNaN(specificity) || float.IsInfinity(specificity))
                     specificity = 0.0f;
-                finalMatrix.Add(new List<float>() { accuracy, precision, recall, fmeasure, specificity });
+                finalMatrix.Add(new List<double>() { Math.Round(accuracy * 100, 3) , Math.Round(precision * 100, 3) , Math.Round(recall * 100, 3),
+                    Math.Round(specificity * 100, 3), Math.Round(fmeasure * 100, 3)  });
             }
         }
 
@@ -104,7 +105,7 @@ namespace NLP
             return this.ClassTags;
         }
 
-        public List<List<float>> GetClassificationMatrix()
+        public List<List<double>> GetClassificationMatrix()
         {
             return this.finalMatrix;
         }
@@ -138,20 +139,26 @@ namespace NLP
                 i++;
             }
 
-            float totalAccuracy = 0.0f, totalPrecision = 0.0f, totalRecall = 0.0f, totalFmeasure = 0.0f, totalSpecificity = 0.0f;
+            double totalAccuracy = 0.0f, totalPrecision = 0.0f, totalRecall = 0.0f, totalFmeasure = 0.0f, totalSpecificity = 0.0f;
             for (int j = 0; j < ClassTags.Count; j++)
             {
                 totalAccuracy += finalMatrix[j][0];
                 totalPrecision += finalMatrix[j][1];
                 totalRecall += finalMatrix[j][2];
-                totalFmeasure += finalMatrix[j][3];
-                totalSpecificity += finalMatrix[j][4];
+                totalSpecificity += finalMatrix[j][3];
+                totalFmeasure += finalMatrix[j][4];
             }
-            totalAccuracy = (float)totalAccuracy / ClassTags.Count;
-            totalPrecision = (float)totalPrecision / ClassTags.Count;
-            totalRecall = (float)totalRecall / ClassTags.Count;
-            totalFmeasure = (float)totalFmeasure / ClassTags.Count;
-            totalSpecificity = (float)totalSpecificity / ClassTags.Count;
+            totalAccuracy = (double)(totalAccuracy / ClassTags.Count) * 100;
+            totalAccuracy = Math.Round(totalAccuracy, 3);
+            totalPrecision = (double)(totalPrecision / ClassTags.Count) * 100;
+            totalPrecision = Math.Round(totalPrecision, 3);
+            totalRecall = (double)(totalRecall / ClassTags.Count) * 100;
+            totalRecall = Math.Round(totalRecall, 3);
+            totalSpecificity = (double)(totalSpecificity / ClassTags.Count) * 100;
+            totalSpecificity = Math.Round(totalSpecificity, 3);
+            totalFmeasure = (double)(totalFmeasure / ClassTags.Count) * 100;
+            totalFmeasure = Math.Round(totalFmeasure, 3);
+
 
             matrix.Add(new List<string>()
             {

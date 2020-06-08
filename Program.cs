@@ -1,4 +1,4 @@
-﻿#define RULE_70_30
+﻿//#define RULE_70_30
 #define CROSS_VALIDATION
 
 using System;
@@ -7,6 +7,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http.Headers;
+using System.Runtime.Serialization;
 using Newtonsoft.Json;
 using NLP;
 using NUnit.Framework.Constraints;
@@ -180,14 +181,25 @@ namespace PostAppConsole
             #region Evaluations & results
             Evaluation eval = new Evaluation();
             eval.CreateSupervizedEvaluationsMatrix(wordsTest, decoder.PredictedTags, decoder.UnknownWords, fbeta: 1);
-            Console.WriteLine("TAG\t\tACCURACY\t\tPRECISION\t\tRECALL(TPR)\t\tF1-SCORE\t\tSPECIFICITY(TNR)");
-            var fullMatrix = eval.PrintClassificationResultsMatrix();
-            for (int i = 0; i < eval.GetFullMatrixLineLength(); i++)
+            using (System.IO.StreamWriter file = new System.IO.StreamWriter(path + "statistics\\" + "bdt.csv"))
             {
-                for (int j = 0; j < eval.GetFullMatrixColLength(); j++)
-                    Console.Write(fullMatrix[i][j] + "\t\t");
-                Console.WriteLine();
+                file.WriteLine("TAG,ACCURACY,PRECISION,RECALL(TPR),SPECIFICITY(TNR),F1-SCORE");
+                var fullMatrix = eval.PrintClassificationResultsMatrix();
+                for (int i = 0; i < eval.GetFullMatrixLineLength(); i++)
+                {
+                    for (int j = 0; j < eval.GetFullMatrixColLength(); j++)
+                        file.Write(fullMatrix[i][j] + ",");
+                    file.WriteLine();
+                }
             }
+            //Console.WriteLine("TAG ACCURACY PRECISION RECALL(TPR) SPECIFICITY(TNR) F1-SCORE");
+            //var fullMatrix = eval.PrintClassificationResultsMatrix();
+            //for (int i = 0; i < eval.GetFullMatrixLineLength(); i++)
+            //{
+            //    for (int j = 0; j < eval.GetFullMatrixColLength(); j++)
+            //        Console.Write(fullMatrix[i][j] + " ");
+            //    Console.WriteLine();
+            //}
 
             Console.WriteLine("\nAccuracy for known words: " + eval.GetNaiveAccuracy(wordsTest, decoder.PredictedTags, decoder.UnknownWords, evalMode: "k"));
             Console.WriteLine("Accuracy for unknown words: " + eval.GetNaiveAccuracy(wordsTest, decoder.PredictedTags, decoder.UnknownWords, evalMode: "u"));
@@ -297,7 +309,7 @@ namespace PostAppConsole
             #endregion
 
 #elif (CROSS_VALIDATION)
-            const int FOLDS = 2;
+            const int FOLDS = 10;
             const bool SHUFFLE = true;
             const string CVPATH = "dataset\\crossvalidation";
             Console.WriteLine("You chose Cross-Validation for the data-set! Folds: " + FOLDS + ", Shuffle-option: " + SHUFFLE);
@@ -312,6 +324,9 @@ namespace PostAppConsole
             //foreach (var item in res)
             //    Console.WriteLine(item.Key + ": " + item.Value);
             #endregion
+
+            List<float> knownacc = new List<float>(), unknownacc = new List<float>(), totalacc = new List<float>(), procentageunk = new List<float>();
+
 
             CrossValidation cv = new CrossValidation(filePath: BrownFolderPath, fold: FOLDS, shuffle: SHUFFLE); // with randomness
             Console.WriteLine("Done with loading dataset & splitting them into folds!\n");
@@ -343,7 +358,7 @@ namespace PostAppConsole
                 sw.Start();
                 tagger.CreateHiddenMarkovModel(uncapWords, capWords);
 
-                tagger.CalculateHiddenMarkovModelProbabilitiesForTestCorpus(wordsTest, model: "trigram");
+                tagger.CalculateHiddenMarkovModelProbabilitiesForTestCorpus(wordsTest, model: "bigram");
 
                 sw.Stop();
                 Console.WriteLine("Done with training POS MODEL & calculating probabilities! Time: " + sw.ElapsedMilliseconds + " ms");
@@ -355,7 +370,7 @@ namespace PostAppConsole
                 Decoder decoder = new Decoder();
 
                 sw.Reset(); sw.Start();
-                decoder.ViterbiDecoding(tagger, wordsTest, modelForward: "trigram", modelBackward: "trigram", mode: "f+b");
+                decoder.ViterbiDecoding(tagger, wordsTest, modelForward: "bigram", modelBackward: "bigram", mode: "backward");
                 sw.Stop();
 
                 Console.WriteLine("Done with DECODING VITERBI MODEL! Time: " + sw.ElapsedMilliseconds + " ms");
@@ -364,19 +379,27 @@ namespace PostAppConsole
 
             #region Evaluations & results
                 Evaluation eval = new Evaluation();
-                eval.CreateSupervizedEvaluationsMatrix(wordsTest, decoder.PredictedTags, decoder.UnknownWords, fbeta: 1);
-                Console.WriteLine("TAG\t\tACCURACY\t\tPRECISION\t\tRECALL(TPR)\t\tF1-SCORE\t\tSPECIFICITY(TNR)");
-                var fullMatrix = eval.PrintClassificationResultsMatrix();
-                for (int i = 0; i < eval.GetFullMatrixLineLength(); i++)
-                {
-                    for (int j = 0; j < eval.GetFullMatrixColLength(); j++)
-                        Console.Write(fullMatrix[i][j] + "\t\t");
-                    Console.WriteLine();
-                }
+                //eval.CreateSupervizedEvaluationsMatrix(wordsTest, decoder.PredictedTags, decoder.UnknownWords, fbeta: 1);
+                //Console.WriteLine("TAG\t\tACCURACY\t\tPRECISION\t\tRECALL(TPR)\t\tF1-SCORE\t\tSPECIFICITY(TNR)");
+                //var fullMatrix = eval.PrintClassificationResultsMatrix();
+                //for (int i = 0; i < eval.GetFullMatrixLineLength(); i++)
+                //{
+                //    for (int j = 0; j < eval.GetFullMatrixColLength(); j++)
+                //        Console.Write(fullMatrix[i][j] + "\t\t");
+                //    Console.WriteLine();
+                //}
 
-                Console.WriteLine("\nAccuracy for known words: " + eval.GetNaiveAccuracy(wordsTest, decoder.PredictedTags, decoder.UnknownWords, evalMode: "k"));
-                Console.WriteLine("Accuracy for unknown words: " + eval.GetNaiveAccuracy(wordsTest, decoder.PredictedTags, decoder.UnknownWords, evalMode: "u"));
-                Console.WriteLine("Accuracy on both: " + eval.GetNaiveAccuracy(wordsTest, decoder.PredictedTags, decoder.UnknownWords, evalMode: "k+u"));
+                var ka = eval.GetNaiveAccuracy(wordsTest, decoder.PredictedTags, decoder.UnknownWords, evalMode: "k");
+                knownacc.Add(ka);
+                var unkw = eval.GetNaiveAccuracy(wordsTest, decoder.PredictedTags, decoder.UnknownWords, evalMode: "u");
+                unknownacc.Add(unkw);
+                var tot = eval.GetNaiveAccuracy(wordsTest, decoder.PredictedTags, decoder.UnknownWords, evalMode: "k+u");
+                totalacc.Add(tot);
+
+
+                Console.WriteLine("\nAccuracy for known words: " + ka);
+                Console.WriteLine("Accuracy for unknown words: " + unkw);
+                Console.WriteLine("Accuracy on both: " + tot);
             #endregion
 
                 Console.WriteLine("+");
@@ -390,13 +413,30 @@ namespace PostAppConsole
                     else knownwordscount++;
                 }
 
-                Console.WriteLine("Unknown words (count): " + unkwordscount + " | Procentage (%): " + (float)unkwordscount / wordsTest.Count);
+                var proc = (float)unkwordscount / wordsTest.Count;
+                procentageunk.Add(proc);
+
+                Console.WriteLine("Unknown words (count): " + unkwordscount + " | Procentage (%): " + proc);
                 Console.WriteLine("Known words (count): " + knownwordscount + " | Procentage (%): " + (float)knownwordscount / wordsTest.Count);
                 Console.WriteLine("Total words (count): " + wordsTest.Count);
             #endregion
 
                 Console.WriteLine("\n\n[FOLD " + (foldNumber + 1) + "/" + FOLDS + " DONE!]\n\n");
             }
+
+            var known = (float)knownacc.Sum() / FOLDS;
+            known = (float)Math.Round(known * 100, 3);
+            var unk = (float)unknownacc.Sum() / FOLDS;
+            unk = (float)Math.Round(unk * 100, 3);
+            var total = (float)totalacc.Sum() / FOLDS;
+            total = (float)Math.Round(total * 100, 3);
+            var procunk = (float)procentageunk.Sum() / FOLDS;
+            procunk = (float)Math.Round(procunk * 100, 3);
+
+            Console.WriteLine("\nAccuracy for all known words: " + known);
+            Console.WriteLine("Accuracy for all unknown words: " + unk);
+            Console.WriteLine("Accuracy on all total: " + total);
+            Console.WriteLine("Procentage (%): " + procunk);
 
 #endif
         }

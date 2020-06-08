@@ -1,0 +1,201 @@
+You chose Cross-Validation for the data-set! Folds: 10, Shuffle-option: True
+Done with loading dataset & splitting them into folds!
+
+Done with loading and creating tokens for train & test files!
+Done with training POS MODEL & calculating probabilities! Time: 115641 ms
+Bidirectional method Probability: 0
+Forward method Probability: 0.161497
+Backward method Probability: 0.8385031
+Done with DECODING VITERBI MODEL! Time: 73757 ms
+
+Accuracy for known words: 0.9678565
+Accuracy for unknown words: 0.8541882
+Accuracy on both: 0.9637993
++
+Unknown words (count): 3868 | Procentage (%): 0.03569319
+Known words (count): 104500 | Procentage (%): 0.9643068
+Total words (count): 108368
+
+
+[FOLD 1/10 DONE!]
+
+
+Done with loading and creating tokens for train & test files!
+Done with training POS MODEL & calculating probabilities! Time: 105954 ms
+Bidirectional method Probability: 0.0007380074
+Forward method Probability: 0.1381919
+Backward method Probability: 0.8610701
+Done with DECODING VITERBI MODEL! Time: 71733 ms
+
+Accuracy for known words: 0.9664122
+Accuracy for unknown words: 0.8208136
+Accuracy on both: 0.9610577
++
+Unknown words (count): 4007 | Procentage (%): 0.03677631
+Known words (count): 104949 | Procentage (%): 0.9632237
+Total words (count): 108956
+
+
+[FOLD 2/10 DONE!]
+
+
+Done with loading and creating tokens for train & test files!
+Done with training POS MODEL & calculating probabilities! Time: 107729 ms
+Bidirectional method Probability: 0.0005348547
+Forward method Probability: 0.1597433
+Backward method Probability: 0.8397219
+Done with DECODING VITERBI MODEL! Time: 67122 ms
+
+Accuracy for known words: 0.9646417
+Accuracy for unknown words: 0.8276829
+Accuracy on both: 0.9596694
++
+Unknown words (count): 3923 | Procentage (%): 0.03630491
+Known words (count): 104134 | Procentage (%): 0.9636951
+Total words (count): 108057
+
+
+[FOLD 3/10 DONE!]
+
+
+Done with loading and creating tokens for train & test files!
+Done with training POS MODEL & calculating probabilities! Time: 99864 ms
+Bidirectional method Probability: 0.0007443245
+Forward method Probability: 0.1475623
+Backward method Probability: 0.8516933
+Done with DECODING VITERBI MODEL! Time: 73029 ms
+
+Accuracy for known words: 0.9682674
+Accuracy for unknown words: 0.8431969
+Accuracy on both: 0.964142
++
+Unknown words (count): 3616 | Procentage (%): 0.03298457
+Known words (count): 106011 | Procentage (%): 0.9670154
+Total words (count): 109627
+
+
+[FOLD 4/10 DONE!]
+
+
+Done with loading and creating tokens for train & test files!
+Done with training POS MODEL & calculating probabilities! Time: 119173 ms
+Bidirectional method Probability: 0.0001850824
+Forward method Probability: 0.1384416
+Backward method Probability: 0.8613733
+Done with DECODING VITERBI MODEL! Time: 83142 ms
+
+Accuracy for known words: 0.9673581
+Accuracy for unknown words: 0.7881224
+Accuracy on both: 0.9609976
++
+Unknown words (count): 3856 | Procentage (%): 0.03548684
+Known words (count): 104804 | Procentage (%): 0.9645132
+Total words (count): 108660
+
+
+[FOLD 5/10 DONE!]
+
+
+Done with loading and creating tokens for train & test files!
+Done with training POS MODEL & calculating probabilities! Time: 100455 ms
+Bidirectional method Probability: 0.0001890717
+Forward method Probability: 0.1433163
+Backward method Probability: 0.8564946
+Done with DECODING VITERBI MODEL! Time: 59432 ms
+
+Accuracy for known words: 0.9665294
+Accuracy for unknown words: 0.8166181
+Accuracy on both: 0.9613634
++
+Unknown words (count): 3779 | Procentage (%): 0.03446012
+Known words (count): 105884 | Procentage (%): 0.9655399
+Total words (count): 109663
+
+
+[FOLD 6/10 DONE!]
+
+
+Done with loading and creating tokens for train & test files!
+Done with training POS MODEL & calculating probabilities! Time: 107150 ms
+Bidirectional method Probability: 0.0001772735
+Forward method Probability: 0.1556462
+Backward method Probability: 0.8441766
+Done with DECODING VITERBI MODEL! Time: 64262 ms
+
+Accuracy for known words: 0.96615
+Accuracy for unknown words: 0.8156457
+Accuracy on both: 0.9613071
++
+Unknown words (count): 3477 | Procentage (%): 0.03217776
+Known words (count): 104579 | Procentage (%): 0.9678223
+Total words (count): 108056
+
+
+[FOLD 7/10 DONE!]
+
+
+Done with loading and creating tokens for train & test files!
+Done with training POS MODEL & calculating probabilities! Time: 84413 ms
+Bidirectional method Probability: 0
+Forward method Probability: 0.1497195
+Backward method Probability: 0.8502805
+Done with DECODING VITERBI MODEL! Time: 56396 ms
+
+Accuracy for known words: 0.9657352
+Accuracy for unknown words: 0.817607
+Accuracy on both: 0.9601396
++
+Unknown words (count): 4112 | Procentage (%): 0.03777502
+Known words (count): 104743 | Procentage (%): 0.962225
+Total words (count): 108855
+
+
+[FOLD 8/10 DONE!]
+
+
+Done with loading and creating tokens for train & test files!
+Done with training POS MODEL & calculating probabilities! Time: 83322 ms
+Bidirectional method Probability: 0
+Forward method Probability: 0.1309658
+Backward method Probability: 0.8690342
+Done with DECODING VITERBI MODEL! Time: 58626 ms
+
+Accuracy for known words: 0.9665947
+Accuracy for unknown words: 0.7814208
+Accuracy on both: 0.9597046
++
+Unknown words (count): 4026 | Procentage (%): 0.03720853
+Known words (count): 104175 | Procentage (%): 0.9627914
+Total words (count): 108201
+
+
+[FOLD 9/10 DONE!]
+
+
+Done with loading and creating tokens for train & test files!
+Done with training POS MODEL & calculating probabilities! Time: 91002 ms
+Bidirectional method Probability: 0.0001859082
+Forward method Probability: 0.1489124
+Backward method Probability: 0.8509017
+Done with DECODING VITERBI MODEL! Time: 52344 ms
+
+Accuracy for known words: 0.9664055
+Accuracy for unknown words: 0.8380282
+Accuracy on both: 0.9625206
++
+Unknown words (count): 3266 | Procentage (%): 0.03026148
+Known words (count): 104660 | Procentage (%): 0.9697385
+Total words (count): 107926
+
+
+[FOLD 10/10 DONE!]
+
+
+
+Accuracy for all known words: 0.9665951
+Accuracy for all unknown words: 0.8203323
+Accuracy on all total: 0.9614701
+Procentage (%): 0.03491287
+
+C:\Program Files\dotnet\dotnet.exe (process 13796) exited with code 0.
+Press any key to close this window . . .
