@@ -309,7 +309,7 @@ namespace PostAppConsole
             #endregion
 
 #elif (CROSS_VALIDATION)
-            const int FOLDS = 10;
+            const int FOLDS = 4;
             const bool SHUFFLE = true;
             const string CVPATH = "dataset\\crossvalidation";
             Console.WriteLine("You chose Cross-Validation for the data-set! Folds: " + FOLDS + ", Shuffle-option: " + SHUFFLE);
@@ -358,7 +358,7 @@ namespace PostAppConsole
                 sw.Start();
                 tagger.CreateHiddenMarkovModel(uncapWords, capWords);
 
-                tagger.CalculateHiddenMarkovModelProbabilitiesForTestCorpus(wordsTest, model: "bigram");
+                tagger.CalculateHiddenMarkovModelProbabilitiesForTestCorpus(wordsTest, model: "trigram");
 
                 sw.Stop();
                 Console.WriteLine("Done with training POS MODEL & calculating probabilities! Time: " + sw.ElapsedMilliseconds + " ms");
@@ -370,7 +370,7 @@ namespace PostAppConsole
                 Decoder decoder = new Decoder();
 
                 sw.Reset(); sw.Start();
-                decoder.ViterbiDecoding(tagger, wordsTest, modelForward: "bigram", modelBackward: "bigram", mode: "backward");
+                decoder.ViterbiDecoding(tagger, wordsTest, modelForward: "trigram", modelBackward: "trigram", mode: "f+b");
                 sw.Stop();
 
                 Console.WriteLine("Done with DECODING VITERBI MODEL! Time: " + sw.ElapsedMilliseconds + " ms");
@@ -433,10 +433,11 @@ namespace PostAppConsole
             var procunk = (float)procentageunk.Sum() / FOLDS;
             procunk = (float)Math.Round(procunk * 100, 3);
 
-            Console.WriteLine("\nAccuracy for all known words: " + known);
-            Console.WriteLine("Accuracy for all unknown words: " + unk);
-            Console.WriteLine("Accuracy on all total: " + total);
             Console.WriteLine("Procentage (%): " + procunk);
+            Console.WriteLine("Accuracy for all unknown words: " + unk);
+            Console.WriteLine("\nAccuracy for all known words: " + known);
+            Console.WriteLine("Accuracy on all total: " + total);
+            
 
 #endif
         }
