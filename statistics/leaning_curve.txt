@@ -1,0 +1,118 @@
+1 categorie:
+Accuracy for known words: 0.9563513
+Accuracy for unknown words: 0.7281972
+Accuracy on both: 0.92336
++
+Unknown words (count): 47299 | Procentage (%): 0.1446006
+Known words (count): 279802 | Procentage (%): 0.8553994
+Total words (count): 327101
+
+2 categorii:
+Accuracy for known words: 0.9600674
+Accuracy for unknown words: 0.7515641
+Accuracy on both: 0.9366342
++
+Unknown words (count): 36762 | Procentage (%): 0.1123873
+Known words (count): 290339 | Procentage (%): 0.8876127
+Total words (count): 327101
+
+3 categorii:
+Accuracy for known words: 0.9619214
+Accuracy for unknown words: 0.760604
+Accuracy on both: 0.9422747
++
+Unknown words (count): 31922 | Procentage (%): 0.09759066
+Known words (count): 295179 | Procentage (%): 0.9024094
+Total words (count): 327101
+
+4 categorii:
+Accuracy for known words: 0.9623891
+Accuracy for unknown words: 0.7687103
+Accuracy on both: 0.9450628
++
+Unknown words (count): 29262 | Procentage (%): 0.08945861
+Known words (count): 297839 | Procentage (%): 0.9105414
+Total words (count): 327101
+
+5 categorii:
+Accuracy for known words: 0.9633548
+Accuracy for unknown words: 0.7719068
+Accuracy on both: 0.9486336
++
+Unknown words (count): 25152 | Procentage (%): 0.07689368
+Known words (count): 301949 | Procentage (%): 0.9231063
+Total words (count): 327101
+
+6 categorii:
+Accuracy for known words: 0.964256
+Accuracy for unknown words: 0.7842982
+Accuracy on both: 0.9524061
++
+Unknown words (count): 21539 | Procentage (%): 0.06584816
+Known words (count): 305562 | Procentage (%): 0.9341518
+Total words (count): 327101
+
+7:
+Accuracy for known words: 0.9656518
+Accuracy for unknown words: 0.7994565
+Accuracy on both: 0.9564905
++
+Unknown words (count): 18031 | Procentage (%): 0.05512365
+Known words (count): 309070 | Procentage (%): 0.9448764
+Total words (count): 327101
+
+8:
+Accuracy for known words: 0.9654851
+Accuracy for unknown words: 0.7991297
+Accuracy on both: 0.9567198
++
+Unknown words (count): 17235 | Procentage (%): 0.05269015
+Known words (count): 309866 | Procentage (%): 0.9473099
+Total words (count): 327101
+
+9:
+Accuracy for known words: 0.9652963
+Accuracy for unknown words: 0.8039924
+Accuracy on both: 0.9575146
++
+Unknown words (count): 15780 | Procentage (%): 0.04824198
+Known words (count): 311321 | Procentage (%): 0.951758
+Total words (count): 327101
+
+10:
+Accuracy for known words: 0.9660087
+Accuracy for unknown words: 0.8060001
+Accuracy on both: 0.9587039
++
+Unknown words (count): 14933 | Procentage (%): 0.04565256
+Known words (count): 312168 | Procentage (%): 0.9543474
+Total words (count): 327101
+
+11:
+Accuracy for known words: 0.9662628
+Accuracy for unknown words: 0.8056129
+Accuracy on both: 0.9591227
++
+Unknown words (count): 14538 | Procentage (%): 0.04444499
+Known words (count): 312563 | Procentage (%): 0.955555
+Total words (count): 327101
+
+12:
+Accuracy for known words: 0.9664916
+Accuracy for unknown words: 0.8044569
+Accuracy on both: 0.9595782
++
+Unknown words (count): 13956 | Procentage (%): 0.04266572
+Known words (count): 313145 | Procentage (%): 0.9573343
+Total words (count): 327101
+
+13:
+Accuracy for known words: 0.966862
+Accuracy for unknown words: 0.8051774
+Accuracy on both: 0.9602172
++
+Unknown words (count): 13443 | Procentage (%): 0.0410974
+Known words (count): 313658 | Procentage (%): 0.9589026
+Total words (count): 327101
+
+
