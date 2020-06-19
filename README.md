@@ -1,7 +1,7 @@
 # part-of-speech-tagging-library
 ## Information
 A natural language processing library for automatic part-of-speech tagging  
-Tags used in the system: Noun, Verb, Article/Determiner, Preposition, Adjective, Pronoun, Conjuction, Others.  
+Tags used in the process are the following: Noun, Verb, Article/Determiner, Preposition, Adjective, Pronoun, Conjuction, Others.  
 Passed the **96%** overall accuracy threshold for the **Brown Corpus**  
 
 ## Installing & Using the library
