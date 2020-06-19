@@ -12,7 +12,7 @@ Passed the **96%** overall accuracy threshold for the **Brown Corpus**
 
 ## Library Arhitecture
 <img src="./docs/images/arhitecture.png" width="600">
-More info about the system at .../part-of-speech-tagging/docs/Documentatie_pos_tagging.docx (in Romanian)  
+More info about the project & the library at .../part-of-speech-tagging/docs/Documentatie_pos_tagging.docx (in Romanian)  
 
 ## Demo Application
 To run the demo Open & Run: **Program.cs**  
