@@ -1,5 +1,4 @@
 # part-of-speech-tagging-library
-
 ## Information
 A natural language processing library for automatic part-of-speech tagging  
 Tags used in the system: Noun, Verb, Article/Determiner, Preposition, Adjective, Pronoun, Conjuction, Others.  
