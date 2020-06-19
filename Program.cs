@@ -613,7 +613,7 @@ namespace PostAppConsole
                 foreach (var item in histogram)
                 {
                     int index = getIndexForConversion(item.Key);
-                    double val = Math.Round(((double)item.Value / sum) * 100.0d, 2);
+                    double val = Math.Round(((double)item.Value / sum) * 100.0d, 1);
                     freqHisto.Add(index, val);
                 }
 
