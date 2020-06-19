@@ -65,6 +65,7 @@ namespace NLP
                 return results;
             }
 
+
             /// <summary>
             /// Eliminates all end of sentence punctuation (the tagger doesn't need to predict EOS tags).
             /// </summary>
@@ -138,5 +139,35 @@ namespace NLP
             }
             return newWords;
         }
+
+        /// <summary>
+        /// Public static function to pre-process (data cleaning, normalization) the tokenized list of words. (version on list of strings)
+        /// </summary>
+        /// <param name="words"></param>
+        /// <param name="toLowerOption"></param>
+        /// <param name="keepOnlyCapitalizedWords"></param>
+        /// <returns></returns>
+        public static List<string> PreProcessingPipeline(List<string> words, bool toLowerOption = false, bool keepOnlyCapitalizedWords = false)
+        {
+            List<string> newWords = new List<string>();
+            foreach (var sw in words)
+            {
+                if (Cleaning.IsStopWord(sw)) continue;
+                string tsw = Cleaning.EliminateDigitsFromWord(sw);
+                if (string.IsNullOrEmpty(tsw)) continue;
+                if (toLowerOption)
+                    tsw = Normalization.ToLowerCaseNormalization(tsw);
+
+                if (keepOnlyCapitalizedWords)
+                    if (!char.IsUpper(tsw[0]))
+                        continue;
+
+                newWords.Add(tsw);
+            }
+            return newWords;
+        }
+
+
+
     }
 }

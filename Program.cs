@@ -1,5 +1,6 @@
 ﻿//#define RULE_70_30
-#define CROSS_VALIDATION
+//#define CROSS_VALIDATION
+#define DEMO_APP
 
 using System;
 using System.Collections.Generic;
@@ -18,6 +19,84 @@ namespace PostAppConsole
 {
     class Program
     {
+        static ConsoleColor[] bkColor = new ConsoleColor[9] { ConsoleColor.DarkRed, ConsoleColor.Green, ConsoleColor.DarkYellow,
+                ConsoleColor.Yellow, ConsoleColor.Cyan, ConsoleColor.Magenta, ConsoleColor.Gray, ConsoleColor.DarkBlue, ConsoleColor.DarkGray };
+        static ConsoleColor[] frColor = new ConsoleColor[9] { ConsoleColor.White, ConsoleColor.Black, ConsoleColor.Black,
+                ConsoleColor.Black, ConsoleColor.Black, ConsoleColor.White, ConsoleColor.Black, ConsoleColor.White, ConsoleColor.White };
+        static string[] pos = new string[9] { "Noun", "Verb", "Pronoun", "Adjective", "Adverb", "Preposition",
+            "Conjunction", "Article/Determiner", "Others" };
+
+        private static void header()
+        {
+            Console.WriteLine("List of tags: ");
+            for (int i = 0; i < 9; i++)
+            {
+                Console.ForegroundColor = frColor[i];
+                Console.BackgroundColor = bkColor[i];
+                Console.WriteLine("  " + pos[i] + "  ");
+
+                Console.ResetColor();
+            }
+            Console.WriteLine();
+        }
+
+        private static void header(Dictionary<int, double> histogram)
+        {
+            Console.WriteLine("List of tags: ");
+            for (int i = 0; i < 9; i++)
+            {
+                Console.ForegroundColor = frColor[i];
+                Console.BackgroundColor = bkColor[i];
+                Console.Write("  " + pos[i] + "  ");
+                Console.ResetColor();
+
+                if (histogram.ContainsKey(i))
+                {
+                    if (histogram[i] > 0.0d)
+                        Console.Write(" " + histogram[i] + "%");
+                }
+
+                Console.WriteLine();
+            }
+            Console.WriteLine();
+        }
+
+        private static void emptySpace()
+        {
+            Console.ResetColor();
+            Console.Write(" ");
+        }
+
+        private static int getIndexForConversion(string tag)
+        {
+            switch (tag)
+            {
+                case "NN": return 0;
+                case "VB": return 1;
+                case "PN": return 2;
+                case "JJ": return 3;
+                case "RB": return 4;
+                case "PP": return 5;
+                case "CC": return 6;
+                case "AT/DT": return 7;
+                case "OT": return 8;
+            }
+            return -1;
+        }
+
+        private static string read()
+        {
+            string input;
+            do
+            {
+                header();
+                Console.Write("Enter your sentence here: ");
+                input = Console.ReadLine();
+                Console.Clear();
+            } while (string.IsNullOrWhiteSpace(input));
+            return input;
+        }
+
         static string LoadAndReadFolderFiles(string folderName)
         {
             string path = Directory.GetParent(Directory.GetCurrentDirectory()).Parent.Parent.FullName + "\\" + folderName;
@@ -181,25 +260,25 @@ namespace PostAppConsole
             #region Evaluations & results
             Evaluation eval = new Evaluation();
             eval.CreateSupervizedEvaluationsMatrix(wordsTest, decoder.PredictedTags, decoder.UnknownWords, fbeta: 1);
-            using (System.IO.StreamWriter file = new System.IO.StreamWriter(path + "statistics\\" + "bdt.csv"))
-            {
-                file.WriteLine("TAG,ACCURACY,PRECISION,RECALL(TPR),SPECIFICITY(TNR),F1-SCORE");
-                var fullMatrix = eval.PrintClassificationResultsMatrix();
-                for (int i = 0; i < eval.GetFullMatrixLineLength(); i++)
-                {
-                    for (int j = 0; j < eval.GetFullMatrixColLength(); j++)
-                        file.Write(fullMatrix[i][j] + ",");
-                    file.WriteLine();
-                }
-            }
-            //Console.WriteLine("TAG ACCURACY PRECISION RECALL(TPR) SPECIFICITY(TNR) F1-SCORE");
-            //var fullMatrix = eval.PrintClassificationResultsMatrix();
-            //for (int i = 0; i < eval.GetFullMatrixLineLength(); i++)
+            //using (System.IO.StreamWriter file = new System.IO.StreamWriter(path + "statistics\\" + "bdt.csv"))
             //{
-            //    for (int j = 0; j < eval.GetFullMatrixColLength(); j++)
-            //        Console.Write(fullMatrix[i][j] + " ");
-            //    Console.WriteLine();
+            //    file.WriteLine("TAG,ACCURACY,PRECISION,RECALL(TPR),SPECIFICITY(TNR),F1-SCORE");
+            //    var fullMatrix = eval.PrintClassificationResultsMatrix();
+            //    for (int i = 0; i < eval.GetFullMatrixLineLength(); i++)
+            //    {
+            //        for (int j = 0; j < eval.GetFullMatrixColLength(); j++)
+            //            file.Write(fullMatrix[i][j] + ",");
+            //        file.WriteLine();
+            //    }
             //}
+            Console.WriteLine("TAG ACCURACY PRECISION RECALL(TPR) SPECIFICITY(TNR) F1-SCORE");
+            var fullMatrix = eval.PrintClassificationResultsMatrix();
+            for (int i = 0; i < eval.GetFullMatrixLineLength(); i++)
+            {
+                for (int j = 0; j < eval.GetFullMatrixColLength(); j++)
+                    Console.Write(fullMatrix[i][j] + " ");
+                Console.WriteLine();
+            }
 
             Console.WriteLine("\nAccuracy for known words: " + eval.GetNaiveAccuracy(wordsTest, decoder.PredictedTags, decoder.UnknownWords, evalMode: "k"));
             Console.WriteLine("Accuracy for unknown words: " + eval.GetNaiveAccuracy(wordsTest, decoder.PredictedTags, decoder.UnknownWords, evalMode: "u"));
@@ -439,6 +518,124 @@ namespace PostAppConsole
             Console.WriteLine("Accuracy on all total: " + total);
             
 
+#elif(DEMO_APP)
+            #region Load & convert to model
+            string modelsPath = path + "\\models\\";
+
+            string unigram = File.ReadAllText(modelsPath + "unigram.json");
+            string bigram = File.ReadAllText(modelsPath + "bigram.json");
+            string trigram = File.ReadAllText(modelsPath + "trigram.json");
+            string capitalizedPrefix = File.ReadAllText(modelsPath + "capitalizedPrefix.json");
+            string nonCapitalizedPrefix = File.ReadAllText(modelsPath + "nonCapitalizedPrefix.json");
+            string capitalizedSuffix = File.ReadAllText(modelsPath + "capitalizedSuffix.json");
+            string nonCapitalizedSuffix = File.ReadAllText(modelsPath + "nonCapitalizedSuffix.json");
+            string emission = File.ReadAllText(modelsPath + "emission.json");
+            string emissionWithCapital = File.ReadAllText(modelsPath + "emissionWithCapital.json");
+
+            var unigramFreq = JsonConvert.DeserializeObject<Dictionary<string, int>>(unigram);
+            var bigramNonConverted = JsonConvert.DeserializeObject<Dictionary<string, int>>(bigram);
+            var trigramNonConverted = JsonConvert.DeserializeObject<Dictionary<string, int>>(trigram);
+            var capitalizedPrefixProb = JsonConvert.DeserializeObject<List<PartOfSpeechModel.EmissionProbabilisticModel>>(capitalizedPrefix);
+            var nonCapitalizedPrefixProb = JsonConvert.DeserializeObject<List<PartOfSpeechModel.EmissionProbabilisticModel>>(nonCapitalizedPrefix);
+            var capitalizedSuffixProb = JsonConvert.DeserializeObject<List<PartOfSpeechModel.EmissionProbabilisticModel>>(capitalizedSuffix);
+            var nonCapitalizedSuffixProb = JsonConvert.DeserializeObject<List<PartOfSpeechModel.EmissionProbabilisticModel>>(nonCapitalizedSuffix);
+            var emissionFreq = JsonConvert.DeserializeObject<List<PartOfSpeechModel.EmissionModel>>(emission);
+            var emissionWithCapitalFreq = JsonConvert.DeserializeObject<List<PartOfSpeechModel.EmissionModel>>(emissionWithCapital);
+
+            Dictionary<Tuple<string, string>, int> bigramFreq = new Dictionary<Tuple<string, string>, int>();
+            Dictionary<Tuple<string, string, string>, int> trigramFreq = new Dictionary<Tuple<string, string, string>, int>();
+
+            foreach (var item in bigramNonConverted)
+            {
+                string[] split = item.Key.Split(',');
+                var charsToRemove = new string[] { "(", ")", " " };
+                foreach (var c in charsToRemove)
+                {
+                    split[0] = split[0].Replace(c, string.Empty);
+                    split[1] = split[1].Replace(c, string.Empty);
+                }
+                bigramFreq.Add(new Tuple<string, string>(split[0], split[1]), item.Value);
+            }
+
+            foreach (var item in trigramNonConverted)
+            {
+                string[] split = item.Key.Split(',');
+                var charsToRemove = new string[] { "(", ")", " " };
+                foreach (var c in charsToRemove)
+                {
+                    split[0] = split[0].Replace(c, string.Empty);
+                    split[1] = split[1].Replace(c, string.Empty);
+                    split[2] = split[2].Replace(c, string.Empty);
+                }
+                trigramFreq.Add(new Tuple<string, string, string>(split[0], split[1], split[2]), item.Value);
+            }
+            #endregion
+
+            PartOfSpeechModel model = new PartOfSpeechModel(emissionFreq, emissionWithCapitalFreq, unigramFreq, bigramFreq, trigramFreq,
+                nonCapitalizedSuffixProb, nonCapitalizedPrefixProb, capitalizedSuffixProb, capitalizedPrefixProb);
+            NLP.Decoder decoder = new NLP.Decoder();
+
+            string input = null;
+            List<string> preprocessedInput;
+
+            while (true)
+            {
+                do
+                {
+                    if (string.IsNullOrWhiteSpace(input))
+                        input = read();
+                    preprocessedInput = Tokenizer.TokenizeSentenceWords(input);
+                    input = null;
+                } while (preprocessedInput.Count == 0 || preprocessedInput[0] == string.Empty);
+
+                preprocessedInput = TextPreprocessing.PreProcessingPipeline(preprocessedInput);
+                model.CalculateHiddenMarkovModelProbabilitiesForTestCorpus(preprocessedInput, model: "trigram");
+
+                List<Tokenizer.WordTag> inputTest = new List<Tokenizer.WordTag>();
+                foreach (var item in preprocessedInput)
+                {
+                    if (item == "." || item == "!" || item == "?")
+                        inputTest.Add(new Tokenizer.WordTag(item, "."));
+                    else inputTest.Add(new Tokenizer.WordTag(item, ""));
+                }
+                if (inputTest[inputTest.Count - 1].tag != ".") // safe case check
+                    inputTest.Add(new Tokenizer.WordTag(".", "."));
+
+                decoder.ViterbiDecoding(model, inputTest, modelForward: "trigram", modelBackward: "trigram", mode: "f+b");
+
+                Dictionary<string, int> histogram = new Dictionary<string, int>();
+                Dictionary<int, double> freqHisto = new Dictionary<int, double>();
+                foreach (var item in decoder.PredictedTags)
+                    if (histogram.ContainsKey(item))
+                        histogram[item] += 1;
+                    else histogram.Add(item, 1);
+                int sum = histogram.Sum(x => x.Value);
+                foreach (var item in histogram)
+                {
+                    int index = getIndexForConversion(item.Key);
+                    double val = Math.Round(((double)item.Value / sum) * 100.0d, 2);
+                    freqHisto.Add(index, val);
+                }
+
+                header(freqHisto);
+                Console.ResetColor();
+                Console.Write("Tagged Sentence: ");
+
+                for (int i = 0; i < decoder.PredictedTags.Count; i++)
+                {
+                    int index = getIndexForConversion(decoder.PredictedTags[i]);
+                    Console.ForegroundColor = frColor[index];
+                    Console.BackgroundColor = bkColor[index];
+                    Console.Write(inputTest[i].word);
+                    emptySpace();
+                }
+
+                Console.WriteLine();
+                Console.WriteLine();
+                Console.Write("Enter your sentence here: ");
+                input = Console.ReadLine();
+                Console.Clear();                
+            }
 #endif
         }
     }

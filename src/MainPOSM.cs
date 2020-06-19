@@ -55,26 +55,33 @@ namespace NLP
         /// <param name="SuffixCapitalizedWordEmissionProbabilities"></param>
         /// <param name="PrefixCapitalizedWordEmissionProbabilities"></param>
         public PartOfSpeechModel(
-            List<EmissionProbabilisticModel> WordTagsEmissionProbabilities,
-            List<EmissionProbabilisticModel> WordCapitalizedTagsEmissionProbabilities,
-            Dictionary<string, double> UnigramProbabilities,
-            Dictionary<Tuple<string, string>, double> BigramTransitionProbabilities,
-            Dictionary<Tuple<string, string, string>, double> TrigramTransitionProbabilities,
+            List<EmissionModel> WordTagsEmissionFrequence,
+            List<EmissionModel> WordCapitalizedTagsEmissionFrequence,
+            Dictionary<string, int> UnigramFrequnce,
+            Dictionary<Tuple<string, string>, int> BigramTransitionFrequence,
+            Dictionary<Tuple<string, string, string>, int> TrigramTransitionFrequence,
             List<EmissionProbabilisticModel> SuffixEmissionProbabilities,
             List<EmissionProbabilisticModel> PrefixEmissionProbabilities,
             List<EmissionProbabilisticModel> SuffixCapitalizedWordEmissionProbabilities,
             List<EmissionProbabilisticModel> PrefixCapitalizedWordEmissionProbabilities)
         {
-            this.WordCapitalizedTagsEmissionProbabilities = WordTagsEmissionProbabilities;
-            this.WordCapitalizedTagsEmissionProbabilities = WordCapitalizedTagsEmissionProbabilities;
-            this.UnigramProbabilities = UnigramProbabilities;
-            this.BigramTransitionProbabilities = BigramTransitionProbabilities;
-            this.TrigramTransitionProbabilities = TrigramTransitionProbabilities;
+            this.WordTagsEmissionFrequence = WordTagsEmissionFrequence;
+            this.WordCapitalizedTagsEmissionFrequence = WordCapitalizedTagsEmissionFrequence;
+           
+            this.UnigramFrequence = UnigramFrequnce;
+            this.BigramTransitionFrequence = BigramTransitionFrequence;
+            this.TrigramTransitionFrequence = TrigramTransitionFrequence;
 
             this.SuffixEmissionProbabilities = SuffixEmissionProbabilities;
             this.PrefixEmissionProbabilities = PrefixEmissionProbabilities;
             this.SuffixCapitalizedWordEmissionProbabilities = SuffixCapitalizedWordEmissionProbabilities;
             this.PrefixCapitalizedWordEmissionProbabilities = PrefixCapitalizedWordEmissionProbabilities;
+
+            this.WordCapitalizedTagsEmissionProbabilities = new List<EmissionProbabilisticModel>();
+            this.WordTagsEmissionProbabilities = new List<EmissionProbabilisticModel>();
+            this.UnigramProbabilities = new Dictionary<string, double>();
+            this.BigramTransitionProbabilities = new Dictionary<Tuple<string, string>, double>();
+            this.TrigramTransitionProbabilities = new Dictionary<Tuple<string, string, string>, double>();
         }
 
         /// <summary>

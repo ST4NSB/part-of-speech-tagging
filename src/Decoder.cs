@@ -580,9 +580,9 @@ namespace NLP
                 }
             }
 
-            Console.WriteLine("Bidirectional method Probability: " + (float)bidir / (forward + backward + bidir));
-            Console.WriteLine("Forward method Probability: " + (float)forward / (forward + backward + bidir));
-            Console.WriteLine("Backward method Probability: " + (float)backward / (forward + backward + bidir));
+            //Console.WriteLine("Bidirectional method Probability: " + (float)bidir / (forward + backward + bidir));
+            //Console.WriteLine("Forward method Probability: " + (float)forward / (forward + backward + bidir));
+            //Console.WriteLine("Backward method Probability: " + (float)backward / (forward + backward + bidir));
         }
 
 
