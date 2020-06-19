@@ -7,12 +7,12 @@ Passed the **96%** overall accuracy threshold for the **Brown Corpus**
 ## Installing & Using the library
 + In terminal, write:  **git clone https://github.com/ST4NSB/part-of-speech-tagging.git**
 + Go to your project 
-+ Add the Reference to your project -> [./src/bin/Debug/netstandard2.0/**Nlp-PosTagger.dll**]
++ Add the Reference to your project -> [.../part-of-speech-tagging/src/bin/Debug/netstandard2.0/**Nlp-PosTagger.dll**]
 + To import all POS tagging classes, add **using NLP;** to your application header
 
 ## Library Arhitecture
 <img src="./docs/images/arhitecture.png" width="600">
-More info about the system at ./docs/Documentatie_pos_tagging.docx (in Romanian)  
+More info about the system at .../part-of-speech-tagging/docs/Documentatie_pos_tagging.docx (in Romanian)  
 
 ## Demo Application
 To run the demo Open & Run: **Program.cs**  
