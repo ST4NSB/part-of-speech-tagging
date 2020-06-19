@@ -626,7 +626,7 @@ namespace PostAppConsole
                     int index = getIndexForConversion(decoder.PredictedTags[i]);
                     Console.ForegroundColor = frColor[index];
                     Console.BackgroundColor = bkColor[index];
-                    Console.Write(inputTest[i].word);
+                    Console.Write(" " + inputTest[i].word + " ");
                     emptySpace();
                 }
 
