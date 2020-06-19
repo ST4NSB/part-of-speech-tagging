@@ -11,7 +11,7 @@ Passed the **96%** overall accuracy threshold for the **Brown Corpus**
 + To import all POS tagging classes, add **using NLP;** to your application header
 
 ## Library Arhitecture
-<img src="./docs/images/arhitecture.png" width="600">
+<img src="./docs/images/arhitecture.png" width="550">
 More info about the project & the library at .../part-of-speech-tagging/docs/Documentatie_pos_tagging.docx (in Romanian)  
 
 ## Demo Application
