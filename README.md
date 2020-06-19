@@ -18,7 +18,7 @@ More info about the project & the library at .../part-of-speech-tagging/docs/Doc
 To run the demo Open & Run: **Program.cs**  
 
 Example of a tagged sentence:  
-![](./docs/images/pos_demo.png "Demo image")
+![](./docs/images/pos_model.png "Demo image")
 
 ## MIT License
 Copyright (c) 2019 Bărbulescu Adrian
