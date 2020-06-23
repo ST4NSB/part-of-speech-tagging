@@ -1,8 +1,12 @@
 He might tip the waitress. 		- verb example
 Give the radio back to Tip. 		- noun example
 This is a four-foot table. 		- adj example when four-foot is divided but still predicted as adj
-Forsen, a famous swedish streamer, plays a lot of games like Minecraft, Dota, Heartstone, Chess, Terarria, etc. 		-unk words like games
+Forsen, a famous swedish streamer, plays a lot of games like Minecraft, Dota, Heartstone, Chess, Terarria, etc. 		- unk words like games
+Talk to Will first and then call Michael immediately!		    - example where parts-of-speech.info doesnt tag Will correctly
 
+
+
+Get back to me after talking with Will.
 Guide me to the garden.
 The hunt has started.
 One, Two and three are all numbers.
