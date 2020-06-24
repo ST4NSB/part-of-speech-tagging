@@ -56,7 +56,11 @@ namespace NLP
             string word = "";
             foreach (char c in Text)
             {
-                if (!Char.IsWhiteSpace(c) && !Char.IsPunctuation(c))
+                if(c == '-' || c == '/')
+                {
+                    word += c;
+                }
+                else if (!Char.IsWhiteSpace(c) && !Char.IsPunctuation(c))
                 {
                     word += c;
                 }
