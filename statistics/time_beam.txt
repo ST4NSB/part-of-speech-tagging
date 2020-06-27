@@ -1,0 +1,7 @@
+70-30 trigram bidirectional:
+without beam: 
+Done with training POS MODEL & calculating probabilities! Time: 108371 ms
+Done with DECODING VITERBI MODEL! Time: 261589 ms
+with 2 beam: 
+Done with training POS MODEL & calculating probabilities! Time: 98337 ms
+Done with DECODING VITERBI MODEL! Time: 232934 ms

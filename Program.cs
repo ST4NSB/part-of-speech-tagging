@@ -191,7 +191,7 @@ namespace PostAppConsole
             Decoder decoder = new Decoder();
 
             sw.Reset(); sw.Start();
-            decoder.ViterbiDecoding(tagger, wordsTest, modelForward: "trigram", modelBackward: "trigram", mode: "f+b");
+            decoder.ViterbiDecoding(tagger, wordsTest, modelForward: "trigram", modelBackward: "trigram", mode: "f+b", beam: 2);
             sw.Stop();
             #endregion
 

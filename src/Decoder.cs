@@ -43,7 +43,7 @@ namespace NLP
         /// <param name="modelForward"></param>
         /// <param name="modelBackward"></param>
         /// <param name="mode"></param>
-        public void ViterbiDecoding(PartOfSpeechModel tagger, List<Tokenizer.WordTag> testWords, string modelForward = "bigram", string modelBackward = "bigram", string mode = "forward")
+        public void ViterbiDecoding(PartOfSpeechModel tagger, List<Tokenizer.WordTag> testWords, string modelForward = "bigram", string modelBackward = "bigram", string mode = "forward", int beam = 0)
         {
             this.UnknownWords = new HashSet<string>();
 
@@ -54,9 +54,9 @@ namespace NLP
             this.ViterbiGraph = new List<List<ViterbiNode>>();
 
             if (mode.Equals("forward") || mode.Equals("f+b"))
-                this.ForwardAlgorithm(tagger, testWords, modelForward);
+                this.ForwardAlgorithm(tagger, testWords, modelForward, beam);
             if (mode.Equals("backward") || mode.Equals("f+b"))
-                this.BackwardAlgorithm(tagger, testWords, modelBackward, mode);
+                this.BackwardAlgorithm(tagger, testWords, modelBackward, mode, beam);
 
             if (mode.Equals("f+b"))
                 this.BiDirectionalModelTrace();
@@ -70,7 +70,7 @@ namespace NLP
         /// <param name="tagger"></param>
         /// <param name="testWords"></param>
         /// <param name="model"></param>
-        private void ForwardAlgorithm(PartOfSpeechModel tagger, List<Tokenizer.WordTag> testWords, string model)
+        private void ForwardAlgorithm(PartOfSpeechModel tagger, List<Tokenizer.WordTag> testWords, string model, int beam)
         {
             // left to right encoding - forward approach
             bool startPoint = true;
@@ -269,6 +269,8 @@ namespace NLP
                     this.ViterbiGraph.Add(vList);
                 }
                 this.ViterbiGraph[this.ViterbiGraph.Count - 1] = this.ViterbiGraph[this.ViterbiGraph.Count - 1].OrderByDescending(x => x.value).ToList();
+                if(beam != 0)
+                    this.ViterbiGraph[this.ViterbiGraph.Count - 1] = this.ViterbiGraph[this.ViterbiGraph.Count - 1].Take(beam).ToList();
             }
         }
 
@@ -279,7 +281,7 @@ namespace NLP
         /// <param name="testWords"></param>
         /// <param name="model"></param>
         /// <param name="mode"></param>
-        private void BackwardAlgorithm(PartOfSpeechModel tagger, List<Tokenizer.WordTag> testWords, string model, string mode)
+        private void BackwardAlgorithm(PartOfSpeechModel tagger, List<Tokenizer.WordTag> testWords, string model, string mode, int beam)
         {
             // right to left encoding - backward approach
             bool startPoint = true;
@@ -483,6 +485,8 @@ namespace NLP
                     this.ViterbiGraph.Add(vList);
                 }
                 this.ViterbiGraph[this.ViterbiGraph.Count - 1] = this.ViterbiGraph[this.ViterbiGraph.Count - 1].OrderByDescending(x => x.value).ToList();
+                if (beam != 0)
+                    this.ViterbiGraph[this.ViterbiGraph.Count - 1] = this.ViterbiGraph[this.ViterbiGraph.Count - 1].Take(beam).ToList();
             }
 
             if (mode == "backward")
