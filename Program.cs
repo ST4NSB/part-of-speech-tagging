@@ -1,6 +1,6 @@
-﻿//#define RULE_70_30
+﻿#define RULE_70_30
 //#define CROSS_VALIDATION
-#define DEMO_APP
+//#define DEMO_APP
 
 using System;
 using System.Collections.Generic;
@@ -191,7 +191,7 @@ namespace PostAppConsole
             Decoder decoder = new Decoder();
 
             sw.Reset(); sw.Start();
-            decoder.ViterbiDecoding(tagger, wordsTest, modelForward: "trigram", modelBackward: "trigram", mode: "f+b", beam: 2);
+            decoder.ViterbiDecoding(tagger, wordsTest, modelForward: "trigram", modelBackward: "trigram", mode: "backward", beam: 0);
             sw.Stop();
             #endregion
 
