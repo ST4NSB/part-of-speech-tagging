@@ -4,6 +4,9 @@ A natural language processing library for automatic part-of-speech tagging
 Tags used in the tagging process are the following: Noun, Verb, Article/Determiner, Preposition, Adjective, Pronoun, Conjuction, Others.  
 Passed the **96%** overall accuracy threshold for the **Brown Corpus**  
 
+## Documentation
+https://content.sciendo.com/view/journals/ijasitels/10/1/article-p31.xml
+
 ## Installing & Using the library
 + In terminal, write:  **git clone https://github.com/ST4NSB/part-of-speech-tagging.git**
 + Go to your project 
